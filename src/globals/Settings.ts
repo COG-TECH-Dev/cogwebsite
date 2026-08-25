@@ -17,6 +17,13 @@ export const Settings: GlobalConfig = {
   },
   fields: [
     {
+      name: 'siteName',
+      type: 'text',
+      required: true,
+      defaultValue: 'City of God Christian Centre',
+      access: { update: isAdminOrUpField },
+    },
+    {
       name: 'serviceTimes',
       type: 'array',
       access: { update: isAdminOrUpField },

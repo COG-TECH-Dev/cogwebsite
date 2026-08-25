@@ -9,6 +9,11 @@ services:
       - .env
     environment:
       DATABASE_URI: postgresql://payload:payload@postgres:5432/cogwebsite
+      # File-change events from the Windows host don't always reach the
+      # container reliably over the Docker Desktop bind mount, so fall back
+      # to polling for file watching.
+      WATCHPACK_POLLING: 'true'
+      CHOKIDAR_USEPOLLING: 'true'
     depends_on:
       postgres:
         condition: service_healthy

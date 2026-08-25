@@ -1037,6 +1037,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface Setting {
   id: number;
+  siteName: string;
   serviceTimes?:
     | {
         label: string;
@@ -1077,6 +1078,7 @@ export interface Setting {
  * via the `definition` "settings_select".
  */
 export interface SettingsSelect<T extends boolean = true> {
+  siteName?: T;
   serviceTimes?:
     | T
     | {
