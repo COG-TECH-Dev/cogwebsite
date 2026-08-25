@@ -1,11 +1,27 @@
 services:
+  caddy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - '80:80'
+      - '443:443'
+    environment:
+      # Set to your real domain in .env once DNS points at this server —
+      # Caddy then requests and renews a Let's Encrypt cert automatically.
+      # Left as "localhost" it just serves plain HTTP for local testing.
+      SITE_DOMAIN: ${SITE_DOMAIN:-localhost}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+
   app:
     build:
       context: .
       dockerfile: Dockerfile
     restart: unless-stopped
-    ports:
-      - '3000:3000'
     env_file:
       - .env
     environment:
@@ -34,3 +50,5 @@ services:
 volumes:
   pgdata:
   media:
+  caddy_data:
+  caddy_config:

@@ -7,8 +7,9 @@ content changes — no code required.
 
 See [`.claude/plans`](./) — or ask the team — for the full project plan: tech
 stack rationale, data model, and build phases. This repo currently reflects
-**Phase 1**: project scaffold, Postgres wiring, and the role-based access
-control foundation.
+**Phase 5**: the full site, admin panel, motion/polish, spam-protected forms
+with email notifications, and a production-ready deployment path with real
+database migrations.
 
 ## Roles
 
@@ -19,8 +20,8 @@ Set per-user on the `role` field of the Users collection:
 | Super Admin | Everything, including managing other users' roles |
 | Admin / Pastor | Full content control; can manage Content Editor/Ministry Leader/Volunteer accounts; only role (besides Super Admin) that can read prayer requests and contact/appointment/membership submissions |
 | Content Editor | Full CRUD + publish on all public content (pages, ministries, events, sermons, media, resources) |
-| Ministry Leader | Edit only their own ministry's content (added in Phase 2) |
-| Volunteer | Draft-only content, pending review by a Content Editor or above |
+| Ministry Leader | Edit only their own ministry's content, and events/gallery items tied to it |
+| Volunteer | Draft-only content on Events/Media Gallery, pending review by a Content Editor or above |
 
 The admin panel only shows each user the collections and actions their role
 allows — see [`src/access/`](src/access) for the shared permission logic
@@ -42,11 +43,32 @@ For **local development**, use `docker compose -f docker-compose.dev.yml up`
 the database schema on first run) alongside a Postgres container. No local
 Node.js or Postgres install needed.
 
+Two things to know when developing this way:
+- New npm packages need a container restart to be installed (`npm install`
+  only runs once, at container start) — `docker compose -f docker-compose.dev.yml down && docker compose -f docker-compose.dev.yml up`.
+- Brand-new route/page files sometimes need the same restart to be picked up
+  by the dev server's route scan — edits to *existing* files hot-reload fine.
+
 `docker compose up` (no `-f` flag) builds and runs the **production** image
-instead — this is what self-hosted deployment uses, and expects the DB
-schema to already exist via versioned migrations rather than auto-creating
-it (see the comment in `src/payload.config.ts`). Not yet set up — coming in
-a later phase, before go-live.
+instead — see [Deployment](#deployment) below.
+
+## Database migrations
+
+Local dev (`docker-compose.dev.yml`) auto-syncs the database schema to match
+the code — convenient, but Payload deliberately disables that in production
+since an auto-diff could drop a column and lose real data. Production instead
+applies versioned migration files, automatically, on startup.
+
+Whenever you change a collection or global's fields:
+
+```bash
+npm run migrate:create
+```
+
+This generates a new file under `src/migrations/` (diffed against your local
+dev database) — commit it. The next production deploy applies it
+automatically when the app boots (no manual step, see the `prodMigrations`
+comment in `src/payload.config.ts`).
 
 ## Useful scripts
 
@@ -54,10 +76,38 @@ a later phase, before go-live.
 - `npm run build` / `npm start` — production build and serve
 - `npm run generate:types` — regenerate `src/payload-types.ts` after changing
   any collection/global
+- `npm run migrate:create` / `npm run migrate` — generate / apply database migrations
 - `npm run lint` — ESLint
 - `npm run test` — integration (Vitest) + e2e (Playwright) tests
 
 ## Deployment
 
-Self-hosted via Docker (see `Dockerfile` and `docker-compose.yml`). CI
-(`.github/workflows/ci.yml`) lints, typechecks, and builds on every PR.
+Self-hosted via Docker: `docker compose up -d` builds the app image and
+starts it behind a Caddy reverse proxy (automatic HTTPS) plus Postgres — see
+`Dockerfile`, `docker-compose.yml`, and `Caddyfile`.
+
+1. Point your domain's DNS at the server.
+2. Set `SITE_DOMAIN` in `.env` to that domain — Caddy then requests and
+   renews a Let's Encrypt certificate automatically.
+3. Set `SMTP_*` in `.env` for real outgoing email (password resets, and
+   notifications when a prayer request or enquiry is submitted), and
+   `NOTIFY_EMAIL` for where those notifications go. Without these, the site
+   still works — emails just get logged instead of sent.
+4. `docker compose up -d --build`
+
+**Backups**: `scripts/backup.sh` runs `pg_dump` against the running stack and
+rotates old backups — schedule it with cron (see the comment at the top of
+the script), and copy the output somewhere off this server, not just to local
+disk.
+
+CI (`.github/workflows/ci.yml`) lints, typechecks, applies migrations to a
+fresh database, and builds on every PR.
+
+### Give / donations
+
+The `/give` page pulls from a `Pages` document (slug `give`) via the same
+block-based layout builder used for About — add an Embed block with a link to
+whichever giving platform the church chooses (e.g. Tithe.ly, which supports
+UK Gift Aid; GoCardless; or Stripe Payment Links). This is a business
+decision for the church to make, not something built into the code — the
+site never handles card details or moves money itself.

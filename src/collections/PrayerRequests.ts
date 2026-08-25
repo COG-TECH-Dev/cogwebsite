@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { pastoralReadOnly, publicCreateOnly } from '../access'
+import { notifyOnSubmission } from '../hooks/notifyOnSubmission'
 
 export const PrayerRequests: CollectionConfig = {
   slug: 'prayer-requests',
@@ -8,6 +9,14 @@ export const PrayerRequests: CollectionConfig = {
     group: 'People & Enquiries',
     useAsTitle: 'name',
     defaultColumns: ['name', 'status', 'createdAt'],
+  },
+  hooks: {
+    afterChange: [
+      notifyOnSubmission(
+        'New Prayer Request',
+        (doc) => `${doc.name} submitted a prayer request:\n\n${doc.request}`,
+      ),
+    ],
   },
   access: {
     // Anyone can submit a prayer request; only Admin/Pastor and above can

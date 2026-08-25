@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { pastoralReadOnly, publicCreateOnly } from '../access'
+import { notifyOnSubmission } from '../hooks/notifyOnSubmission'
 
 export const FormSubmissions: CollectionConfig = {
   slug: 'form-submissions',
@@ -8,6 +9,14 @@ export const FormSubmissions: CollectionConfig = {
     group: 'People & Enquiries',
     useAsTitle: 'name',
     defaultColumns: ['name', 'formType', 'createdAt'],
+  },
+  hooks: {
+    afterChange: [
+      notifyOnSubmission(
+        'New Website Enquiry',
+        (doc) => `${doc.name} (${doc.email}) submitted a ${doc.formType} form:\n\n${doc.message || '(no message)'}`,
+      ),
+    ],
   },
   access: {
     // Covers Contact, Appointment, and Membership enquiries under one

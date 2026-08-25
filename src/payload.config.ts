@@ -1,4 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
+import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import path from 'path'
 import { buildConfig } from 'payload'
@@ -18,6 +19,7 @@ import { BookstoreItems } from './collections/BookstoreItems'
 import { PrayerRequests } from './collections/PrayerRequests'
 import { FormSubmissions } from './collections/FormSubmissions'
 import { Settings } from './globals/Settings'
+import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -49,6 +51,23 @@ export default buildConfig({
   globals: [Settings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
+  // Without SMTP_HOST set, Payload falls back to logging emails to the
+  // console (already the case today) — nothing breaks, notifications just
+  // won't actually send until SMTP is configured for this environment.
+  email: process.env.SMTP_HOST
+    ? nodemailerAdapter({
+        defaultFromAddress: process.env.SMTP_FROM_EMAIL || 'no-reply@cityofgodchristiancentre.org',
+        defaultFromName: process.env.SMTP_FROM_NAME || 'City of God Christian Centre',
+        transportOptions: {
+          host: process.env.SMTP_HOST,
+          port: Number(process.env.SMTP_PORT) || 587,
+          auth: {
+            user: process.env.SMTP_USER,
+            pass: process.env.SMTP_PASS,
+          },
+        },
+      })
+    : undefined,
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
   },
@@ -56,13 +75,15 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URI || '',
     },
-    // Payload only auto-syncs the DB schema to match the collections/globals
-    // below when NODE_ENV !== 'production' (hard-coded in Payload itself,
-    // `push: true` here can't override that) — see docker-compose.dev.yml
-    // for local development. Before go-live, replace this with versioned
-    // migrations (`payload migrate`) via `prodMigrations`, once the schema
-    // is stable and there's real data that must never be dropped by an
-    // auto-diff.
+    // Payload only auto-syncs the schema (push) when NODE_ENV !== 'production'
+    // — see docker-compose.dev.yml, used for local development. In production
+    // (docker-compose.yml), Payload instead runs these versioned migrations
+    // automatically on startup (connect() checks NODE_ENV === 'production' &&
+    // prodMigrations, see @payloadcms/db-postgres/dist/connect.js) — safe for
+    // a database that already has real content, unlike a schema auto-diff.
+    // Run `npm run migrate:create` after changing any collection/global to
+    // generate a new migration, and commit the result.
+    prodMigrations: migrations,
   }),
   sharp,
 })

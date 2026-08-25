@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 
 import type { FormState } from '@/app/(frontend)/connect/actions'
+import { Honeypot } from './Honeypot'
 
 const initialState: FormState = { status: 'idle' }
 
@@ -23,6 +24,7 @@ export function EnquiryForm({
 
   return (
     <form action={formAction} className="space-y-5">
+      <Honeypot />
       <div>
         <label htmlFor="name" className="mb-1 block text-sm font-medium text-ink">
           Name
