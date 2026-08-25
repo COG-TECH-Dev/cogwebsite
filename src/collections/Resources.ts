@@ -1,6 +1,9 @@
 import type { CollectionConfig } from 'payload'
 
 import { isContentEditorOrUp } from '../access'
+import { revalidateCollection, revalidateCollectionOnDelete } from '../hooks/revalidate'
+
+const paths = (doc: Record<string, unknown>) => ['/resources', `/resources/${doc.slug}`]
 
 export const Resources: CollectionConfig = {
   slug: 'resources',
@@ -8,6 +11,10 @@ export const Resources: CollectionConfig = {
     group: 'Content',
     useAsTitle: 'title',
     defaultColumns: ['title', 'type'],
+  },
+  hooks: {
+    afterChange: [revalidateCollection(paths)],
+    afterDelete: [revalidateCollectionOnDelete(paths)],
   },
   access: {
     read: () => true,

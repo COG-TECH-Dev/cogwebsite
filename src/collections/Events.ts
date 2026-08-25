@@ -2,6 +2,9 @@ import type { CollectionConfig } from 'payload'
 
 import { isMinistryLeaderOfDoc } from '../access'
 import { restrictPublishToContentEditor } from '../hooks/restrictPublishToContentEditor'
+import { revalidateCollection, revalidateCollectionOnDelete } from '../hooks/revalidate'
+
+const paths = (doc: Record<string, unknown>) => ['/', '/programmes', `/programmes/${doc.slug}`]
 
 export const Events: CollectionConfig = {
   slug: 'events',
@@ -13,6 +16,8 @@ export const Events: CollectionConfig = {
   versions: { drafts: true },
   hooks: {
     beforeChange: [restrictPublishToContentEditor],
+    afterChange: [revalidateCollection(paths)],
+    afterDelete: [revalidateCollectionOnDelete(paths)],
   },
   access: {
     read: () => true,

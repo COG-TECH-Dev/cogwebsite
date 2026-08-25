@@ -1,5 +1,6 @@
 'use client'
 
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -60,44 +61,61 @@ export function Nav({ churchName }: { churchName: string }) {
         >
           <span className="sr-only">Menu</span>
           <div className="flex flex-col gap-1.5">
-            <span className="h-0.5 w-5 bg-ink" />
-            <span className="h-0.5 w-5 bg-ink" />
-            <span className="h-0.5 w-5 bg-ink" />
+            <motion.span
+              animate={{ rotate: mobileOpen ? 45 : 0, y: mobileOpen ? 6 : 0 }}
+              className="h-0.5 w-5 origin-center bg-ink"
+            />
+            <motion.span
+              animate={{ opacity: mobileOpen ? 0 : 1 }}
+              className="h-0.5 w-5 bg-ink"
+            />
+            <motion.span
+              animate={{ rotate: mobileOpen ? -45 : 0, y: mobileOpen ? -6 : 0 }}
+              className="h-0.5 w-5 origin-center bg-ink"
+            />
           </div>
         </button>
       </Container>
 
-      {mobileOpen && (
-        <div className="border-t border-border bg-paper lg:hidden">
-          <Container className="flex flex-col gap-1 py-4">
-            {navLinks.map((link) => (
-              <div key={link.href}>
-                <Link
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className="block rounded-lg px-3 py-2 font-medium text-ink hover:bg-brand-50"
-                >
-                  {link.label}
-                </Link>
-                {link.children && (
-                  <div className="ml-3 flex flex-col border-l border-border pl-3">
-                    {link.children.map((child) => (
-                      <Link
-                        key={child.href}
-                        href={child.href}
-                        onClick={() => setMobileOpen(false)}
-                        className="rounded-lg px-3 py-1.5 text-sm text-ink-muted hover:bg-brand-50"
-                      >
-                        {child.label}
-                      </Link>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </Container>
-        </div>
-      )}
+      <AnimatePresence>
+        {mobileOpen && (
+          <motion.div
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
+            className="overflow-hidden border-t border-border bg-paper lg:hidden"
+          >
+            <Container className="flex flex-col gap-1 py-4">
+              {navLinks.map((link) => (
+                <div key={link.href}>
+                  <Link
+                    href={link.href}
+                    onClick={() => setMobileOpen(false)}
+                    className="block rounded-lg px-3 py-2 font-medium text-ink hover:bg-brand-50"
+                  >
+                    {link.label}
+                  </Link>
+                  {link.children && (
+                    <div className="ml-3 flex flex-col border-l border-border pl-3">
+                      {link.children.map((child) => (
+                        <Link
+                          key={child.href}
+                          href={child.href}
+                          onClick={() => setMobileOpen(false)}
+                          className="rounded-lg px-3 py-1.5 text-sm text-ink-muted hover:bg-brand-50"
+                        >
+                          {child.label}
+                        </Link>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </Container>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   )
 }

@@ -2,6 +2,9 @@ import type { CollectionConfig } from 'payload'
 
 import { isMinistryLeaderOfDoc } from '../access'
 import { restrictPublishToContentEditor } from '../hooks/restrictPublishToContentEditor'
+import { revalidateCollection, revalidateCollectionOnDelete } from '../hooks/revalidate'
+
+const paths = (doc: Record<string, unknown>) => ['/media', `/media/${doc.category}`]
 
 export const MediaGalleryItems: CollectionConfig = {
   slug: 'media-gallery-items',
@@ -14,6 +17,8 @@ export const MediaGalleryItems: CollectionConfig = {
   versions: { drafts: true },
   hooks: {
     beforeChange: [restrictPublishToContentEditor],
+    afterChange: [revalidateCollection(paths)],
+    afterDelete: [revalidateCollectionOnDelete(paths)],
   },
   access: {
     read: () => true,

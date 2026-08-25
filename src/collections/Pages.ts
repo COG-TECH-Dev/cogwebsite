@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isContentEditorOrUp } from '../access'
+import { revalidateCollection, revalidateCollectionOnDelete } from '../hooks/revalidate'
 import {
   CallToAction,
   Embed,
@@ -13,6 +14,12 @@ import {
   TestimonialsBlock,
 } from '../blocks'
 
+// Covers /about, /give (top-level slugs), /about/[slug] (subpages), and the
+// /[...slug] catch-all — revalidating a path that was never generated is a
+// harmless no-op, so it's simpler to cover every shape than to know which
+// route rendered this particular page.
+const paths = (doc: Record<string, unknown>) => [`/${doc.slug}`, `/about/${doc.slug}`]
+
 export const Pages: CollectionConfig = {
   slug: 'pages',
   admin: {
@@ -21,6 +28,10 @@ export const Pages: CollectionConfig = {
     defaultColumns: ['title', 'slug', 'parent'],
   },
   versions: { drafts: true },
+  hooks: {
+    afterChange: [revalidateCollection(paths)],
+    afterDelete: [revalidateCollectionOnDelete(paths)],
+  },
   access: {
     read: () => true,
     create: isContentEditorOrUp,

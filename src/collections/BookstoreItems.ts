@@ -1,6 +1,9 @@
 import type { CollectionConfig } from 'payload'
 
 import { isContentEditorOrUp } from '../access'
+import { revalidateCollection, revalidateCollectionOnDelete } from '../hooks/revalidate'
+
+const paths = () => ['/give/bookstore']
 
 export const BookstoreItems: CollectionConfig = {
   slug: 'bookstore-items',
@@ -9,6 +12,10 @@ export const BookstoreItems: CollectionConfig = {
     group: 'Content',
     useAsTitle: 'title',
     defaultColumns: ['title', 'author'],
+  },
+  hooks: {
+    afterChange: [revalidateCollection(paths)],
+    afterDelete: [revalidateCollectionOnDelete(paths)],
   },
   access: {
     read: () => true,

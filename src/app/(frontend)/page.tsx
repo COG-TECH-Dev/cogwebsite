@@ -2,8 +2,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
+import { HeroContent } from '@/components/site/HeroContent'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
+import { Reveal } from '@/components/ui/Reveal'
+import { StaggerGroup, StaggerItem } from '@/components/ui/Stagger'
 
 export const revalidate = 60
 
@@ -50,24 +53,26 @@ export default async function HomePage() {
           />
         )}
         <Container className="relative py-28 text-center sm:py-36">
-          <p className="font-serif text-sm uppercase tracking-[0.3em] text-gold-300">
-            Welcome Home
-          </p>
-          <h1 className="mx-auto mt-6 max-w-3xl font-serif text-5xl font-semibold leading-tight sm:text-6xl">
-            {hero?.headline || 'A Place to Belong, Believe, and Become'}
-          </h1>
-          <p className="mx-auto mt-6 max-w-xl text-lg text-white/80">
-            {hero?.tagline ||
-              'Join City of God Christian Centre for worship, community, and growth in Newcastle upon Tyne.'}
-          </p>
-          <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-            <Button href="/connect" variant="primary">
-              Plan Your Visit
-            </Button>
-            <Button href="/media/sermons" variant="outline">
-              Watch Latest Sermon
-            </Button>
-          </div>
+          <HeroContent>
+            <p className="font-serif text-sm uppercase tracking-[0.3em] text-gold-300">
+              Welcome Home
+            </p>
+            <h1 className="mx-auto mt-6 max-w-3xl font-serif text-5xl font-semibold leading-tight sm:text-6xl">
+              {hero?.headline || 'A Place to Belong, Believe, and Become'}
+            </h1>
+            <p className="mx-auto mt-6 max-w-xl text-lg text-white/80">
+              {hero?.tagline ||
+                'Join City of God Christian Centre for worship, community, and growth in Newcastle upon Tyne.'}
+            </p>
+            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+              <Button href="/connect" variant="primary">
+                Plan Your Visit
+              </Button>
+              <Button href="/media/sermons" variant="outline">
+                Watch Latest Sermon
+              </Button>
+            </div>
+          </HeroContent>
         </Container>
       </section>
 
@@ -88,7 +93,7 @@ export default async function HomePage() {
       {/* Highlighted ministries */}
       <section className="py-24">
         <Container>
-          <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
+          <Reveal className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
             <div>
               <p className="text-sm font-semibold uppercase tracking-wide text-gold-600">
                 Get Involved
@@ -100,35 +105,36 @@ export default async function HomePage() {
             <Link href="/ministries" className="text-sm font-semibold text-brand-600 hover:underline">
               View all ministries →
             </Link>
-          </div>
+          </Reveal>
 
           {ministries.docs.length > 0 ? (
-            <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {ministries.docs.map((ministry) => {
                 const img = mediaUrl(ministry.image)
                 return (
-                  <Link
-                    key={ministry.id}
-                    href={`/ministries/${ministry.slug}`}
-                    className="group overflow-hidden rounded-2xl border border-border bg-surface transition-shadow hover:shadow-lg"
-                  >
-                    <div className="relative aspect-4/3 bg-brand-50">
-                      {img && (
-                        <Image src={img} alt={ministry.name} fill className="object-cover" />
-                      )}
-                    </div>
-                    <div className="p-5">
-                      <p className="font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
-                        {ministry.name}
-                      </p>
-                      {ministry.summary && (
-                        <p className="mt-1 line-clamp-2 text-sm text-ink-muted">{ministry.summary}</p>
-                      )}
-                    </div>
-                  </Link>
+                  <StaggerItem key={ministry.id}>
+                    <Link
+                      href={`/ministries/${ministry.slug}`}
+                      className="group block overflow-hidden rounded-2xl border border-border bg-surface transition-all hover:-translate-y-1 hover:shadow-lg"
+                    >
+                      <div className="relative aspect-4/3 bg-brand-50">
+                        {img && (
+                          <Image src={img} alt={ministry.name} fill className="object-cover" />
+                        )}
+                      </div>
+                      <div className="p-5">
+                        <p className="font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
+                          {ministry.name}
+                        </p>
+                        {ministry.summary && (
+                          <p className="mt-1 line-clamp-2 text-sm text-ink-muted">{ministry.summary}</p>
+                        )}
+                      </div>
+                    </Link>
+                  </StaggerItem>
                 )
               })}
-            </div>
+            </StaggerGroup>
           ) : (
             <p className="mt-10 text-ink-muted">Ministries will appear here once added in the admin panel.</p>
           )}
@@ -138,7 +144,7 @@ export default async function HomePage() {
       {/* Upcoming events + latest sermon */}
       <section className="bg-brand-50 py-24">
         <Container className="grid gap-16 lg:grid-cols-2">
-          <div>
+          <Reveal>
             <p className="text-sm font-semibold uppercase tracking-wide text-gold-600">What&apos;s On</p>
             <h2 className="mt-2 font-serif text-3xl font-semibold text-brand-700">Upcoming Events</h2>
 
@@ -148,7 +154,7 @@ export default async function HomePage() {
                   <li key={event.id}>
                     <Link
                       href={`/programmes/${event.slug}`}
-                      className="flex items-center justify-between gap-4 rounded-xl border border-border bg-surface p-5 transition-shadow hover:shadow-md"
+                      className="flex items-center justify-between gap-4 rounded-xl border border-border bg-surface p-5 transition-all hover:-translate-y-0.5 hover:shadow-md"
                     >
                       <div>
                         <p className="font-semibold text-brand-700">{event.title}</p>
@@ -171,16 +177,16 @@ export default async function HomePage() {
             <Link href="/programmes" className="mt-6 inline-block text-sm font-semibold text-brand-600 hover:underline">
               See all programmes →
             </Link>
-          </div>
+          </Reveal>
 
-          <div>
+          <Reveal delay={0.15}>
             <p className="text-sm font-semibold uppercase tracking-wide text-gold-600">Listen In</p>
             <h2 className="mt-2 font-serif text-3xl font-semibold text-brand-700">Latest Sermon</h2>
 
             {latestSermon ? (
               <Link
                 href={`/media/sermons/${latestSermon.slug}`}
-                className="mt-8 block overflow-hidden rounded-2xl border border-border bg-surface transition-shadow hover:shadow-lg"
+                className="mt-8 block overflow-hidden rounded-2xl border border-border bg-surface transition-all hover:-translate-y-1 hover:shadow-lg"
               >
                 <div className="relative aspect-video bg-brand-100">
                   {mediaUrl(latestSermon.thumbnail) && (
@@ -204,7 +210,7 @@ export default async function HomePage() {
             ) : (
               <p className="mt-8 text-ink-muted">Sermons will appear here once added in the admin panel.</p>
             )}
-          </div>
+          </Reveal>
         </Container>
       </section>
 
@@ -212,20 +218,21 @@ export default async function HomePage() {
       {testimonials.docs.length > 0 && (
         <section className="py-24">
           <Container>
-            <h2 className="text-center font-serif text-3xl font-semibold text-brand-700">
-              Stories from Our Family
-            </h2>
-            <div className="mt-10 grid gap-6 md:grid-cols-3">
+            <Reveal>
+              <h2 className="text-center font-serif text-3xl font-semibold text-brand-700">
+                Stories from Our Family
+              </h2>
+            </Reveal>
+            <StaggerGroup className="mt-10 grid gap-6 md:grid-cols-3">
               {testimonials.docs.map((testimonial) => (
-                <blockquote
-                  key={testimonial.id}
-                  className="rounded-2xl border border-border bg-surface p-6"
-                >
-                  <p className="text-ink-muted">&ldquo;{testimonial.quote}&rdquo;</p>
-                  <footer className="mt-4 font-semibold text-brand-700">{testimonial.name}</footer>
-                </blockquote>
+                <StaggerItem key={testimonial.id}>
+                  <blockquote className="h-full rounded-2xl border border-border bg-surface p-6">
+                    <p className="text-ink-muted">&ldquo;{testimonial.quote}&rdquo;</p>
+                    <footer className="mt-4 font-semibold text-brand-700">{testimonial.name}</footer>
+                  </blockquote>
+                </StaggerItem>
               ))}
-            </div>
+            </StaggerGroup>
           </Container>
         </section>
       )}
@@ -233,15 +240,17 @@ export default async function HomePage() {
       {/* Final CTA */}
       <section className="bg-brand-700 py-20 text-center text-white">
         <Container>
-          <h2 className="font-serif text-3xl font-semibold sm:text-4xl">Join Us This Sunday</h2>
-          <p className="mx-auto mt-4 max-w-lg text-white/80">
-            We&apos;d love to welcome you. Come as you are.
-          </p>
-          <div className="mt-8">
-            <Button href="/connect" variant="primary">
-              Plan Your Visit
-            </Button>
-          </div>
+          <Reveal>
+            <h2 className="font-serif text-3xl font-semibold sm:text-4xl">Join Us This Sunday</h2>
+            <p className="mx-auto mt-4 max-w-lg text-white/80">
+              We&apos;d love to welcome you. Come as you are.
+            </p>
+            <div className="mt-8">
+              <Button href="/connect" variant="primary">
+                Plan Your Visit
+              </Button>
+            </div>
+          </Reveal>
         </Container>
       </section>
     </div>

@@ -1,11 +1,18 @@
 import type { GlobalConfig } from 'payload'
 
 import { isAdminOrUpField, isContentEditorOrUp } from '../access'
+import { revalidateGlobal } from '../hooks/revalidate'
 
 export const Settings: GlobalConfig = {
   slug: 'settings',
   admin: {
     group: 'Settings',
+  },
+  hooks: {
+    // The root layout (Nav/Footer) has no `revalidate` export of its own,
+    // so without this, Settings changes would never appear until the next
+    // full deploy. `'layout'` busts everything under the root layout.
+    afterChange: [revalidateGlobal(['/'])],
   },
   access: {
     read: () => true,
