@@ -17,13 +17,13 @@ import { isContentEditorOrUp } from './isContentEditorOrUp'
 export const isMinistryLeaderOfDoc = (relationField: string): Access => {
   return (args) => {
     const { req } = args
-    const user = req.user as (typeof req.user & { ministries?: Array<string | { id: string }> }) | null
+    const user = req.user
 
     if (!user) return false
     if (isContentEditorOrUp(args)) return true
     if (user.role !== 'ministry-leader') return false
 
-    const ministryIds = (user.ministries ?? []).map((m) => (typeof m === 'string' ? m : m.id))
+    const ministryIds = (user.ministries ?? []).map((m) => (typeof m === 'number' ? m : m.id))
 
     if (ministryIds.length === 0) return false
 

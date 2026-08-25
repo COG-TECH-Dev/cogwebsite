@@ -7,6 +7,17 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { Pages } from './collections/Pages'
+import { Ministries } from './collections/Ministries'
+import { Events } from './collections/Events'
+import { Sermons } from './collections/Sermons'
+import { MediaGalleryItems } from './collections/MediaGalleryItems'
+import { Resources } from './collections/Resources'
+import { Testimonials } from './collections/Testimonials'
+import { BookstoreItems } from './collections/BookstoreItems'
+import { PrayerRequests } from './collections/PrayerRequests'
+import { FormSubmissions } from './collections/FormSubmissions'
+import { Settings } from './globals/Settings'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -21,7 +32,21 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Users, Media],
+  collections: [
+    Users,
+    Media,
+    Pages,
+    Ministries,
+    Events,
+    Sermons,
+    MediaGalleryItems,
+    Resources,
+    Testimonials,
+    BookstoreItems,
+    PrayerRequests,
+    FormSubmissions,
+  ],
+  globals: [Settings],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

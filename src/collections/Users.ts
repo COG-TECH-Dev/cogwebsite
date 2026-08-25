@@ -41,8 +41,20 @@ export const Users: CollectionConfig = {
       },
     },
     // Email + password fields are added automatically by `auth: true`.
-    // A `ministries` relationship (for scoping Ministry Leader access) is
-    // added in Phase 2 once the Ministries collection exists.
+    {
+      name: 'ministries',
+      type: 'relationship',
+      relationTo: 'ministries',
+      hasMany: true,
+      access: {
+        // Only Admin+ decides which ministries a Ministry Leader manages.
+        update: isAdminOrUpField,
+      },
+      admin: {
+        description: 'For Ministry Leaders: which ministry/ministries this person manages.',
+        condition: (data) => data.role === 'ministry-leader',
+      },
+    },
   ],
   versions: false,
 }
