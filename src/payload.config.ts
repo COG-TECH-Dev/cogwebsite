@@ -1,6 +1,7 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -86,4 +87,13 @@ export default buildConfig({
     prodMigrations: migrations,
   }),
   sharp,
+  plugins: [
+    // Falls back to local disk automatically when BLOB_READ_WRITE_TOKEN
+    // isn't set (e.g. local dev via docker-compose.dev.yml) — required for
+    // Vercel deployment, since serverless functions have no persistent disk.
+    vercelBlobStorage({
+      collections: { media: true },
+      token: process.env.BLOB_READ_WRITE_TOKEN,
+    }),
+  ],
 })

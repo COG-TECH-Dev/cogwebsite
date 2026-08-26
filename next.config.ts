@@ -18,6 +18,14 @@ const nextConfig: NextConfig = {
         pathname: '/images/**',
       },
     ],
+    // Only relevant once BLOB_READ_WRITE_TOKEN is set (Vercel deployment) —
+    // Media uploads then live at this domain instead of local disk.
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '*.public.blob.vercel-storage.com',
+      },
+    ],
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {

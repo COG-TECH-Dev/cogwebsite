@@ -82,9 +82,36 @@ comment in `src/payload.config.ts`).
 
 ## Deployment
 
-Self-hosted via Docker: `docker compose up -d` builds the app image and
-starts it behind a Caddy reverse proxy (automatic HTTPS) plus Postgres — see
-`Dockerfile`, `docker-compose.yml`, and `Caddyfile`.
+Two supported paths — same codebase either way, only environment variables
+and where media files live change.
+
+### Option A: Vercel (managed, least ops)
+
+1. Import this GitHub repo into Vercel.
+2. In the Vercel dashboard, add a Postgres database to the project (Storage
+   tab → Postgres, powered by Neon) — this sets a connection string
+   automatically; copy its value into this project's `DATABASE_URI`
+   environment variable (Vercel's own var name for it varies, so set
+   `DATABASE_URI` explicitly to match, since that's the name our code reads).
+3. Enable Vercel Blob storage for the project (Storage tab → Blob) — this
+   automatically injects `BLOB_READ_WRITE_TOKEN`, which switches media
+   uploads from local disk (which doesn't exist on Vercel) to Blob storage.
+   Nothing else to configure.
+4. Add a fresh `PAYLOAD_SECRET` and `NEXT_PUBLIC_SERVER_URL` (your Vercel
+   domain) as environment variables. `SMTP_*`/`NOTIFY_EMAIL` are optional,
+   same as below.
+5. Deploy. Database migrations run automatically on first boot — no manual
+   step (see `prodMigrations` in `src/payload.config.ts`).
+
+The `Dockerfile`/`docker-compose.yml`/`Caddyfile`/`scripts/backup.sh` below
+simply go unused on this path.
+
+### Option B: Self-hosted via Docker
+
+`docker compose up -d` builds the app image and starts it behind a Caddy
+reverse proxy (automatic HTTPS) plus Postgres — see `Dockerfile`,
+`docker-compose.yml`, and `Caddyfile`. Media uploads are stored on local disk
+in this setup (a Docker volume), not Vercel Blob.
 
 1. Point your domain's DNS at the server.
 2. Set `SITE_DOMAIN` in `.env` to that domain — Caddy then requests and
@@ -98,10 +125,11 @@ starts it behind a Caddy reverse proxy (automatic HTTPS) plus Postgres — see
 **Backups**: `scripts/backup.sh` runs `pg_dump` against the running stack and
 rotates old backups — schedule it with cron (see the comment at the top of
 the script), and copy the output somewhere off this server, not just to local
-disk.
+disk. (Not needed on Vercel — your managed Postgres provider handles this.)
 
 CI (`.github/workflows/ci.yml`) lints, typechecks, applies migrations to a
-fresh database, and builds on every PR.
+fresh database, and builds on every PR, regardless of which deployment
+option you use.
 
 ### Give / donations
 
