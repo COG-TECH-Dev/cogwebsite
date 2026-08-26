@@ -4,6 +4,7 @@ import { isContentEditorOrUp } from '../access'
 import { revalidateCollection, revalidateCollectionOnDelete } from '../hooks/revalidate'
 import {
   CallToAction,
+  CardGrid,
   Embed,
   FAQAccordion,
   Hero,
@@ -52,7 +53,18 @@ export const Pages: CollectionConfig = {
     {
       name: 'layout',
       type: 'blocks',
-      blocks: [Hero, RichTextBlock, ImageGrid, Stats, TeamGrid, CallToAction, FAQAccordion, TestimonialsBlock, Embed],
+      blocks: [
+        Hero,
+        RichTextBlock,
+        CardGrid,
+        ImageGrid,
+        Stats,
+        TeamGrid,
+        CallToAction,
+        FAQAccordion,
+        TestimonialsBlock,
+        Embed,
+      ],
     },
     {
       name: 'seo',

@@ -286,6 +286,21 @@ export interface Page {
           }
         | {
             heading?: string | null;
+            eyebrow?: string | null;
+            columns?: ('2' | '3' | '4') | null;
+            items?:
+              | {
+                  title: string;
+                  body: string;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'cardGrid';
+          }
+        | {
+            heading?: string | null;
             images?:
               | {
                   image: number | Media;
@@ -745,6 +760,22 @@ export interface PagesSelect<T extends boolean = true> {
           | T
           | {
               content?: T;
+              id?: T;
+              blockName?: T;
+            };
+        cardGrid?:
+          | T
+          | {
+              heading?: T;
+              eyebrow?: T;
+              columns?: T;
+              items?:
+                | T
+                | {
+                    title?: T;
+                    body?: T;
+                    id?: T;
+                  };
               id?: T;
               blockName?: T;
             };

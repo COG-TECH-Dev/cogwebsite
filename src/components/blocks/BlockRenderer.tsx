@@ -68,6 +68,40 @@ function Block({ block }: { block: LayoutBlock }) {
         </Container>
       )
 
+    case 'cardGrid': {
+      const colsClass =
+        block.columns === '4'
+          ? 'sm:grid-cols-2 lg:grid-cols-4'
+          : block.columns === '3'
+            ? 'sm:grid-cols-2 lg:grid-cols-3'
+            : 'sm:grid-cols-2'
+      return (
+        <Container className="py-16">
+          {(block.eyebrow || block.heading) && (
+            <div className="mb-10 text-center">
+              {block.eyebrow && (
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-600">{block.eyebrow}</p>
+              )}
+              {block.heading && (
+                <h2 className="mt-2 font-serif text-3xl font-semibold text-brand-700">{block.heading}</h2>
+              )}
+            </div>
+          )}
+          <div className={`grid gap-6 ${colsClass}`}>
+            {block.items?.map((item, i) => (
+              <div
+                key={i}
+                className="rounded-xl border-t-4 border-gold-500 bg-surface p-6 shadow-sm transition-shadow hover:shadow-md"
+              >
+                <p className="font-serif text-lg font-semibold text-brand-700">{item.title}</p>
+                <p className="mt-2 text-sm leading-relaxed text-ink-muted">{item.body}</p>
+              </div>
+            ))}
+          </div>
+        </Container>
+      )
+    }
+
     case 'stats':
       return (
         <Container className="py-16">

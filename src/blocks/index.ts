@@ -1,5 +1,6 @@
 export { Hero } from './Hero'
 export { RichTextBlock } from './RichTextBlock'
+export { CardGrid } from './CardGrid'
 export { ImageGrid } from './ImageGrid'
 export { Stats } from './Stats'
 export { TeamGrid } from './TeamGrid'

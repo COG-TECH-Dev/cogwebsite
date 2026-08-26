@@ -70,14 +70,11 @@ export default async function HomePage() {
               Welcome Home
             </p>
             <h1 className="mx-auto mt-6 max-w-3xl font-serif text-5xl font-semibold leading-tight sm:text-6xl">
-              {hero?.headline || 'A Place to Belong, Believe, and Become'}
+              {hero?.headline || 'A Place where God lives and Miracles happen Naturally.'}
             </h1>
             <p className="mx-auto mt-6 max-w-xl text-lg text-white/80">
               {hero?.tagline ||
                 'Join City of God Christian Centre for worship, community, and growth in Newcastle upon Tyne.'}
-            </p>
-            <p className="mx-auto mt-3 max-w-xl font-serif text-lg italic text-gold-300">
-              {hero?.declarationLine || 'A Place where God lives and Miracles happen Naturally.'}
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <Button href="/connect" variant="primary">
