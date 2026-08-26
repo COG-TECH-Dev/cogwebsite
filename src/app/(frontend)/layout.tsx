@@ -4,6 +4,7 @@ import React from 'react'
 import { getPayloadClient } from '@/lib/payload'
 import { Footer } from '@/components/site/Footer'
 import { Nav } from '@/components/site/Nav'
+import { WhatsAppButton } from '@/components/site/WhatsAppButton'
 import './styles.css'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' })
@@ -25,6 +26,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <Nav churchName={churchName} />
         <main className="flex-1">{children}</main>
         <Footer settings={settings} churchName={churchName} />
+        <WhatsAppButton />
       </body>
     </html>
   )

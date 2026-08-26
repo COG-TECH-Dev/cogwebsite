@@ -58,6 +58,8 @@ export const Settings: GlobalConfig = {
         { name: 'facebook', type: 'text' },
         { name: 'instagram', type: 'text' },
         { name: 'youtube', type: 'text' },
+        { name: 'tiktok', type: 'text' },
+        { name: 'radioUrl', type: 'text', admin: { description: 'COG Grand Radio (external site)' } },
       ],
     },
     {

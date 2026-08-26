@@ -1056,6 +1056,11 @@ export interface Setting {
     facebook?: string | null;
     instagram?: string | null;
     youtube?: string | null;
+    tiktok?: string | null;
+    /**
+     * COG Grand Radio (external site)
+     */
+    radioUrl?: string | null;
   };
   nav?:
     | {
@@ -1101,6 +1106,8 @@ export interface SettingsSelect<T extends boolean = true> {
         facebook?: T;
         instagram?: T;
         youtube?: T;
+        tiktok?: T;
+        radioUrl?: T;
       };
   nav?:
     | T

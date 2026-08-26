@@ -59,8 +59,8 @@ export function Footer({ settings, churchName }: { settings: Setting | null; chu
               </li>
             ))}
           </ul>
-          {(social?.facebook || social?.instagram || social?.youtube) && (
-            <div className="mt-6 flex gap-4 text-sm">
+          {(social?.facebook || social?.instagram || social?.youtube || social?.tiktok || social?.radioUrl) && (
+            <div className="mt-6 flex flex-wrap gap-4 text-sm">
               {social?.facebook && (
                 <a href={social.facebook} target="_blank" rel="noopener noreferrer" className="hover:text-gold-300">
                   Facebook
@@ -76,16 +76,34 @@ export function Footer({ settings, churchName }: { settings: Setting | null; chu
                   YouTube
                 </a>
               )}
+              {social?.tiktok && (
+                <a href={social.tiktok} target="_blank" rel="noopener noreferrer" className="hover:text-gold-300">
+                  TikTok
+                </a>
+              )}
+              {social?.radioUrl && (
+                <a href={social.radioUrl} target="_blank" rel="noopener noreferrer" className="hover:text-gold-300">
+                  COG Grand Radio
+                </a>
+              )}
             </div>
           )}
         </div>
       </Container>
 
       <div className="border-t border-white/10 py-6">
-        <Container>
+        <Container className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-white/50">
             &copy; {new Date().getFullYear()} {churchName}. All rights reserved.
           </p>
+          <a
+            href="https://techconsult.coseng.co.uk"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-xs text-white/50 hover:text-gold-300"
+          >
+            Powered by Coseng TechConsult
+          </a>
         </Container>
       </div>
     </footer>

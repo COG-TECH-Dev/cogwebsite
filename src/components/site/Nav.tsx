@@ -1,6 +1,7 @@
 'use client'
 
 import { AnimatePresence, motion } from 'motion/react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -13,8 +14,15 @@ export function Nav({ churchName }: { churchName: string }) {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-paper/90 backdrop-blur">
       <Container className="flex h-20 items-center justify-between">
-        <Link href="/" className="font-serif text-xl font-semibold text-brand-600">
-          {churchName}
+        <Link href="/" className="flex items-center">
+          <Image
+            src="/images/COG-logo.webp"
+            alt={churchName}
+            width={1600}
+            height={900}
+            priority
+            className="h-11 w-auto"
+          />
         </Link>
 
         <nav className="hidden items-center gap-1 lg:flex">
