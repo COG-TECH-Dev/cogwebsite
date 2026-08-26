@@ -92,18 +92,26 @@ export function Footer({ settings, churchName }: { settings: Setting | null; chu
       </Container>
 
       <div className="border-t border-white/10 py-6">
-        <Container className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <Container className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-white/50">
             &copy; {new Date().getFullYear()} {churchName}. All rights reserved.
           </p>
-          <a
-            href="https://techconsult.coseng.co.uk"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-xs text-white/50 hover:text-gold-300"
-          >
-            Powered by Coseng TechConsult
-          </a>
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-white/50">
+            <Link href="/terms-of-use" className="underline hover:text-gold-300">
+              Terms of Use
+            </Link>
+            <Link href="/privacy-policy" className="underline hover:text-gold-300">
+              Privacy Policy
+            </Link>
+            <a
+              href="https://techconsult.coseng.co.uk"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-gold-300"
+            >
+              Powered by Coseng TechConsult
+            </a>
+          </div>
         </Container>
       </div>
     </footer>
