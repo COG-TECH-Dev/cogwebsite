@@ -1,7 +1,7 @@
 export type NavLink = {
   label: string
   href: string
-  children?: { label: string; href: string }[]
+  children?: { label: string; href: string; external?: boolean }[]
 }
 
 // Primary site structure — mirrors the collections/routes built in Phase 3.
@@ -21,6 +21,17 @@ export const navLinks: NavLink[] = [
   },
   { label: 'Ministries', href: '/ministries' },
   { label: 'Programmes', href: '/programmes' },
+  {
+    label: 'Branches',
+    href: '/',
+    children: [
+      { label: 'Newcastle Church', href: '/' },
+      { label: 'Sunderland Church', href: 'https://cityofgodsunderland.org/', external: true },
+      { label: 'London Church', href: 'https://cityofgodlondon.org/', external: true },
+      { label: 'Middlesbrough Church', href: 'https://cityofgodmiddlesbrough.org/', external: true },
+      { label: 'Gateshead Church', href: '/' },
+    ],
+  },
   {
     label: 'Media',
     href: '/media',

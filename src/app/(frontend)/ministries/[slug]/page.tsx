@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 
 import { getPayloadClient } from '@/lib/payload'
+import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 
@@ -61,7 +62,7 @@ export default async function MinistryPage({ params }: Args) {
             </div>
           )}
           {ministry.meetingTimes && ministry.meetingTimes.length > 0 && (
-            <div className="rounded-2xl border border-border bg-surface p-5">
+            <div className="mb-6 rounded-2xl border border-border bg-surface p-5">
               <p className="text-sm font-semibold uppercase tracking-wide text-gold-600">Meeting Times</p>
               <ul className="mt-3 space-y-2 text-sm">
                 {ministry.meetingTimes.map((mt, i) => (
@@ -73,6 +74,13 @@ export default async function MinistryPage({ params }: Args) {
               </ul>
             </div>
           )}
+          <div className="rounded-2xl bg-brand-700 p-6 text-center text-white">
+            <p className="font-serif text-lg font-semibold">Want to get involved?</p>
+            <p className="mt-1 text-sm text-white/70">We&apos;d love to have you join us.</p>
+            <Button href="/connect/membership" className="mt-4 w-full">
+              Join This Ministry
+            </Button>
+          </div>
         </aside>
       </Container>
     </div>

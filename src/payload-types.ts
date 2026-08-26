@@ -1073,7 +1073,15 @@ export interface Setting {
   homepageHero?: {
     headline?: string | null;
     tagline?: string | null;
+    /**
+     * Short spoken-word line, e.g. "A Place where God lives and Miracles happen Naturally."
+     */
+    declarationLine?: string | null;
     backgroundImage?: (number | null) | Media;
+    /**
+     * A direct .mp4 URL for a looping hero video. Takes priority over the background image when set.
+     */
+    backgroundVideoUrl?: string | null;
   };
   updatedAt?: string | null;
   createdAt?: string | null;
@@ -1122,7 +1130,9 @@ export interface SettingsSelect<T extends boolean = true> {
     | {
         headline?: T;
         tagline?: T;
+        declarationLine?: T;
         backgroundImage?: T;
+        backgroundVideoUrl?: T;
       };
   updatedAt?: T;
   createdAt?: T;

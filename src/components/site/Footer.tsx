@@ -52,7 +52,7 @@ export function Footer({ settings, churchName }: { settings: Setting | null; chu
           <p className="text-sm font-semibold uppercase tracking-wide text-gold-300">Explore</p>
           <ul className="mt-4 grid grid-cols-2 gap-2 text-sm text-white/80">
             {navLinks.map((link) => (
-              <li key={link.href}>
+              <li key={link.label}>
                 <Link href={link.href} className="hover:text-gold-300">
                   {link.label}
                 </Link>

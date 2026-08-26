@@ -27,7 +27,7 @@ export function Nav({ churchName }: { churchName: string }) {
 
         <nav className="hidden items-center gap-1 lg:flex">
           {navLinks.map((link) => (
-            <div key={link.href} className="group relative">
+            <div key={link.label} className="group relative">
               <Link
                 href={link.href}
                 className="flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium text-ink hover:bg-brand-50 hover:text-brand-600"
@@ -39,8 +39,10 @@ export function Nav({ churchName }: { churchName: string }) {
                   <div className="min-w-48 rounded-xl border border-border bg-surface p-2 shadow-lg">
                     {link.children.map((child) => (
                       <Link
-                        key={child.href}
+                        key={child.label}
                         href={child.href}
+                        target={child.external ? '_blank' : undefined}
+                        rel={child.external ? 'noopener noreferrer' : undefined}
                         className="block rounded-lg px-3 py-2 text-sm text-ink hover:bg-brand-50 hover:text-brand-600"
                       >
                         {child.label}
@@ -96,7 +98,7 @@ export function Nav({ churchName }: { churchName: string }) {
           >
             <Container className="flex flex-col gap-1 py-4">
               {navLinks.map((link) => (
-                <div key={link.href}>
+                <div key={link.label}>
                   <Link
                     href={link.href}
                     onClick={() => setMobileOpen(false)}
@@ -108,8 +110,10 @@ export function Nav({ churchName }: { churchName: string }) {
                     <div className="ml-3 flex flex-col border-l border-border pl-3">
                       {link.children.map((child) => (
                         <Link
-                          key={child.href}
+                          key={child.label}
                           href={child.href}
+                          target={child.external ? '_blank' : undefined}
+                          rel={child.external ? 'noopener noreferrer' : undefined}
                           onClick={() => setMobileOpen(false)}
                           className="rounded-lg px-3 py-1.5 text-sm text-ink-muted hover:bg-brand-50"
                         >

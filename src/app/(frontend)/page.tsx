@@ -36,6 +36,7 @@ export default async function HomePage() {
 
   const hero = settings?.homepageHero
   const heroImage = mediaUrl(hero?.backgroundImage)
+  const heroVideo = hero?.backgroundVideoUrl
   const serviceTimes = settings?.serviceTimes ?? []
   const latestSermon = sermons.docs[0]
 
@@ -43,14 +44,25 @@ export default async function HomePage() {
     <div>
       {/* Hero */}
       <section className="relative overflow-hidden bg-brand-700 text-white">
-        {heroImage && (
-          <Image
-            src={heroImage}
-            alt=""
-            fill
-            priority
-            className="absolute inset-0 object-cover opacity-30"
+        {heroVideo ? (
+          <video
+            src={heroVideo}
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 h-full w-full object-cover opacity-40"
           />
+        ) : (
+          heroImage && (
+            <Image
+              src={heroImage}
+              alt=""
+              fill
+              priority
+              className="absolute inset-0 object-cover opacity-30"
+            />
+          )
         )}
         <Container className="relative py-28 text-center sm:py-36">
           <HeroContent>
@@ -63,6 +75,9 @@ export default async function HomePage() {
             <p className="mx-auto mt-6 max-w-xl text-lg text-white/80">
               {hero?.tagline ||
                 'Join City of God Christian Centre for worship, community, and growth in Newcastle upon Tyne.'}
+            </p>
+            <p className="mx-auto mt-3 max-w-xl font-serif text-lg italic text-gold-300">
+              {hero?.declarationLine || 'A Place where God lives and Miracles happen Naturally.'}
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
               <Button href="/connect" variant="primary">
@@ -89,6 +104,22 @@ export default async function HomePage() {
           </Container>
         </section>
       )}
+
+      {/* Declaration */}
+      <section className="bg-brand-50 py-20">
+        <Container>
+          <Reveal className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-600">
+              Our Declaration
+            </p>
+            <p className="mt-6 font-serif text-2xl italic leading-relaxed text-brand-700 sm:text-3xl">
+              &ldquo;We are the light of the world. We stand on the Word and we cannot be moved.
+              Wherever we go, we shine bright by the Spirit of God — a city set on a hill, the City
+              of God.&rdquo;
+            </p>
+          </Reveal>
+        </Container>
+      </section>
 
       {/* Highlighted ministries */}
       <section className="py-24">

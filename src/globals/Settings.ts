@@ -79,7 +79,15 @@ export const Settings: GlobalConfig = {
       fields: [
         { name: 'headline', type: 'text' },
         { name: 'tagline', type: 'text' },
+        { name: 'declarationLine', type: 'text', admin: { description: 'Short spoken-word line, e.g. "A Place where God lives and Miracles happen Naturally."' } },
         { name: 'backgroundImage', type: 'upload', relationTo: 'media' },
+        {
+          name: 'backgroundVideoUrl',
+          type: 'text',
+          admin: {
+            description: 'A direct .mp4 URL for a looping hero video. Takes priority over the background image when set.',
+          },
+        },
       ],
     },
   ],
