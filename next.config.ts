@@ -7,8 +7,11 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
-  // Required by Dockerfile's multi-stage build (copies .next/standalone).
-  output: 'standalone',
+  // Required by Dockerfile's multi-stage build (copies .next/standalone) —
+  // but Vercel has its own build packaging and breaks if this is set
+  // (fails post-build with an ENOENT on a .nft.json trace file), so only
+  // apply it outside Vercel's own build environment.
+  output: process.env.VERCEL ? undefined : 'standalone',
   images: {
     localPatterns: [
       {
