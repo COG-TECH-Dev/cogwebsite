@@ -88,15 +88,20 @@ function Block({ block }: { block: LayoutBlock }) {
             </div>
           )}
           <div className={`grid gap-6 ${colsClass}`}>
-            {block.items?.map((item, i) => (
-              <div
-                key={i}
-                className="rounded-xl border-t-4 border-gold-500 bg-surface p-6 shadow-sm transition-shadow hover:shadow-md"
-              >
-                <p className="font-serif text-lg font-semibold text-brand-700">{item.title}</p>
-                <p className="mt-2 text-sm leading-relaxed text-ink-muted">{item.body}</p>
-              </div>
-            ))}
+            {block.items?.map((item, i) => {
+              // Cycles through the logo's three accent hues rather than one
+              // repeated color on every card.
+              const accent = ['border-gold-500', 'border-flame-500', 'border-sky-500'][i % 3]
+              return (
+                <div
+                  key={i}
+                  className={`rounded-xl border-t-4 ${accent} bg-surface p-6 shadow-sm transition-shadow hover:shadow-md`}
+                >
+                  <p className="font-serif text-lg font-semibold text-brand-700">{item.title}</p>
+                  <p className="mt-2 text-sm leading-relaxed text-ink-muted">{item.body}</p>
+                </div>
+              )
+            })}
           </div>
         </Container>
       )

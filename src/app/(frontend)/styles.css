@@ -8,18 +8,27 @@
   --color-ink: #1a1a1f;
   --color-ink-muted: #5b5b66;
 
-  --color-brand-50: #eef1f7;
-  --color-brand-100: #d3daea;
-  --color-brand-400: #3d5175;
-  --color-brand-500: #263756;
-  --color-brand-600: #1f2a44;
-  --color-brand-700: #171f34;
-  --color-brand-900: #0d1220;
+  /* Sampled directly from public/images/COG-logo.webp — real brand colors,
+     not an invented palette. brand-* is a dark scale of the logo's amber
+     wordmark color (for large surfaces like the hero/footer, where the
+     vivid amber itself would be too loud); gold-* keeps the actual vivid
+     amber for buttons/accents; flame-*/sky-* are the mark's two accent
+     hues, used sparingly for small highlights rather than large areas. */
+  --color-brand-50: #faf1e6;
+  --color-brand-100: #f3e0c8;
+  --color-brand-400: #a8611c;
+  --color-brand-500: #7d4614;
+  --color-brand-600: #5c3410;
+  --color-brand-700: #3d2308;
+  --color-brand-900: #241503;
 
-  --color-gold-100: #f6ecd6;
-  --color-gold-300: #e4c887;
-  --color-gold-500: #c99a3d;
-  --color-gold-600: #a97e2c;
+  --color-gold-100: #fbeedd;
+  --color-gold-300: #e8a661;
+  --color-gold-500: #c2660a;
+  --color-gold-600: #9c5208;
+
+  --color-flame-500: #e8532b;
+  --color-sky-500: #2fbee0;
 
   --color-paper: #faf8f4;
   --color-surface: #ffffff;
@@ -27,8 +36,8 @@
 }
 
 html {
-  /* Bumps every rem-based Tailwind text size site-wide (16px -> 18px base) */
-  font-size: 18px;
+  /* Bumps every rem-based Tailwind text size site-wide (16px -> 20px base) */
+  font-size: 20px;
   -webkit-font-smoothing: antialiased;
 }
 
