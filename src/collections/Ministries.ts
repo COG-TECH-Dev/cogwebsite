@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isContentEditorOrUp, isMinistryLeaderOfDoc } from '../access'
+import { ICON_OPTIONS } from '../blocks/iconOptions'
 import { revalidateCollection, revalidateCollectionOnDelete } from '../hooks/revalidate'
 
 const paths = (doc: Record<string, unknown>) => ['/', '/ministries', `/ministries/${doc.slug}`]
@@ -29,7 +30,20 @@ export const Ministries: CollectionConfig = {
     { name: 'slug', type: 'text', required: true, unique: true, index: true },
     { name: 'summary', type: 'textarea' },
     { name: 'description', type: 'richText' },
-    { name: 'image', type: 'upload', relationTo: 'media' },
+    {
+      name: 'image',
+      type: 'upload',
+      relationTo: 'media',
+      admin: { description: 'Optional. If left empty, an icon is shown instead.' },
+    },
+    {
+      name: 'icon',
+      type: 'select',
+      options: [...ICON_OPTIONS],
+      admin: {
+        description: 'Shown when no photo is uploaded. Leave unset to auto-pick one based on the ministry name.',
+      },
+    },
     { name: 'leaderName', type: 'text' },
     {
       name: 'meetingTimes',

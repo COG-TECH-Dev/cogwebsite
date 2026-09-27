@@ -199,7 +199,41 @@ export interface Ministry {
     };
     [k: string]: unknown;
   } | null;
+  /**
+   * Optional. If left empty, an icon is shown instead.
+   */
   image?: (number | null) | Media;
+  /**
+   * Shown when no photo is uploaded. Leave unset to auto-pick one based on the ministry name.
+   */
+  icon?:
+    | (
+        | 'cross'
+        | 'book'
+        | 'flame'
+        | 'heart'
+        | 'users'
+        | 'prayer'
+        | 'globe'
+        | 'church'
+        | 'sparkles'
+        | 'water'
+        | 'sun'
+        | 'music'
+        | 'home'
+        | 'compass'
+        | 'crown'
+        | 'scroll'
+        | 'lightbulb'
+        | 'star'
+        | 'dove'
+        | 'shield'
+        | 'eye'
+        | 'target'
+        | 'pin'
+        | 'handshake'
+      )
+    | null;
   leaderName?: string | null;
   meetingTimes?:
     | {
@@ -1027,6 +1061,7 @@ export interface MinistriesSelect<T extends boolean = true> {
   summary?: T;
   description?: T;
   image?: T;
+  icon?: T;
   leaderName?: T;
   meetingTimes?:
     | T

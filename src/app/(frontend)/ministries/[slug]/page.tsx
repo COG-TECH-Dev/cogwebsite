@@ -1,12 +1,18 @@
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { Metadata } from 'next'
+import { Clock, UserRound } from 'lucide-react'
 import Image from 'next/image'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { getPayloadClient } from '@/lib/payload'
+import { guessMinistryIcon } from '@/lib/guessMinistryIcon'
+import { BlockIcon } from '@/components/blocks/BlockIcon'
+import { BrandPanel } from '@/components/ui/BrandVisuals'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
+import { Reveal } from '@/components/ui/Reveal'
 
 export const revalidate = 60
 
@@ -25,10 +31,21 @@ async function getMinistry(slug: string) {
   return result.docs[0] ?? null
 }
 
+async function getOtherMinistries(excludeId: number) {
+  const payload = await getPayloadClient()
+  const result = await payload.find({
+    collection: 'ministries',
+    where: { id: { not_equals: excludeId } },
+    limit: 3,
+    sort: 'name',
+  })
+  return result.docs
+}
+
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { slug } = await params
   const ministry = await getMinistry(slug)
-  return { title: ministry?.name }
+  return { title: ministry?.name, description: ministry?.summary ?? undefined }
 }
 
 export default async function MinistryPage({ params }: Args) {
@@ -37,52 +54,107 @@ export default async function MinistryPage({ params }: Args) {
   if (!ministry) notFound()
 
   const img = mediaUrl(ministry.image)
+  const icon = ministry.icon || guessMinistryIcon(ministry.name)
+  const others = await getOtherMinistries(ministry.id)
 
   return (
     <div>
       <PageHeader eyebrow="Ministry" title={ministry.name} description={ministry.summary ?? undefined} />
       <Container className="grid gap-10 py-16 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          {img && (
-            <div className="relative mb-8 aspect-video overflow-hidden rounded-2xl bg-brand-50">
-              <Image src={img} alt={ministry.name} fill className="object-cover" />
+          <Reveal>
+            <div className="relative mb-8 aspect-video overflow-hidden rounded-2xl shadow-lg">
+              {img ? (
+                <Image src={img} alt={ministry.name} fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-cover" />
+              ) : (
+                <BrandPanel className="absolute inset-0 flex items-center justify-center">
+                  <span className="flex h-24 w-24 items-center justify-center rounded-3xl bg-white/10 backdrop-blur">
+                    <BlockIcon name={icon} className="h-12 w-12 text-gold-300" />
+                  </span>
+                </BrandPanel>
+              )}
             </div>
-          )}
-          {ministry.description && (
-            <div className="prose prose-neutral max-w-none">
-              <RichText data={ministry.description} />
-            </div>
-          )}
+            {ministry.description ? (
+              <div className="prose prose-neutral max-w-none">
+                <RichText data={ministry.description} />
+              </div>
+            ) : (
+              ministry.summary && <p className="text-lg leading-relaxed text-ink-muted">{ministry.summary}</p>
+            )}
+          </Reveal>
         </div>
-        <aside>
-          {ministry.leaderName && (
-            <div className="mb-6 rounded-2xl border border-border bg-surface p-5">
-              <p className="text-sm font-semibold uppercase tracking-wide text-gold-600">Led By</p>
-              <p className="mt-1 font-semibold text-brand-700">{ministry.leaderName}</p>
+
+        <Reveal delay={0.1}>
+          <aside className="space-y-6 lg:sticky lg:top-28">
+            {ministry.leaderName && (
+              <div className="rounded-2xl border border-border bg-surface p-5">
+                <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-gold-600">
+                  <UserRound className="h-4 w-4" aria-hidden="true" />
+                  Led By
+                </p>
+                <p className="mt-2 font-serif text-lg font-semibold text-brand-700">{ministry.leaderName}</p>
+              </div>
+            )}
+            {ministry.meetingTimes && ministry.meetingTimes.length > 0 && (
+              <div className="rounded-2xl border border-border bg-surface p-5">
+                <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-gold-600">
+                  <Clock className="h-4 w-4" aria-hidden="true" />
+                  Meeting Times
+                </p>
+                <ul className="mt-3 space-y-2 text-sm">
+                  {ministry.meetingTimes.map((mt, i) => (
+                    <li key={i} className="flex justify-between gap-4">
+                      <span className="font-medium text-ink">{mt.label}</span>
+                      <span className="text-ink-muted">{mt.time}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            <div className="relative isolate overflow-hidden rounded-2xl bg-linear-to-br from-brand-900 via-brand-700 to-brand-600 p-6 text-center text-white">
+              <p className="font-serif text-lg font-semibold">Want to get involved?</p>
+              <p className="mt-1 text-sm text-white/70">We&apos;d love to have you join us.</p>
+              <Button href="/connect/membership" className="mt-4 w-full">
+                Join This Ministry
+              </Button>
             </div>
-          )}
-          {ministry.meetingTimes && ministry.meetingTimes.length > 0 && (
-            <div className="mb-6 rounded-2xl border border-border bg-surface p-5">
-              <p className="text-sm font-semibold uppercase tracking-wide text-gold-600">Meeting Times</p>
-              <ul className="mt-3 space-y-2 text-sm">
-                {ministry.meetingTimes.map((mt, i) => (
-                  <li key={i} className="flex justify-between gap-4">
-                    <span>{mt.label}</span>
-                    <span className="text-ink-muted">{mt.time}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-          <div className="rounded-2xl bg-brand-700 p-6 text-center text-white">
-            <p className="font-serif text-lg font-semibold">Want to get involved?</p>
-            <p className="mt-1 text-sm text-white/70">We&apos;d love to have you join us.</p>
-            <Button href="/connect/membership" className="mt-4 w-full">
-              Join This Ministry
-            </Button>
-          </div>
-        </aside>
+          </aside>
+        </Reveal>
       </Container>
+
+      {others.length > 0 && (
+        <div className="border-t border-border bg-brand-50">
+          <Container className="py-16">
+            <h2 className="mb-8 font-serif text-2xl font-semibold text-brand-700">Explore Other Ministries</h2>
+            <div className="grid gap-6 sm:grid-cols-3">
+              {others.map((other) => {
+                const otherImg = mediaUrl(other.image)
+                const otherIcon = other.icon || guessMinistryIcon(other.name)
+                return (
+                  <Link
+                    key={other.id}
+                    href={`/ministries/${other.slug}`}
+                    className="group overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+                  >
+                    <div className="relative aspect-video">
+                      {otherImg ? (
+                        <Image src={otherImg} alt={other.name} fill sizes="33vw" className="object-cover" />
+                      ) : (
+                        <BrandPanel className="absolute inset-0 flex items-center justify-center">
+                          <BlockIcon name={otherIcon} className="h-8 w-8 text-gold-300" />
+                        </BrandPanel>
+                      )}
+                    </div>
+                    <div className="p-4">
+                      <p className="font-serif font-semibold text-brand-700 group-hover:text-brand-600">{other.name}</p>
+                    </div>
+                  </Link>
+                )
+              })}
+            </div>
+          </Container>
+        </div>
+      )}
     </div>
   )
 }

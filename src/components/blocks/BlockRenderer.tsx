@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import type { Page, Testimonial } from '@/payload-types'
+import { ACCENTS, BrandPanel, Glows } from '@/components/ui/BrandVisuals'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 import { Reveal } from '@/components/ui/Reveal'
@@ -28,13 +29,6 @@ const paragraphs = (text: string | null | undefined) =>
 
 const isExternal = (href: string) => /^https?:\/\//i.test(href)
 
-// The logo's three hues, cycled across cards so no single colour dominates.
-const ACCENTS = [
-  { badge: 'bg-gold-100 text-gold-600', bar: 'from-gold-500 to-gold-300', number: 'text-gold-500' },
-  { badge: 'bg-flame-500/10 text-flame-500', bar: 'from-flame-500 to-gold-500', number: 'text-flame-500' },
-  { badge: 'bg-sky-500/10 text-sky-500', bar: 'from-sky-500 to-gold-300', number: 'text-sky-500' },
-]
-
 const TITLE_WORDS = new Set(['apostle', 'pastor', 'rev', 'dr', 'prophet', 'bishop', 'elder', 'evangelist', 'minister', 'mr', 'mrs', 'ms'])
 
 function initials(name: string) {
@@ -44,15 +38,6 @@ function initials(name: string) {
     .slice(0, 2)
     .map((w) => w[0]?.toUpperCase() ?? '')
     .join('')
-}
-
-function Glows() {
-  return (
-    <div aria-hidden="true" className="pointer-events-none absolute inset-0 -z-10">
-      <div className="absolute -right-20 -top-24 h-72 w-72 rounded-full bg-gold-500/30 blur-3xl" />
-      <div className="absolute -bottom-28 -left-16 h-72 w-72 rounded-full bg-flame-500/20 blur-3xl" />
-    </div>
-  )
 }
 
 function SectionHeading({
@@ -75,17 +60,6 @@ function SectionHeading({
       )}
       {intro && <p className="mt-4 text-pretty text-lg leading-relaxed text-ink-muted">{intro}</p>}
     </Reveal>
-  )
-}
-
-// Shown wherever a photo would go but none has been uploaded yet — keeps the
-// layout looking finished rather than leaving a blank grey box.
-function BrandPanel({ children, className = '' }: { children?: React.ReactNode; className?: string }) {
-  return (
-    <div className={`relative isolate overflow-hidden bg-linear-to-br from-brand-900 via-brand-700 to-brand-500 ${className}`}>
-      <Glows />
-      {children}
-    </div>
   )
 }
 

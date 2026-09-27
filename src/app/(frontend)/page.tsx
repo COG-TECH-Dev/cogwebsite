@@ -2,7 +2,10 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
+import { guessMinistryIcon } from '@/lib/guessMinistryIcon'
+import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { HeroContent } from '@/components/site/HeroContent'
+import { BrandPanel } from '@/components/ui/BrandVisuals'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
 import { Reveal } from '@/components/ui/Reveal'
@@ -139,15 +142,20 @@ export default async function HomePage() {
             <StaggerGroup className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {ministries.docs.map((ministry) => {
                 const img = mediaUrl(ministry.image)
+                const icon = ministry.icon || guessMinistryIcon(ministry.name)
                 return (
                   <StaggerItem key={ministry.id}>
                     <Link
                       href={`/ministries/${ministry.slug}`}
                       className="group block overflow-hidden rounded-2xl border border-border bg-surface transition-all hover:-translate-y-1 hover:shadow-lg"
                     >
-                      <div className="relative aspect-4/3 bg-brand-50">
-                        {img && (
-                          <Image src={img} alt={ministry.name} fill className="object-cover" />
+                      <div className="relative aspect-4/3">
+                        {img ? (
+                          <Image src={img} alt={ministry.name} fill sizes="(min-width: 1024px) 25vw, 50vw" className="object-cover" />
+                        ) : (
+                          <BrandPanel className="absolute inset-0 flex items-center justify-center">
+                            <BlockIcon name={icon} className="h-9 w-9 text-gold-300" />
+                          </BrandPanel>
                         )}
                       </div>
                       <div className="p-5">
