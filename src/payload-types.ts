@@ -244,6 +244,10 @@ export interface Page {
   title: string;
   slug: string;
   /**
+   * Short line shown under the page title in the banner at the top of the page.
+   */
+  subtitle?: string | null;
+  /**
    * Optional — nests this page under another (e.g. About subpages).
    */
   parent?: (number | null) | Page;
@@ -285,19 +289,108 @@ export interface Page {
             blockType: 'richText';
           }
         | {
+            eyebrow?: string | null;
+            heading: string;
+            /**
+             * Leave a blank line between paragraphs.
+             */
+            body?: string | null;
+            /**
+             * Optional short checklist shown under the text.
+             */
+            bullets?:
+              | {
+                  text: string;
+                  id?: string | null;
+                }[]
+              | null;
+            /**
+             * Optional photo. If left empty, a branded panel with the church logo is shown instead.
+             */
+            image?: (number | null) | Media;
+            imagePosition?: ('right' | 'left') | null;
+            background?: ('light' | 'tinted') | null;
+            buttonLabel?: string | null;
+            buttonUrl?: string | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'splitFeature';
+          }
+        | {
             heading?: string | null;
             eyebrow?: string | null;
+            /**
+             * Optional short paragraph shown under the heading.
+             */
+            intro?: string | null;
             columns?: ('2' | '3' | '4') | null;
             items?:
               | {
                   title: string;
                   body: string;
+                  /**
+                   * Optional icon shown at the top of the card.
+                   */
+                  icon?:
+                    | (
+                        | 'cross'
+                        | 'book'
+                        | 'flame'
+                        | 'heart'
+                        | 'users'
+                        | 'prayer'
+                        | 'globe'
+                        | 'church'
+                        | 'sparkles'
+                        | 'water'
+                        | 'sun'
+                        | 'music'
+                        | 'home'
+                        | 'compass'
+                        | 'crown'
+                        | 'scroll'
+                        | 'lightbulb'
+                        | 'star'
+                        | 'dove'
+                        | 'shield'
+                        | 'eye'
+                        | 'target'
+                        | 'pin'
+                        | 'handshake'
+                      )
+                    | null;
+                  /**
+                   * Optional small line at the bottom, e.g. a scripture reference.
+                   */
+                  footnote?: string | null;
+                  /**
+                   * Optional link — makes the whole card clickable. Use /about/history for pages on this site, or a full https:// address for other websites.
+                   */
+                  href?: string | null;
                   id?: string | null;
                 }[]
               | null;
             id?: string | null;
             blockName?: string | null;
             blockType: 'cardGrid';
+          }
+        | {
+            eyebrow?: string | null;
+            heading?: string | null;
+            items?:
+              | {
+                  /**
+                   * A year or a phase name, e.g. "1999" or "The Beginning".
+                   */
+                  label: string;
+                  title: string;
+                  body?: string | null;
+                  id?: string | null;
+                }[]
+              | null;
+            id?: string | null;
+            blockName?: string | null;
+            blockType: 'timeline';
           }
         | {
             heading?: string | null;
@@ -326,10 +419,18 @@ export interface Page {
           }
         | {
             heading?: string | null;
+            eyebrow?: string | null;
+            /**
+             * Show the first person as a large highlighted card (e.g. the Lead Pastor).
+             */
+            featureFirst?: boolean | null;
             members?:
               | {
                   name: string;
                   title?: string | null;
+                  /**
+                   * A portrait photo. If empty, a coloured card with their initials is shown.
+                   */
                   photo?: (number | null) | Media;
                   bio?: string | null;
                   id?: string | null;
@@ -736,6 +837,7 @@ export interface MediaSelect<T extends boolean = true> {
 export interface PagesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
+  subtitle?: T;
   parent?: T;
   layout?:
     | T
@@ -763,15 +865,55 @@ export interface PagesSelect<T extends boolean = true> {
               id?: T;
               blockName?: T;
             };
+        splitFeature?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              body?: T;
+              bullets?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              image?: T;
+              imagePosition?: T;
+              background?: T;
+              buttonLabel?: T;
+              buttonUrl?: T;
+              id?: T;
+              blockName?: T;
+            };
         cardGrid?:
           | T
           | {
               heading?: T;
               eyebrow?: T;
+              intro?: T;
               columns?: T;
               items?:
                 | T
                 | {
+                    title?: T;
+                    body?: T;
+                    icon?: T;
+                    footnote?: T;
+                    href?: T;
+                    id?: T;
+                  };
+              id?: T;
+              blockName?: T;
+            };
+        timeline?:
+          | T
+          | {
+              eyebrow?: T;
+              heading?: T;
+              items?:
+                | T
+                | {
+                    label?: T;
                     title?: T;
                     body?: T;
                     id?: T;
@@ -810,6 +952,8 @@ export interface PagesSelect<T extends boolean = true> {
           | T
           | {
               heading?: T;
+              eyebrow?: T;
+              featureFirst?: T;
               members?:
                 | T
                 | {

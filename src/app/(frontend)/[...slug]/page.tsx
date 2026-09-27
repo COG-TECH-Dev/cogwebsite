@@ -23,7 +23,7 @@ export default async function CatchAllPage({ params }: Args) {
 
   return (
     <div>
-      <PageHeader title={page.title} />
+      <PageHeader title={page.title} description={page.subtitle ?? undefined} />
       <BlockRenderer layout={page.layout} />
     </div>
   )

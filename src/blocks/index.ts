@@ -1,6 +1,8 @@
 export { Hero } from './Hero'
 export { RichTextBlock } from './RichTextBlock'
 export { CardGrid } from './CardGrid'
+export { SplitFeature } from './SplitFeature'
+export { Timeline } from './Timeline'
 export { ImageGrid } from './ImageGrid'
 export { Stats } from './Stats'
 export { TeamGrid } from './TeamGrid'

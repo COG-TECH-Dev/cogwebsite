@@ -10,8 +10,10 @@ import {
   Hero,
   ImageGrid,
   RichTextBlock,
+  SplitFeature,
   Stats,
   TeamGrid,
+  Timeline,
   TestimonialsBlock,
 } from '../blocks'
 
@@ -43,6 +45,11 @@ export const Pages: CollectionConfig = {
     { name: 'title', type: 'text', required: true },
     { name: 'slug', type: 'text', required: true, unique: true, index: true },
     {
+      name: 'subtitle',
+      type: 'text',
+      admin: { description: 'Short line shown under the page title in the banner at the top of the page.' },
+    },
+    {
       name: 'parent',
       type: 'relationship',
       relationTo: 'pages',
@@ -56,7 +63,9 @@ export const Pages: CollectionConfig = {
       blocks: [
         Hero,
         RichTextBlock,
+        SplitFeature,
         CardGrid,
+        Timeline,
         ImageGrid,
         Stats,
         TeamGrid,

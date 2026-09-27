@@ -12,7 +12,7 @@
      not an invented palette. brand-* is a dark scale of the logo's amber
      wordmark color (for large surfaces like the hero/footer, where the
      vivid amber itself would be too loud); gold-* keeps the actual vivid
-     amber for buttons/accents; flame-*/sky-* are the mark's two accent
+     amber for buttons/accents; flame- and sky- are the mark's two accent
      hues, used sparingly for small highlights rather than large areas. */
   --color-brand-50: #faf1e6;
   --color-brand-100: #f3e0c8;

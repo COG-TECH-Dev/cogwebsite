@@ -1,11 +1,18 @@
 import type { Block } from 'payload'
 
+import { ICON_OPTIONS } from './iconOptions'
+
 export const CardGrid: Block = {
   slug: 'cardGrid',
   labels: { singular: 'Card Grid', plural: 'Card Grids' },
   fields: [
     { name: 'heading', type: 'text' },
     { name: 'eyebrow', type: 'text' },
+    {
+      name: 'intro',
+      type: 'textarea',
+      admin: { description: 'Optional short paragraph shown under the heading.' },
+    },
     {
       name: 'columns',
       type: 'select',
@@ -23,6 +30,25 @@ export const CardGrid: Block = {
       fields: [
         { name: 'title', type: 'text', required: true },
         { name: 'body', type: 'textarea', required: true },
+        {
+          name: 'icon',
+          type: 'select',
+          options: [...ICON_OPTIONS],
+          admin: { description: 'Optional icon shown at the top of the card.' },
+        },
+        {
+          name: 'footnote',
+          type: 'text',
+          admin: { description: 'Optional small line at the bottom, e.g. a scripture reference.' },
+        },
+        {
+          name: 'href',
+          type: 'text',
+          admin: {
+            description:
+              'Optional link — makes the whole card clickable. Use /about/history for pages on this site, or a full https:// address for other websites.',
+          },
+        },
       ],
     },
   ],
