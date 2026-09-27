@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 
 import { isContentEditorOrUp, isMinistryLeaderOfDoc } from '../access'
 import { ICON_OPTIONS } from '../blocks/iconOptions'
+import { formatSlug } from '../hooks/formatSlug'
 import { revalidateCollection, revalidateCollectionOnDelete } from '../hooks/revalidate'
 
 const paths = (doc: Record<string, unknown>) => ['/', '/ministries', `/ministries/${doc.slug}`]
@@ -27,7 +28,15 @@ export const Ministries: CollectionConfig = {
   },
   fields: [
     { name: 'name', type: 'text', required: true },
-    { name: 'slug', type: 'text', required: true, unique: true, index: true },
+    {
+      name: 'slug',
+      type: 'text',
+      required: true,
+      unique: true,
+      index: true,
+      admin: { description: 'Auto-generated from the name if left blank. Used in the page URL.' },
+      hooks: { beforeValidate: [formatSlug('name')] },
+    },
     { name: 'summary', type: 'textarea' },
     { name: 'description', type: 'richText' },
     {

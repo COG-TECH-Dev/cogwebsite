@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { isContentEditorOrUp } from '../access'
+import { formatSlug } from '../hooks/formatSlug'
 import { revalidateCollection, revalidateCollectionOnDelete } from '../hooks/revalidate'
 import {
   CallToAction,
@@ -43,7 +44,15 @@ export const Pages: CollectionConfig = {
   },
   fields: [
     { name: 'title', type: 'text', required: true },
-    { name: 'slug', type: 'text', required: true, unique: true, index: true },
+    {
+      name: 'slug',
+      type: 'text',
+      required: true,
+      unique: true,
+      index: true,
+      admin: { description: 'Auto-generated from the title if left blank. Used in the page URL.' },
+      hooks: { beforeValidate: [formatSlug('title')] },
+    },
     {
       name: 'subtitle',
       type: 'text',
