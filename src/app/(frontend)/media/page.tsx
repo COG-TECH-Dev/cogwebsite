@@ -1,34 +1,71 @@
+import { Camera, Mic, Radio, Tv } from 'lucide-react'
 import Link from 'next/link'
+import type { ComponentType } from 'react'
 
+import { getPayloadClient } from '@/lib/payload'
+import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
+import { StaggerGroup, StaggerItem } from '@/components/ui/Stagger'
 
+export const revalidate = 60
 export const metadata = { title: 'Media' }
 
-const sections = [
-  { label: 'Sermons', href: '/media/sermons', description: 'Catch up on recent messages.' },
-  { label: 'Gallery', href: '/media/gallery', description: 'Photos from church life.' },
-  { label: 'COG TV', href: '/media/cog-tv', description: 'Watch our video content.' },
-  { label: 'COG Grand Radio', href: '/media/cog-grand-radio', description: 'Listen live and on demand.' },
+const sections: { label: string; href: string; description: string; icon: ComponentType<{ className?: string }> }[] = [
+  { label: 'Sermons', href: '/media/sermons', description: 'Catch up on recent messages.', icon: Mic },
+  { label: 'Gallery', href: '/media/gallery', description: 'Photos from church life.', icon: Camera },
+  { label: 'COG TV', href: '/media/cog-tv', description: 'Watch our video content.', icon: Tv },
+  { label: 'COG Grand Radio', href: '/media/cog-grand-radio', description: 'Listen live and on demand.', icon: Radio },
 ]
 
-export default function MediaHubPage() {
+export default async function MediaHubPage() {
+  const payload = await getPayloadClient()
+  const settings = await payload.findGlobal({ slug: 'settings' }).catch(() => null)
+  const radioUrl = settings?.socialLinks?.radioUrl
+
   return (
     <div>
       <PageHeader eyebrow="Media" title="Watch, Listen, and Explore" />
       <Container className="py-16">
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-          {sections.map((section) => (
-            <Link
-              key={section.href}
-              href={section.href}
-              className="rounded-2xl border border-border bg-surface p-6 transition-shadow hover:shadow-lg"
+        <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+          {sections.map((section, i) => {
+            const accent = ACCENTS[i % ACCENTS.length]
+            const Icon = section.icon
+            return (
+              <StaggerItem key={section.href} className="h-full">
+                <Link
+                  href={section.href}
+                  className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface p-6 shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
+                >
+                  <span aria-hidden="true" className={`absolute inset-x-0 top-0 h-1 bg-linear-to-r ${accent.bar}`} />
+                  <span className={`flex h-12 w-12 items-center justify-center rounded-xl ${accent.badge}`}>
+                    <Icon className="h-6 w-6" />
+                  </span>
+                  <p className="mt-5 font-serif text-xl font-semibold text-brand-700">{section.label}</p>
+                  <p className="mt-2 text-sm text-ink-muted">{section.description}</p>
+                </Link>
+              </StaggerItem>
+            )
+          })}
+        </StaggerGroup>
+
+        {radioUrl && (
+          <BrandPanel className="mt-12 rounded-3xl p-8 text-center text-white sm:p-12">
+            <Radio className="mx-auto h-10 w-10 text-gold-300" aria-hidden="true" />
+            <h2 className="mt-4 font-serif text-2xl font-semibold sm:text-3xl">COG Grand Radio is Live</h2>
+            <p className="mx-auto mt-2 max-w-lg text-white/80">
+              Tune in anytime for worship, teaching, and encouragement — streaming 24/7.
+            </p>
+            <a
+              href={radioUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-6 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-600"
             >
-              <p className="font-serif text-xl font-semibold text-brand-700">{section.label}</p>
-              <p className="mt-2 text-sm text-ink-muted">{section.description}</p>
-            </Link>
-          ))}
-        </div>
+              Listen Live
+            </a>
+          </BrandPanel>
+        )}
       </Container>
     </div>
   )
