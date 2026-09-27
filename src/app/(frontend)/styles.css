@@ -9,18 +9,23 @@
   --color-ink-muted: #5b5b66;
 
   /* Sampled directly from public/images/COG-logo.webp — real brand colors,
-     not an invented palette. brand-* is a dark scale of the logo's amber
-     wordmark color (for large surfaces like the hero/footer, where the
-     vivid amber itself would be too loud); gold-* keeps the actual vivid
-     amber for buttons/accents; flame- and sky- are the mark's two accent
-     hues, used sparingly for small highlights rather than large areas. */
+     not an invented palette. gold-* keeps the actual vivid amber wordmark
+     color for buttons/accents; flame- and sky- are the mark's two accent
+     hues, used sparingly for small highlights rather than large areas.
+
+     brand-50/100 stay a warm cream tint (unchanged) for light section
+     backgrounds. brand-400/500/600/700/900 are a dark navy scale derived
+     from the logo's own sky-blue accent hue (not invented — the same cyan
+     swoosh, darkened) for large dark surfaces (hero, footer, page banners)
+     and headings — replaces an earlier amber-brown version of this scale
+     that read as too brown/muddy over photos. */
   --color-brand-50: #faf1e6;
   --color-brand-100: #f3e0c8;
-  --color-brand-400: #a8611c;
-  --color-brand-500: #7d4614;
-  --color-brand-600: #5c3410;
-  --color-brand-700: #3d2308;
-  --color-brand-900: #241503;
+  --color-brand-400: #24869e;
+  --color-brand-500: #175564;
+  --color-brand-600: #0f3942;
+  --color-brand-700: #092025;
+  --color-brand-900: #051215;
 
   --color-gold-100: #fbeedd;
   --color-gold-300: #e8a661;
