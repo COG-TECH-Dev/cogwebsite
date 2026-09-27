@@ -104,12 +104,12 @@ export function Footer({ settings, churchName }: { settings: Setting | null; chu
               Privacy Policy
             </Link>
             <a
-              href="https://techconsult.coseng.co.uk"
+              href="https://www.elmorilx.com/"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-gold-300"
             >
-              Powered by Coseng TechConsult
+              Powered by Elmoril
             </a>
           </div>
         </Container>
