@@ -19,6 +19,7 @@ import { Testimonials } from './collections/Testimonials'
 import { BookstoreItems } from './collections/BookstoreItems'
 import { PrayerRequests } from './collections/PrayerRequests'
 import { FormSubmissions } from './collections/FormSubmissions'
+import { Giving } from './globals/Giving'
 import { Settings } from './globals/Settings'
 import { migrations } from './migrations'
 
@@ -49,7 +50,7 @@ export default buildConfig({
     PrayerRequests,
     FormSubmissions,
   ],
-  globals: [Settings],
+  globals: [Settings, Giving],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   // Without SMTP_HOST set, Payload falls back to logging emails to the

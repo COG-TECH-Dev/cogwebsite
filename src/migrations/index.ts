@@ -4,6 +4,7 @@ import * as migration_20260826_051159_add_hero_video_and_declaration from './202
 import * as migration_20260826_053847_add_card_grid_block from './20260826_053847_add_card_grid_block';
 import * as migration_20260927_060229_about_redesign_blocks from './20260927_060229_about_redesign_blocks';
 import * as migration_20260927_072329_ministries_icon_field from './20260927_072329_ministries_icon_field';
+import * as migration_20260927_082258_add_giving_global from './20260927_082258_add_giving_global';
 
 export const migrations = [
   {
@@ -34,6 +35,11 @@ export const migrations = [
   {
     up: migration_20260927_072329_ministries_icon_field.up,
     down: migration_20260927_072329_ministries_icon_field.down,
-    name: '20260927_072329_ministries_icon_field'
+    name: '20260927_072329_ministries_icon_field',
+  },
+  {
+    up: migration_20260927_082258_add_giving_global.up,
+    down: migration_20260927_082258_add_giving_global.down,
+    name: '20260927_082258_add_giving_global'
   },
 ];

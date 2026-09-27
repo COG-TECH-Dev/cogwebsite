@@ -109,9 +109,11 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     settings: Setting;
+    giving: Giving;
   };
   globalsSelect: {
     settings: SettingsSelect<false> | SettingsSelect<true>;
+    giving: GivingSelect<false> | GivingSelect<true>;
   };
   locale: null;
   widgets: {
@@ -1298,6 +1300,44 @@ export interface Setting {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "giving".
+ */
+export interface Giving {
+  id: number;
+  /**
+   * Shown on the Give page as a "Bank Transfer" option. Leave Account Name blank to hide this option entirely.
+   */
+  bankTransfer?: {
+    /**
+     * e.g. City of God Christian Centre
+     */
+    accountName?: string | null;
+    /**
+     * e.g. 12-34-56
+     */
+    sortCode?: string | null;
+    accountNumber?: string | null;
+    /**
+     * e.g. "Please use your name as the payment reference"
+     */
+    referenceNote?: string | null;
+  };
+  /**
+   * A link to a card/online giving provider (e.g. Tithe.ly, GoCardless, a Stripe Payment Link). Leave URL blank to show "coming soon" instead.
+   */
+  onlineGiving?: {
+    url?: string | null;
+    label?: string | null;
+  };
+  /**
+   * Optional. Shown in the Gift Aid section if set.
+   */
+  charityNumber?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "settings_select".
  */
 export interface SettingsSelect<T extends boolean = true> {
@@ -1344,6 +1384,30 @@ export interface SettingsSelect<T extends boolean = true> {
         backgroundImage?: T;
         backgroundVideoUrl?: T;
       };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "giving_select".
+ */
+export interface GivingSelect<T extends boolean = true> {
+  bankTransfer?:
+    | T
+    | {
+        accountName?: T;
+        sortCode?: T;
+        accountNumber?: T;
+        referenceNote?: T;
+      };
+  onlineGiving?:
+    | T
+    | {
+        url?: T;
+        label?: T;
+      };
+  charityNumber?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;
