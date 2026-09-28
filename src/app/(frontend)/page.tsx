@@ -80,7 +80,7 @@ export default async function HomePage() {
                 'Join City of God Christian Centre for worship, community, and growth in Newcastle upon Tyne.'}
             </p>
             <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
-              <Button href="/connect" variant="primary">
+              <Button href="/connect/new-here" variant="primary">
                 Plan Your Visit
               </Button>
               <Button href="/media/sermons" variant="outline">
@@ -344,7 +344,7 @@ export default async function HomePage() {
               We&apos;d love to welcome you. Come as you are.
             </p>
             <div className="mt-8">
-              <Button href="/connect" variant="primary">
+              <Button href="/connect/new-here" variant="primary">
                 Plan Your Visit
               </Button>
             </div>
