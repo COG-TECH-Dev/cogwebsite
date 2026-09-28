@@ -18,12 +18,14 @@ export function EnquiryForm({
   action,
   showPreferredDate = false,
   ministries,
+  defaultMinistryId,
   showReferenceLetterFields = false,
   submitLabel = 'Send',
 }: {
   action: (prev: FormState, formData: FormData) => Promise<FormState>
   showPreferredDate?: boolean
   ministries?: { id: number; name: string }[]
+  defaultMinistryId?: number
   showReferenceLetterFields?: boolean
   submitLabel?: string
 }) {
@@ -69,7 +71,7 @@ export function EnquiryForm({
           <label htmlFor="interestedMinistry" className="mb-1 block text-sm font-medium text-ink">
             Which ministry would you like to join?
           </label>
-          <select id="interestedMinistry" name="interestedMinistry" className="input">
+          <select id="interestedMinistry" name="interestedMinistry" className="input" defaultValue={defaultMinistryId ?? ''}>
             <option value="">Not sure yet</option>
             {ministries.map((ministry) => (
               <option key={ministry.id} value={ministry.id}>

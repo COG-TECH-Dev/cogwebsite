@@ -6,9 +6,13 @@ import { PageHeader } from '@/components/ui/PageHeader'
 
 export const metadata = { title: 'Membership' }
 
-export default async function MembershipPage() {
+type Args = { searchParams: Promise<{ ministry?: string }> }
+
+export default async function MembershipPage({ searchParams }: Args) {
+  const { ministry } = await searchParams
   const payload = await getPayloadClient()
   const ministries = await payload.find({ collection: 'ministries', limit: 100, sort: 'name' })
+  const defaultMinistryId = ministry ? Number(ministry) : undefined
 
   return (
     <div>
@@ -21,6 +25,7 @@ export default async function MembershipPage() {
         <EnquiryForm
           action={submitEnquiry.bind(null, 'membership')}
           ministries={ministries.docs.map((m) => ({ id: m.id, name: m.name }))}
+          defaultMinistryId={Number.isFinite(defaultMinistryId) ? defaultMinistryId : undefined}
           submitLabel="Submit"
         />
       </Container>

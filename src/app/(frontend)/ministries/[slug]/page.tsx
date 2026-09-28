@@ -114,7 +114,7 @@ export default async function MinistryPage({ params }: Args) {
             <div className="relative isolate overflow-hidden rounded-2xl bg-linear-to-br from-brand-900 via-brand-700 to-brand-600 p-6 text-center text-white">
               <p className="font-serif text-lg font-semibold">Want to get involved?</p>
               <p className="mt-1 text-sm text-white/70">We&apos;d love to have you join us.</p>
-              <Button href="/connect/membership" className="mt-4 w-full">
+              <Button href={`/connect/membership?ministry=${ministry.id}`} className="mt-4 w-full">
                 Join This Ministry
               </Button>
             </div>
