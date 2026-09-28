@@ -2,10 +2,10 @@ import type { CollectionAfterChangeHook } from 'payload'
 
 /**
  * Emails the church office whenever a prayer request or contact/appointment/
- * membership form is submitted. Without SMTP configured (see payload.config
- * `email` adapter), Payload's built-in fallback just logs the email to the
- * console instead of sending — this hook works either way, no extra guard
- * needed.
+ * membership form is submitted. Without RESEND_API_KEY configured (see
+ * payload.config `email` adapter), Payload's built-in fallback just logs the
+ * email to the console instead of sending — this hook works either way, no
+ * extra guard needed.
  */
 export const notifyOnSubmission = (subject: string, describe: (doc: Record<string, unknown>) => string) => {
   const afterChange: CollectionAfterChangeHook = async ({ doc, operation, req }) => {

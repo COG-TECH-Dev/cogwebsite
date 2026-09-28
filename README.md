@@ -98,8 +98,8 @@ and where media files live change.
    uploads from local disk (which doesn't exist on Vercel) to Blob storage.
    Nothing else to configure.
 4. Add a fresh `PAYLOAD_SECRET` and `NEXT_PUBLIC_SERVER_URL` (your Vercel
-   domain) as environment variables. `SMTP_*`/`NOTIFY_EMAIL` are optional,
-   same as below.
+   domain) as environment variables. `RESEND_API_KEY`/`NOTIFY_EMAIL` are
+   optional, same as below.
 5. Deploy. Database migrations run automatically on first boot — no manual
    step (see `prodMigrations` in `src/payload.config.ts`).
 
@@ -116,8 +116,8 @@ in this setup (a Docker volume), not Vercel Blob.
 1. Point your domain's DNS at the server.
 2. Set `SITE_DOMAIN` in `.env` to that domain — Caddy then requests and
    renews a Let's Encrypt certificate automatically.
-3. Set `SMTP_*` in `.env` for real outgoing email (password resets, and
-   notifications when a prayer request or enquiry is submitted), and
+3. Set `RESEND_API_KEY` in `.env` for real outgoing email (password resets,
+   and notifications when a prayer request or enquiry is submitted), and
    `NOTIFY_EMAIL` for where those notifications go. Without these, the site
    still works — emails just get logged instead of sent.
 4. `docker compose up -d --build`

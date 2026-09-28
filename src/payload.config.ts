@@ -1,5 +1,5 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
-import { nodemailerAdapter } from '@payloadcms/email-nodemailer'
+import { resendAdapter } from '@payloadcms/email-resend'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { vercelBlobStorage } from '@payloadcms/storage-vercel-blob'
 import path from 'path'
@@ -61,21 +61,16 @@ export default buildConfig({
   globals: [Settings, Giving],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
-  // Without SMTP_HOST set, Payload falls back to logging emails to the
+  // Without RESEND_API_KEY set, Payload falls back to logging emails to the
   // console (already the case today) — nothing breaks, notifications just
-  // won't actually send until SMTP is configured for this environment.
-  email: process.env.SMTP_HOST
-    ? nodemailerAdapter({
-        defaultFromAddress: process.env.SMTP_FROM_EMAIL || 'no-reply@cityofgodchristiancentre.org',
-        defaultFromName: process.env.SMTP_FROM_NAME || 'City of God Christian Centre',
-        transportOptions: {
-          host: process.env.SMTP_HOST,
-          port: Number(process.env.SMTP_PORT) || 587,
-          auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
-          },
-        },
+  // won't actually send until it's configured for this environment. Resend
+  // sends over HTTPS rather than an SMTP socket, which is more reliable
+  // from Vercel's serverless functions than raw SMTP.
+  email: process.env.RESEND_API_KEY
+    ? resendAdapter({
+        apiKey: process.env.RESEND_API_KEY,
+        defaultFromAddress: process.env.EMAIL_FROM_ADDRESS || 'no-reply@cityofgodchristiancentre.org',
+        defaultFromName: process.env.EMAIL_FROM_NAME || 'City of God Christian Centre',
       })
     : undefined,
   typescript: {
