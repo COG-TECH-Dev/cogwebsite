@@ -34,7 +34,11 @@ export default async function HomePage() {
       draft: false,
     }),
     payload.find({ collection: 'sermons', sort: '-date', limit: 1 }),
-    payload.find({ collection: 'testimonials', where: { featured: { equals: true } }, limit: 3 }),
+    payload.find({
+      collection: 'testimonials',
+      where: { and: [{ featured: { equals: true } }, { status: { equals: 'approved' } }] },
+      limit: 3,
+    }),
   ])
 
   const hero = settings?.homepageHero
@@ -284,6 +288,11 @@ export default async function HomePage() {
                 </StaggerItem>
               ))}
             </StaggerGroup>
+            <p className="mt-8 text-center">
+              <Link href="/connect/share-testimony" className="text-sm font-semibold text-brand-600 hover:underline">
+                Share your story →
+              </Link>
+            </p>
           </Container>
         </section>
       )}

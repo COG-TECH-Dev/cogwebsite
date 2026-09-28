@@ -70,3 +70,33 @@ export async function submitEnquiry(
     return { status: 'error', message: 'Something went wrong. Please try again.' }
   }
 }
+
+export async function submitTestimony(_prev: FormState, formData: FormData): Promise<FormState> {
+  const successMessage = "Thank you for sharing — our team will review it before it's shared publicly."
+
+  if (isSpam(formData)) {
+    return { status: 'success', message: successMessage }
+  }
+
+  const payload = await getPayloadClient()
+  const relatedMinistry = formData.get('relatedMinistry')
+
+  try {
+    await payload.create({
+      collection: 'testimonials',
+      data: {
+        name: String(formData.get('name') || ''),
+        submitterEmail: String(formData.get('email') || ''),
+        quote: String(formData.get('quote') || ''),
+        relatedMinistry: relatedMinistry ? Number(relatedMinistry) : undefined,
+        // Never trust the client for these — every public submission starts
+        // hidden until a Content Editor+ reviews and approves it.
+        status: 'pending-review',
+        featured: false,
+      },
+    })
+    return { status: 'success', message: successMessage }
+  } catch {
+    return { status: 'error', message: 'Something went wrong. Please try again.' }
+  }
+}

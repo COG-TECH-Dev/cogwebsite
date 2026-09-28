@@ -60,6 +60,7 @@ export const navLinks: NavLink[] = [
     children: [
       { label: "I'm New Here", href: '/connect/new-here' },
       { label: 'Prayer Request', href: '/connect/prayer-request' },
+      { label: 'Share a Testimony', href: '/connect/share-testimony' },
       { label: 'Contact Us', href: '/connect/contact' },
       { label: 'Appointments', href: '/connect/appointments' },
       { label: 'Membership', href: '/connect/membership' },
