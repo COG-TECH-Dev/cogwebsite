@@ -1,6 +1,7 @@
 'use server'
 
 import { getPayloadClient } from '@/lib/payload'
+import type { FormSubmission } from '@/payload-types'
 
 export type FormState = { status: 'idle' | 'success' | 'error'; message?: string }
 
@@ -37,7 +38,7 @@ export async function submitPrayerRequest(_prev: FormState, formData: FormData):
 }
 
 export async function submitEnquiry(
-  formType: 'contact' | 'appointment' | 'membership',
+  formType: 'contact' | 'appointment' | 'membership' | 'reference-letter',
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
@@ -46,6 +47,7 @@ export async function submitEnquiry(
   }
 
   const payload = await getPayloadClient()
+  const interestedMinistry = formData.get('interestedMinistry')
 
   try {
     await payload.create({
@@ -56,6 +58,10 @@ export async function submitEnquiry(
         email: String(formData.get('email') || ''),
         phone: String(formData.get('phone') || ''),
         preferredDate: formData.get('preferredDate') ? String(formData.get('preferredDate')) : undefined,
+        interestedMinistry: interestedMinistry ? Number(interestedMinistry) : undefined,
+        letterType: (formData.get('letterType') as FormSubmission['letterType']) || undefined,
+        purpose: formData.get('purpose') ? String(formData.get('purpose')) : undefined,
+        requiredByDate: formData.get('requiredByDate') ? String(formData.get('requiredByDate')) : undefined,
         message: String(formData.get('message') || ''),
       },
     })

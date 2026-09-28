@@ -11,12 +11,14 @@ export const revalidate = 60
 export const metadata = { title: 'Resources' }
 
 const TYPE_LABELS: Record<string, string> = {
+  'start-here': 'Start Here',
   devotional: 'Devotional',
   'reading-plan': 'Bible Reading Plan',
   'topical-guide': 'Topical Guide',
 }
 
 const TYPE_ICONS: Record<string, string> = {
+  'start-here': 'compass',
   devotional: 'sun',
   'reading-plan': 'book',
   'topical-guide': 'lightbulb',
@@ -36,6 +38,7 @@ export default async function ResourcesPage({ searchParams }: Args) {
 
   const filters = [
     { label: 'All', value: undefined },
+    { label: 'Start Here', value: 'start-here' },
     { label: 'Devotionals', value: 'devotional' },
     { label: 'Reading Plans', value: 'reading-plan' },
     { label: 'Topical Guides', value: 'topical-guide' },

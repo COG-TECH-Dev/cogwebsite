@@ -37,12 +37,46 @@ export const FormSubmissions: CollectionConfig = {
         { label: 'Contact', value: 'contact' },
         { label: 'Appointment Request', value: 'appointment' },
         { label: 'Membership', value: 'membership' },
+        { label: 'Reference Letter Request', value: 'reference-letter' },
       ],
     },
     { name: 'name', type: 'text', required: true },
     { name: 'email', type: 'text', required: true },
     { name: 'phone', type: 'text' },
     { name: 'preferredDate', type: 'date', admin: { condition: (data) => data.formType === 'appointment' } },
+    {
+      name: 'interestedMinistry',
+      type: 'relationship',
+      relationTo: 'ministries',
+      admin: {
+        description: 'Which ministry they want to join.',
+        condition: (data) => data.formType === 'membership',
+      },
+    },
+    {
+      name: 'letterType',
+      type: 'select',
+      options: [
+        { label: 'Character Reference', value: 'character' },
+        { label: 'Membership Confirmation', value: 'membership-confirmation' },
+        { label: 'Financial Reference', value: 'financial' },
+        { label: 'Other', value: 'other' },
+      ],
+      admin: { condition: (data) => data.formType === 'reference-letter' },
+    },
+    {
+      name: 'purpose',
+      type: 'text',
+      admin: {
+        description: 'What the reference letter is for.',
+        condition: (data) => data.formType === 'reference-letter',
+      },
+    },
+    {
+      name: 'requiredByDate',
+      type: 'date',
+      admin: { condition: (data) => data.formType === 'reference-letter' },
+    },
     { name: 'message', type: 'textarea' },
   ],
 }

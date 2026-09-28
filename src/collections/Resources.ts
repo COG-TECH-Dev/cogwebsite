@@ -39,6 +39,7 @@ export const Resources: CollectionConfig = {
       type: 'select',
       required: true,
       options: [
+        { label: 'Start Here (New to Faith)', value: 'start-here' },
         { label: 'Devotional', value: 'devotional' },
         { label: 'Bible Reading Plan', value: 'reading-plan' },
         { label: 'Topical Guide', value: 'topical-guide' },

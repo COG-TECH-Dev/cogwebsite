@@ -1,11 +1,15 @@
 import { submitEnquiry } from '@/app/(frontend)/connect/actions'
+import { getPayloadClient } from '@/lib/payload'
 import { EnquiryForm } from '@/components/site/EnquiryForm'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 
 export const metadata = { title: 'Membership' }
 
-export default function MembershipPage() {
+export default async function MembershipPage() {
+  const payload = await getPayloadClient()
+  const ministries = await payload.find({ collection: 'ministries', limit: 100, sort: 'name' })
+
   return (
     <div>
       <PageHeader
@@ -14,7 +18,11 @@ export default function MembershipPage() {
         description="Take the next step in your journey with City of God Christian Centre."
       />
       <Container className="max-w-xl py-16">
-        <EnquiryForm action={submitEnquiry.bind(null, 'membership')} submitLabel="Submit" />
+        <EnquiryForm
+          action={submitEnquiry.bind(null, 'membership')}
+          ministries={ministries.docs.map((m) => ({ id: m.id, name: m.name }))}
+          submitLabel="Submit"
+        />
       </Container>
     </div>
   )

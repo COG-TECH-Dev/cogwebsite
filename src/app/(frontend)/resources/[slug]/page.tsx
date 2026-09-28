@@ -16,12 +16,14 @@ export const revalidate = 60
 type Args = { params: Promise<{ slug: string }> }
 
 const TYPE_LABELS: Record<string, string> = {
+  'start-here': 'Start Here',
   devotional: 'Devotional',
   'reading-plan': 'Bible Reading Plan',
   'topical-guide': 'Topical Guide',
 }
 
 const TYPE_ICONS: Record<string, string> = {
+  'start-here': 'compass',
   devotional: 'sun',
   'reading-plan': 'book',
   'topical-guide': 'lightbulb',

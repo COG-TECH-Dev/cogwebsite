@@ -6,6 +6,7 @@ import * as migration_20260927_060229_about_redesign_blocks from './20260927_060
 import * as migration_20260927_072329_ministries_icon_field from './20260927_072329_ministries_icon_field';
 import * as migration_20260927_082258_add_giving_global from './20260927_082258_add_giving_global';
 import * as migration_20260928_060444_add_youtube_channel_id from './20260928_060444_add_youtube_channel_id';
+import * as migration_20260928_062931_add_reference_letter_and_start_here from './20260928_062931_add_reference_letter_and_start_here';
 
 export const migrations = [
   {
@@ -46,6 +47,11 @@ export const migrations = [
   {
     up: migration_20260928_060444_add_youtube_channel_id.up,
     down: migration_20260928_060444_add_youtube_channel_id.down,
-    name: '20260928_060444_add_youtube_channel_id'
+    name: '20260928_060444_add_youtube_channel_id',
+  },
+  {
+    up: migration_20260928_062931_add_reference_letter_and_start_here.up,
+    down: migration_20260928_062931_add_reference_letter_and_start_here.down,
+    name: '20260928_062931_add_reference_letter_and_start_here'
   },
 ];

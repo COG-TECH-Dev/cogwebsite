@@ -91,6 +91,21 @@ export default async function HomePage() {
         </Container>
       </section>
 
+      {/* Leadership welcome message */}
+      <section className="py-20">
+        <Container>
+          <Reveal className="mx-auto max-w-2xl text-center">
+            <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-600">A Word From Our Leadership</p>
+            <p className="mt-6 text-lg leading-relaxed text-ink-muted">
+              On behalf of the entire leadership team, welcome to City of God Christian Centre. Whether you are
+              joining us for the first time or you have been part of this family for years, we are so glad you are
+              here. Our prayer is that you will encounter God&apos;s love, find genuine community, and discover your
+              purpose as you journey with us.
+            </p>
+          </Reveal>
+        </Container>
+      </section>
+
       {/* Service times */}
       {serviceTimes.length > 0 && (
         <section className="border-b border-border bg-surface">
@@ -272,6 +287,53 @@ export default async function HomePage() {
           </Container>
         </section>
       )}
+
+      {/* Next steps */}
+      <section className="py-24">
+        <Container>
+          <Reveal className="mx-auto mb-10 max-w-2xl text-center">
+            <h2 className="font-serif text-3xl font-semibold text-brand-700 sm:text-4xl">Whatever Brought You Here</h2>
+            <p className="mt-3 text-ink-muted">There&apos;s a next step for you, wherever you&apos;re starting from.</p>
+          </Reveal>
+          <StaggerGroup className="grid gap-6 sm:grid-cols-3">
+            <StaggerItem>
+              <div className="h-full rounded-2xl border border-border bg-surface p-7">
+                <p className="font-serif text-xl font-semibold text-brand-700">I&apos;m New Here</p>
+                <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+                  Whether it&apos;s your first time or you&apos;re looking for a church home, we&apos;re glad
+                  you&apos;re here. Join us this Sunday and experience real community.
+                </p>
+                <Link href="/connect/new-here" className="mt-4 inline-block text-sm font-semibold text-brand-600 hover:underline">
+                  Plan your visit →
+                </Link>
+              </div>
+            </StaggerItem>
+            <StaggerItem>
+              <div className="h-full rounded-2xl border border-border bg-surface p-7">
+                <p className="font-serif text-xl font-semibold text-brand-700">Just Visited Us?</p>
+                <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+                  We&apos;d love to hear from you and help you take your next step.
+                </p>
+                <Link href="/connect/contact" className="mt-4 inline-block text-sm font-semibold text-brand-600 hover:underline">
+                  Get in touch →
+                </Link>
+              </div>
+            </StaggerItem>
+            <StaggerItem>
+              <div className="h-full rounded-2xl border border-border bg-surface p-7">
+                <p className="font-serif text-xl font-semibold text-brand-700">Take a Step of Faith</p>
+                <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+                  Whatever brought you here today, God already knows — and He&apos;s inviting you to take the next
+                  step. It only takes a moment to respond.
+                </p>
+                <Link href="/connect/prayer-request" className="mt-4 inline-block text-sm font-semibold text-brand-600 hover:underline">
+                  Respond now →
+                </Link>
+              </div>
+            </StaggerItem>
+          </StaggerGroup>
+        </Container>
+      </section>
 
       {/* Final CTA */}
       <section className="bg-brand-700 py-20 text-center text-white">

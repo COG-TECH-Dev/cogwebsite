@@ -7,13 +7,24 @@ import { Honeypot } from './Honeypot'
 
 const initialState: FormState = { status: 'idle' }
 
+const LETTER_TYPES = [
+  { value: 'character', label: 'Character Reference' },
+  { value: 'membership-confirmation', label: 'Membership Confirmation' },
+  { value: 'financial', label: 'Financial Reference' },
+  { value: 'other', label: 'Other' },
+]
+
 export function EnquiryForm({
   action,
   showPreferredDate = false,
+  ministries,
+  showReferenceLetterFields = false,
   submitLabel = 'Send',
 }: {
   action: (prev: FormState, formData: FormData) => Promise<FormState>
   showPreferredDate?: boolean
+  ministries?: { id: number; name: string }[]
+  showReferenceLetterFields?: boolean
   submitLabel?: string
 }) {
   const [state, formAction, pending] = useActionState(action, initialState)
@@ -53,9 +64,52 @@ export function EnquiryForm({
           <input id="preferredDate" name="preferredDate" type="date" className="input" />
         </div>
       )}
+      {ministries && ministries.length > 0 && (
+        <div>
+          <label htmlFor="interestedMinistry" className="mb-1 block text-sm font-medium text-ink">
+            Which ministry would you like to join?
+          </label>
+          <select id="interestedMinistry" name="interestedMinistry" className="input">
+            <option value="">Not sure yet</option>
+            {ministries.map((ministry) => (
+              <option key={ministry.id} value={ministry.id}>
+                {ministry.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      {showReferenceLetterFields && (
+        <>
+          <div>
+            <label htmlFor="letterType" className="mb-1 block text-sm font-medium text-ink">
+              Letter Type
+            </label>
+            <select id="letterType" name="letterType" required className="input">
+              {LETTER_TYPES.map((type) => (
+                <option key={type.value} value={type.value}>
+                  {type.label}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label htmlFor="purpose" className="mb-1 block text-sm font-medium text-ink">
+              Purpose of Letter
+            </label>
+            <input id="purpose" name="purpose" type="text" required className="input" />
+          </div>
+          <div>
+            <label htmlFor="requiredByDate" className="mb-1 block text-sm font-medium text-ink">
+              Required By (optional)
+            </label>
+            <input id="requiredByDate" name="requiredByDate" type="date" className="input" />
+          </div>
+        </>
+      )}
       <div>
         <label htmlFor="message" className="mb-1 block text-sm font-medium text-ink">
-          Message
+          {showReferenceLetterFields ? 'Additional Notes (optional)' : 'Message'}
         </label>
         <textarea id="message" name="message" rows={5} className="input" />
       </div>

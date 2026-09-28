@@ -650,7 +650,7 @@ export interface Resource {
    * Auto-generated from the title if left blank. Used in the page URL.
    */
   slug: string;
-  type: 'devotional' | 'reading-plan' | 'topical-guide';
+  type: 'start-here' | 'devotional' | 'reading-plan' | 'topical-guide';
   body?: {
     root: {
       type: string;
@@ -714,11 +714,21 @@ export interface PrayerRequest {
  */
 export interface FormSubmission {
   id: number;
-  formType: 'contact' | 'appointment' | 'membership';
+  formType: 'contact' | 'appointment' | 'membership' | 'reference-letter';
   name: string;
   email: string;
   phone?: string | null;
   preferredDate?: string | null;
+  /**
+   * Which ministry they want to join.
+   */
+  interestedMinistry?: (number | null) | Ministry;
+  letterType?: ('character' | 'membership-confirmation' | 'financial' | 'other') | null;
+  /**
+   * What the reference letter is for.
+   */
+  purpose?: string | null;
+  requiredByDate?: string | null;
   message?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -1214,6 +1224,10 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
   email?: T;
   phone?: T;
   preferredDate?: T;
+  interestedMinistry?: T;
+  letterType?: T;
+  purpose?: T;
+  requiredByDate?: T;
   message?: T;
   updatedAt?: T;
   createdAt?: T;

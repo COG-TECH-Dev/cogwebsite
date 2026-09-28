@@ -1,4 +1,4 @@
-import { CalendarCheck, Mail, MessageCircleHeart, UserPlus } from 'lucide-react'
+import { CalendarCheck, DoorOpen, FileText, Mail, MessageCircleHeart, UserPlus } from 'lucide-react'
 import Link from 'next/link'
 import type { ComponentType } from 'react'
 
@@ -10,10 +10,12 @@ import { StaggerGroup, StaggerItem } from '@/components/ui/Stagger'
 export const metadata = { title: 'Connect' }
 
 const sections: { label: string; href: string; description: string; icon: ComponentType<{ className?: string }> }[] = [
+  { label: "I'm New Here", href: '/connect/new-here', description: 'Planning a visit? Start here.', icon: DoorOpen },
   { label: 'Prayer Request', href: '/connect/prayer-request', description: "Share what's on your heart.", icon: MessageCircleHeart },
   { label: 'Contact Us', href: '/connect/contact', description: 'General questions and enquiries.', icon: Mail },
   { label: 'Appointments', href: '/connect/appointments', description: 'Book time with our pastoral team.', icon: CalendarCheck },
   { label: 'Membership', href: '/connect/membership', description: 'Take the next step and join us.', icon: UserPlus },
+  { label: 'Reference Letter', href: '/connect/reference-letter', description: 'Request a character or membership letter.', icon: FileText },
 ]
 
 export default function ConnectPage() {
@@ -21,7 +23,7 @@ export default function ConnectPage() {
     <div>
       <PageHeader eyebrow="Connect" title="We'd Love to Hear From You" />
       <Container className="py-16">
-        <StaggerGroup className="grid gap-6 sm:grid-cols-2">
+        <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {sections.map((section, i) => {
             const accent = ACCENTS[i % ACCENTS.length]
             const Icon = section.icon
