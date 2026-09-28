@@ -1,4 +1,4 @@
-import { Radio } from 'lucide-react'
+import { Radio, Tv } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -39,15 +39,18 @@ export async function MediaCategoryGrid({
       limit: 50,
       draft: false,
     }),
-    category === 'cog-grand-radio' ? payload.findGlobal({ slug: 'settings' }).catch(() => null) : null,
+    category === 'cog-grand-radio' || category === 'cog-tv'
+      ? payload.findGlobal({ slug: 'settings' }).catch(() => null)
+      : null,
   ])
   const radioUrl = settings?.socialLinks?.radioUrl
+  const youtubeChannelId = settings?.socialLinks?.youtubeChannelId
 
   return (
     <div>
       <PageHeader eyebrow={eyebrow} title={title} description={description} />
       <Container className="py-16">
-        {radioUrl && (
+        {category === 'cog-grand-radio' && radioUrl && (
           <BrandPanel className="mb-12 rounded-3xl p-8 text-center text-white sm:p-10">
             <Radio className="mx-auto h-9 w-9 text-gold-300" aria-hidden="true" />
             <h2 className="mt-3 font-serif text-xl font-semibold sm:text-2xl">Listen Live, 24/7</h2>
@@ -60,6 +63,27 @@ export async function MediaCategoryGrid({
               Listen Live
             </a>
           </BrandPanel>
+        )}
+
+        {category === 'cog-tv' && youtubeChannelId && (
+          <div className="mb-12">
+            <div className="mb-4 flex items-center gap-2">
+              <Tv className="h-5 w-5 text-gold-600" aria-hidden="true" />
+              <h2 className="font-serif text-xl font-semibold text-brand-700">Watch Live</h2>
+            </div>
+            <div className="aspect-video overflow-hidden rounded-2xl border border-border shadow-lg">
+              <iframe
+                src={`https://www.youtube.com/embed/live_stream?channel=${youtubeChannelId}`}
+                className="h-full w-full"
+                allowFullScreen
+                allow="autoplay; encrypted-media"
+                title="Live stream"
+              />
+            </div>
+            <p className="mt-3 text-sm text-ink-muted">
+              Nothing streaming right now? Check back during a service, or browse past messages below.
+            </p>
+          </div>
         )}
 
         {items.docs.length > 0 ? (

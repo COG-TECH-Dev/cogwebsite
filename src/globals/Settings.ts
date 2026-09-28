@@ -60,6 +60,14 @@ export const Settings: GlobalConfig = {
         { name: 'youtube', type: 'text' },
         { name: 'tiktok', type: 'text' },
         { name: 'radioUrl', type: 'text', admin: { description: 'COG Grand Radio (external site)' } },
+        {
+          name: 'youtubeChannelId',
+          type: 'text',
+          admin: {
+            description:
+              "Powers the live stream embed on COG TV. This is the channel's ID (starts with UC…), not the @handle — find it on the channel's About page under 'Share channel'.",
+          },
+        },
       ],
     },
     {

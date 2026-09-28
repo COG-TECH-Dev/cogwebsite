@@ -5,6 +5,7 @@ import * as migration_20260826_053847_add_card_grid_block from './20260826_05384
 import * as migration_20260927_060229_about_redesign_blocks from './20260927_060229_about_redesign_blocks';
 import * as migration_20260927_072329_ministries_icon_field from './20260927_072329_ministries_icon_field';
 import * as migration_20260927_082258_add_giving_global from './20260927_082258_add_giving_global';
+import * as migration_20260928_060444_add_youtube_channel_id from './20260928_060444_add_youtube_channel_id';
 
 export const migrations = [
   {
@@ -40,6 +41,11 @@ export const migrations = [
   {
     up: migration_20260927_082258_add_giving_global.up,
     down: migration_20260927_082258_add_giving_global.down,
-    name: '20260927_082258_add_giving_global'
+    name: '20260927_082258_add_giving_global',
+  },
+  {
+    up: migration_20260928_060444_add_youtube_channel_id.up,
+    down: migration_20260928_060444_add_youtube_channel_id.down,
+    name: '20260928_060444_add_youtube_channel_id'
   },
 ];

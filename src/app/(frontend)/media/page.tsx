@@ -22,6 +22,7 @@ export default async function MediaHubPage() {
   const payload = await getPayloadClient()
   const settings = await payload.findGlobal({ slug: 'settings' }).catch(() => null)
   const radioUrl = settings?.socialLinks?.radioUrl
+  const youtubeChannelId = settings?.socialLinks?.youtubeChannelId
 
   return (
     <div>
@@ -48,6 +49,31 @@ export default async function MediaHubPage() {
             )
           })}
         </StaggerGroup>
+
+        {youtubeChannelId && (
+          <div className="mt-12">
+            <div className="mb-4 flex items-center gap-2">
+              <Tv className="h-5 w-5 text-gold-600" aria-hidden="true" />
+              <h2 className="font-serif text-xl font-semibold text-brand-700">Watch Live</h2>
+            </div>
+            <div className="aspect-video overflow-hidden rounded-2xl border border-border shadow-lg">
+              <iframe
+                src={`https://www.youtube.com/embed/live_stream?channel=${youtubeChannelId}`}
+                className="h-full w-full"
+                allowFullScreen
+                allow="autoplay; encrypted-media"
+                title="Live stream"
+              />
+            </div>
+            <p className="mt-3 text-sm text-ink-muted">
+              Nothing streaming right now? Check back during a service, or watch{' '}
+              <Link href="/media/cog-tv" className="font-medium text-brand-600 hover:underline">
+                past messages on COG TV
+              </Link>
+              .
+            </p>
+          </div>
+        )}
 
         {radioUrl && (
           <BrandPanel className="mt-12 rounded-3xl p-8 text-center text-white sm:p-12">

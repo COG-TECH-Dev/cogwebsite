@@ -184,6 +184,9 @@ export interface User {
 export interface Ministry {
   id: number;
   name: string;
+  /**
+   * Auto-generated from the name if left blank. Used in the page URL.
+   */
   slug: string;
   summary?: string | null;
   description?: {
@@ -278,6 +281,9 @@ export interface Media {
 export interface Page {
   id: number;
   title: string;
+  /**
+   * Auto-generated from the title if left blank. Used in the page URL.
+   */
   slug: string;
   /**
    * Short line shown under the page title in the banner at the top of the page.
@@ -546,6 +552,9 @@ export interface Testimonial {
 export interface Event {
   id: number;
   title: string;
+  /**
+   * Auto-generated from the title if left blank. Used in the page URL.
+   */
   slug: string;
   type: 'programme' | 'conference' | 'mission' | 'regular';
   startDate: string;
@@ -581,6 +590,9 @@ export interface Event {
 export interface Sermon {
   id: number;
   title: string;
+  /**
+   * Auto-generated from the title if left blank. Used in the page URL.
+   */
   slug: string;
   speaker?: string | null;
   date: string;
@@ -634,6 +646,9 @@ export interface MediaGalleryItem {
 export interface Resource {
   id: number;
   title: string;
+  /**
+   * Auto-generated from the title if left blank. Used in the page URL.
+   */
   slug: string;
   type: 'devotional' | 'reading-plan' | 'topical-guide';
   body?: {
@@ -1273,6 +1288,10 @@ export interface Setting {
      * COG Grand Radio (external site)
      */
     radioUrl?: string | null;
+    /**
+     * Powers the live stream embed on COG TV. This is the channel's ID (starts with UC…), not the @handle — find it on the channel's About page under 'Share channel'.
+     */
+    youtubeChannelId?: string | null;
   };
   nav?:
     | {
@@ -1366,6 +1385,7 @@ export interface SettingsSelect<T extends boolean = true> {
         youtube?: T;
         tiktok?: T;
         radioUrl?: T;
+        youtubeChannelId?: T;
       };
   nav?:
     | T
