@@ -103,6 +103,12 @@ export default buildConfig({
     vercelBlobStorage({
       collections: { media: true },
       token: process.env.BLOB_READ_WRITE_TOKEN,
+      // Without this, uploads go through a Vercel serverless function and
+      // hit its hard 4.5MB request-body limit — easy to exceed with real
+      // photos (a DSLR JPEG is routinely 5-15MB). With it, the browser
+      // uploads the file straight to Vercel Blob and only a small
+      // confirmation payload passes through the function.
+      clientUploads: true,
     }),
   ],
 })
