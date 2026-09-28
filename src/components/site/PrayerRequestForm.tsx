@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 
 import { submitPrayerRequest, type FormState } from '@/app/(frontend)/connect/actions'
+import { ConsentNotice } from './ConsentNotice'
 import { Honeypot } from './Honeypot'
 
 const initialState: FormState = { status: 'idle' }
@@ -47,6 +48,7 @@ export function PrayerRequestForm() {
         <input type="checkbox" name="isConfidential" className="h-4 w-4 rounded border-border" />
         Keep this confidential
       </label>
+      <ConsentNotice />
       {state.status === 'error' && <p className="text-sm text-red-600">{state.message}</p>}
       <button type="submit" disabled={pending} className="btn-primary">
         {pending ? 'Sending…' : 'Submit Prayer Request'}

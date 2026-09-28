@@ -3,6 +3,7 @@
 import { useActionState } from 'react'
 
 import type { FormState } from '@/app/(frontend)/connect/actions'
+import { ConsentNotice } from './ConsentNotice'
 import { Honeypot } from './Honeypot'
 
 const initialState: FormState = { status: 'idle' }
@@ -115,6 +116,7 @@ export function EnquiryForm({
         </label>
         <textarea id="message" name="message" rows={5} className="input" />
       </div>
+      <ConsentNotice />
       {state.status === 'error' && <p className="text-sm text-red-600">{state.message}</p>}
       <button type="submit" disabled={pending} className="btn-primary">
         {pending ? 'Sending…' : submitLabel}
