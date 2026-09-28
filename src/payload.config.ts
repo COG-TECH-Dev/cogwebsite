@@ -31,12 +31,17 @@ export default buildConfig({
     user: Users.slug,
     meta: {
       titleSuffix: ' — City of God Christian Centre',
+      icons: [{ url: '/images/cog-mark.png', type: 'image/png' }],
     },
     importMap: {
       baseDir: path.resolve(dirname),
     },
     components: {
       afterLogin: ['/components/admin/PoweredBy#PoweredBy'],
+      graphics: {
+        Icon: '/components/admin/Icon#Icon',
+        Logo: '/components/admin/Logo#Logo',
+      },
     },
   },
   collections: [
