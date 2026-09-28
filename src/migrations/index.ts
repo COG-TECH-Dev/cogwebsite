@@ -7,6 +7,8 @@ import * as migration_20260927_072329_ministries_icon_field from './20260927_072
 import * as migration_20260927_082258_add_giving_global from './20260927_082258_add_giving_global';
 import * as migration_20260928_060444_add_youtube_channel_id from './20260928_060444_add_youtube_channel_id';
 import * as migration_20260928_062931_add_reference_letter_and_start_here from './20260928_062931_add_reference_letter_and_start_here';
+import * as migration_20260928_082256_add_event_registrations from './20260928_082256_add_event_registrations';
+import * as migration_20260928_083012_add_testimonial_status from './20260928_083012_add_testimonial_status';
 
 export const migrations = [
   {
@@ -52,6 +54,16 @@ export const migrations = [
   {
     up: migration_20260928_062931_add_reference_letter_and_start_here.up,
     down: migration_20260928_062931_add_reference_letter_and_start_here.down,
-    name: '20260928_062931_add_reference_letter_and_start_here'
+    name: '20260928_062931_add_reference_letter_and_start_here',
+  },
+  {
+    up: migration_20260928_082256_add_event_registrations.up,
+    down: migration_20260928_082256_add_event_registrations.down,
+    name: '20260928_082256_add_event_registrations',
+  },
+  {
+    up: migration_20260928_083012_add_testimonial_status.up,
+    down: migration_20260928_083012_add_testimonial_status.down,
+    name: '20260928_083012_add_testimonial_status'
   },
 ];

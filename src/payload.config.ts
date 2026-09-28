@@ -12,6 +12,7 @@ import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Ministries } from './collections/Ministries'
 import { Events } from './collections/Events'
+import { EventRegistrations } from './collections/EventRegistrations'
 import { Sermons } from './collections/Sermons'
 import { MediaGalleryItems } from './collections/MediaGalleryItems'
 import { Resources } from './collections/Resources'
@@ -50,6 +51,7 @@ export default buildConfig({
     Pages,
     Ministries,
     Events,
+    EventRegistrations,
     Sermons,
     MediaGalleryItems,
     Resources,

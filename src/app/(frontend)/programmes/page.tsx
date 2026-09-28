@@ -117,6 +117,11 @@ export default async function ProgrammesPage({ searchParams }: Args) {
                         {event.title}
                       </p>
                       {event.location && <p className="mt-1 text-sm text-ink-muted">{event.location}</p>}
+                      {event.registrationEnabled && (
+                        <span className="mt-3 inline-flex w-fit items-center rounded-full bg-gold-100 px-3 py-1 text-xs font-semibold text-gold-700">
+                          RSVP required
+                        </span>
+                      )}
                     </div>
                   </Link>
                 </StaggerItem>

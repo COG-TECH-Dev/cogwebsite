@@ -10,6 +10,7 @@ import { formatEventDateRange, TYPE_ICONS, TYPE_LABELS } from '@/lib/eventDispla
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { BrandPanel } from '@/components/ui/BrandVisuals'
 import { Button } from '@/components/ui/Button'
+import { EventRegistrationForm } from '@/components/site/EventRegistrationForm'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Reveal } from '@/components/ui/Reveal'
@@ -63,6 +64,20 @@ export default async function EventPage({ params }: Args) {
   const icon = TYPE_ICONS[event.type] ?? 'compass'
   const ministry = typeof event.relatedMinistry === 'object' ? event.relatedMinistry : null
   const others = await getOtherEvents(event.id)
+
+  let spotsRemaining: number | null = null
+  let isFull = false
+  if (event.registrationEnabled && event.capacity) {
+    const payload = await getPayloadClient()
+    const registrations = await payload.find({
+      collection: 'event-registrations',
+      where: { event: { equals: event.id } },
+      limit: 0,
+    })
+    const taken = registrations.docs.reduce((sum, r) => sum + (typeof r.guests === 'number' ? r.guests : 1), 0)
+    spotsRemaining = Math.max(event.capacity - taken, 0)
+    isFull = spotsRemaining <= 0
+  }
 
   return (
     <div>
@@ -124,13 +139,36 @@ export default async function EventPage({ params }: Args) {
                   <p className="mt-2 font-semibold text-brand-700 group-hover:text-brand-600">{ministry.name} →</p>
                 </Link>
               )}
-              {event.externalRegistrationLink && (
+              {event.registrationEnabled ? (
                 <div className="relative isolate overflow-hidden rounded-2xl bg-linear-to-br from-brand-900 via-brand-700 to-brand-600 p-6 text-center text-white">
-                  <p className="font-serif text-lg font-semibold">Ready to join us?</p>
-                  <Button href={event.externalRegistrationLink} className="mt-4 w-full">
-                    Register
-                  </Button>
+                  <p className="font-serif text-lg font-semibold">Reserve Your Spot</p>
+                  {spotsRemaining !== null && (
+                    <p className="mt-1 text-sm text-white/80">
+                      {isFull ? 'Fully booked' : `${spotsRemaining} spot${spotsRemaining === 1 ? '' : 's'} left`}
+                    </p>
+                  )}
+                  {isFull ? (
+                    <p className="mt-4 text-sm text-white/90">
+                      This event is fully booked. Contact us if a spot opens up.
+                    </p>
+                  ) : (
+                    <EventRegistrationForm eventId={event.id} />
+                  )}
+                  {event.externalRegistrationLink && (
+                    <Button href={event.externalRegistrationLink} variant="outline" className="mt-4 w-full">
+                      Register Externally
+                    </Button>
+                  )}
                 </div>
+              ) : (
+                event.externalRegistrationLink && (
+                  <div className="relative isolate overflow-hidden rounded-2xl bg-linear-to-br from-brand-900 via-brand-700 to-brand-600 p-6 text-center text-white">
+                    <p className="font-serif text-lg font-semibold">Ready to join us?</p>
+                    <Button href={event.externalRegistrationLink} className="mt-4 w-full">
+                      Register
+                    </Button>
+                  </div>
+                )
               )}
             </aside>
           </Reveal>

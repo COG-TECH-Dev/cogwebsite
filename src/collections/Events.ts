@@ -59,6 +59,21 @@ export const Events: CollectionConfig = {
     { name: 'featuredImage', type: 'upload', relationTo: 'media' },
     { name: 'relatedMinistry', type: 'relationship', relationTo: 'ministries' },
     { name: 'externalRegistrationLink', type: 'text' },
+    {
+      name: 'registrationEnabled',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: { description: 'Let people RSVP for this event directly on the site.' },
+    },
+    {
+      name: 'capacity',
+      type: 'number',
+      min: 1,
+      admin: {
+        description: 'Maximum total attendees. Leave blank for unlimited.',
+        condition: (data) => data.registrationEnabled,
+      },
+    },
     { name: 'featured', type: 'checkbox', defaultValue: false },
   ],
 }

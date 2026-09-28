@@ -72,6 +72,7 @@ export interface Config {
     pages: Page;
     ministries: Ministry;
     events: Event;
+    'event-registrations': EventRegistration;
     sermons: Sermon;
     'media-gallery-items': MediaGalleryItem;
     resources: Resource;
@@ -91,6 +92,7 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     ministries: MinistriesSelect<false> | MinistriesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
+    'event-registrations': EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
     sermons: SermonsSelect<false> | SermonsSelect<true>;
     'media-gallery-items': MediaGalleryItemsSelect<false> | MediaGalleryItemsSelect<true>;
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
@@ -541,6 +543,14 @@ export interface Testimonial {
   photo?: (number | null) | Media;
   quote: string;
   relatedMinistry?: (number | null) | Ministry;
+  /**
+   * Contact email for follow-up only — never shown publicly.
+   */
+  submitterEmail?: string | null;
+  /**
+   * Testimonies submitted by the public start as Pending Review and are hidden from the site until switched to Approved here.
+   */
+  status?: ('pending-review' | 'approved') | null;
   featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -578,10 +588,35 @@ export interface Event {
   featuredImage?: (number | null) | Media;
   relatedMinistry?: (number | null) | Ministry;
   externalRegistrationLink?: string | null;
+  /**
+   * Let people RSVP for this event directly on the site.
+   */
+  registrationEnabled?: boolean | null;
+  /**
+   * Maximum total attendees. Leave blank for unlimited.
+   */
+  capacity?: number | null;
   featured?: boolean | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-registrations".
+ */
+export interface EventRegistration {
+  id: number;
+  event: number | Event;
+  name: string;
+  email: string;
+  phone?: string | null;
+  /**
+   * Total number of people this registration covers, including the registrant.
+   */
+  guests: number;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -776,6 +811,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'events';
         value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'event-registrations';
+        value: number | EventRegistration;
       } | null)
     | ({
         relationTo: 'sermons';
@@ -1116,10 +1155,25 @@ export interface EventsSelect<T extends boolean = true> {
   featuredImage?: T;
   relatedMinistry?: T;
   externalRegistrationLink?: T;
+  registrationEnabled?: T;
+  capacity?: T;
   featured?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-registrations_select".
+ */
+export interface EventRegistrationsSelect<T extends boolean = true> {
+  event?: T;
+  name?: T;
+  email?: T;
+  phone?: T;
+  guests?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1183,6 +1237,8 @@ export interface TestimonialsSelect<T extends boolean = true> {
   photo?: T;
   quote?: T;
   relatedMinistry?: T;
+  submitterEmail?: T;
+  status?: T;
   featured?: T;
   updatedAt?: T;
   createdAt?: T;
