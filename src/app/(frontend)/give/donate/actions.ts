@@ -35,6 +35,7 @@ export async function createDonationCheckout(_prev: DonateState, formData: FormD
   const amountPence = Math.round(amountPounds * 100)
 
   const frequency = formData.get('frequency') === 'monthly' ? 'monthly' : 'one-time'
+  const branch = String(formData.get('branch') || 'Newcastle')
   const fund = String(formData.get('fund') || 'General Fund')
   const donorName = String(formData.get('name') || '').trim()
   const donorEmail = String(formData.get('email') || '').trim()
@@ -66,6 +67,7 @@ export async function createDonationCheckout(_prev: DonateState, formData: FormD
       donorName,
       donorEmail,
       amount: amountPence,
+      branch,
       fund,
       frequency,
       giftAid,
@@ -82,14 +84,14 @@ export async function createDonationCheckout(_prev: DonateState, formData: FormD
       payment_method_types: ['card'],
       customer_email: donorEmail,
       client_reference_id: String(donation.id),
-      metadata: { donationId: String(donation.id), fund },
+      metadata: { donationId: String(donation.id), branch, fund },
       line_items: [
         {
           quantity: 1,
           price_data: {
             currency: 'gbp',
             unit_amount: amountPence,
-            product_data: { name: `Donation — ${fund}` },
+            product_data: { name: `Donation — ${branch} — ${fund}` },
             ...(frequency === 'monthly' ? { recurring: { interval: 'month' as const } } : {}),
           },
         },

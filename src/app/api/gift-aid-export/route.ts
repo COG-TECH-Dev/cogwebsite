@@ -43,13 +43,14 @@ export async function GET(request: Request) {
     limit: 5000,
   })
 
-  const header = ['Donor Name', 'Address', 'Postcode', 'Date Paid', 'Amount (GBP)', 'Fund']
+  const header = ['Donor Name', 'Address', 'Postcode', 'Date Paid', 'Amount (GBP)', 'Branch', 'Fund']
   const rows = result.docs.map((d) => [
     d.giftAid?.fullName || d.donorName,
     d.giftAid?.address || '',
     d.giftAid?.postcode || '',
     d.paidAt ? new Date(d.paidAt).toISOString().slice(0, 10) : '',
     (d.amount / 100).toFixed(2),
+    d.branch,
     d.fund,
   ])
 

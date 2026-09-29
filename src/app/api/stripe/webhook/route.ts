@@ -133,6 +133,7 @@ export async function POST(request: Request) {
               donorName: source.donorName,
               donorEmail: source.donorEmail,
               amount: invoice.amount_paid,
+              branch: source.branch,
               fund: source.fund,
               frequency: 'monthly',
               giftAid: source.giftAid,

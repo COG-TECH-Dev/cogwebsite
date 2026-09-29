@@ -12,6 +12,7 @@ export default async function DonatePage() {
   const payload = await getPayloadClient()
   const giving = await payload.findGlobal({ slug: 'giving' }).catch(() => null)
   const funds = (giving?.funds ?? []).filter((f): f is { name: string; description?: string | null; id?: string | null } => Boolean(f.name))
+  const branches = (giving?.branches ?? []).filter((b): b is { name: string; id?: string | null } => Boolean(b.name))
   const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY)
 
   return (
@@ -23,7 +24,10 @@ export default async function DonatePage() {
       />
       <Container className="max-w-xl py-16">
         {stripeConfigured ? (
-          <DonateForm funds={funds.map((f) => ({ name: f.name, description: f.description ?? undefined }))} />
+          <DonateForm
+            branches={branches.map((b) => b.name)}
+            funds={funds.map((f) => ({ name: f.name, description: f.description ?? undefined }))}
+          />
         ) : (
           <div className="rounded-2xl border border-border bg-surface p-8 text-center">
             <p className="text-ink-muted">

@@ -9,7 +9,13 @@ import { Honeypot } from './Honeypot'
 const initialState: DonateState = { status: 'idle' }
 const QUICK_AMOUNTS = [10, 25, 50, 100]
 
-export function DonateForm({ funds }: { funds: { name: string; description?: string }[] }) {
+export function DonateForm({
+  branches,
+  funds,
+}: {
+  branches: string[]
+  funds: { name: string; description?: string }[]
+}) {
   const [state, formAction, pending] = useActionState(createDonationCheckout, initialState)
   const [amount, setAmount] = useState<number | null>(25)
   const [customAmount, setCustomAmount] = useState('')
@@ -18,6 +24,21 @@ export function DonateForm({ funds }: { funds: { name: string; description?: str
   return (
     <form action={formAction} className="space-y-6">
       <Honeypot />
+
+      {branches.length > 0 && (
+        <div>
+          <label htmlFor="branch" className="mb-1 block text-sm font-medium text-ink">
+            Which branch would you like to give to?
+          </label>
+          <select id="branch" name="branch" required className="input" defaultValue={branches[0]}>
+            {branches.map((branch) => (
+              <option key={branch} value={branch}>
+                {branch}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
 
       <div>
         <p className="mb-2 block text-sm font-medium text-ink">Amount</p>

@@ -36,6 +36,23 @@ export const Giving: GlobalConfig = {
       ],
     },
     {
+      name: 'branches',
+      type: 'array',
+      admin: {
+        description:
+          'Which branch a donor is giving to, shown on the online giving page. The first one is used as the default selection.',
+      },
+      access: { update: isAdminOrUpField },
+      fields: [{ name: 'name', type: 'text', required: true }],
+      defaultValue: [
+        { name: 'Newcastle' },
+        { name: 'Sunderland' },
+        { name: 'London' },
+        { name: 'Middlesbrough' },
+        { name: 'Gateshead' },
+      ],
+    },
+    {
       name: 'funds',
       type: 'array',
       admin: {

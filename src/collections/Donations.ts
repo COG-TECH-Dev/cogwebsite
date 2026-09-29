@@ -7,7 +7,7 @@ export const Donations: CollectionConfig = {
   admin: {
     group: 'Giving',
     useAsTitle: 'donorName',
-    defaultColumns: ['donorName', 'amount', 'fund', 'frequency', 'status', 'createdAt'],
+    defaultColumns: ['donorName', 'amount', 'branch', 'fund', 'frequency', 'status', 'createdAt'],
     description:
       'Records of online gifts made through Stripe. Created automatically when someone starts giving on /give/donate, and marked Completed by the Stripe webhook once payment succeeds.',
   },
@@ -32,6 +32,7 @@ export const Donations: CollectionConfig = {
       required: true,
       admin: { description: 'In pence (e.g. 2500 = £25.00), matching Stripe\'s own convention.' },
     },
+    { name: 'branch', type: 'text', required: true },
     { name: 'fund', type: 'text', required: true },
     {
       name: 'frequency',

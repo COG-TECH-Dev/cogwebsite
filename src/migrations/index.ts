@@ -10,6 +10,7 @@ import * as migration_20260928_062931_add_reference_letter_and_start_here from '
 import * as migration_20260928_082256_add_event_registrations from './20260928_082256_add_event_registrations';
 import * as migration_20260928_083012_add_testimonial_status from './20260928_083012_add_testimonial_status';
 import * as migration_20260929_041122_add_donations_and_funds from './20260929_041122_add_donations_and_funds';
+import * as migration_20260929_083042_add_donation_branch from './20260929_083042_add_donation_branch';
 
 export const migrations = [
   {
@@ -70,6 +71,11 @@ export const migrations = [
   {
     up: migration_20260929_041122_add_donations_and_funds.up,
     down: migration_20260929_041122_add_donations_and_funds.down,
-    name: '20260929_041122_add_donations_and_funds'
+    name: '20260929_041122_add_donations_and_funds',
+  },
+  {
+    up: migration_20260929_083042_add_donation_branch.up,
+    down: migration_20260929_083042_add_donation_branch.down,
+    name: '20260929_083042_add_donation_branch'
   },
 ];

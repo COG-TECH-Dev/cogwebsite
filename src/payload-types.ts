@@ -744,6 +744,7 @@ export interface Donation {
    * In pence (e.g. 2500 = £25.00), matching Stripe's own convention.
    */
   amount: number;
+  branch: string;
   fund: string;
   frequency: 'one-time' | 'monthly';
   /**
@@ -1310,6 +1311,7 @@ export interface DonationsSelect<T extends boolean = true> {
   donorName?: T;
   donorEmail?: T;
   amount?: T;
+  branch?: T;
   fund?: T;
   frequency?: T;
   giftAid?:
@@ -1485,6 +1487,15 @@ export interface Giving {
     referenceNote?: string | null;
   };
   /**
+   * Which branch a donor is giving to, shown on the online giving page. The first one is used as the default selection.
+   */
+  branches?:
+    | {
+        name: string;
+        id?: string | null;
+      }[]
+    | null;
+  /**
    * Funds a donor can choose from on the online giving page. The first one is used as the default selection.
    */
   funds?:
@@ -1573,6 +1584,12 @@ export interface GivingSelect<T extends boolean = true> {
         sortCode?: T;
         accountNumber?: T;
         referenceNote?: T;
+      };
+  branches?:
+    | T
+    | {
+        name?: T;
+        id?: T;
       };
   funds?:
     | T
