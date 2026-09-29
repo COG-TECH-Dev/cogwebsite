@@ -78,6 +78,7 @@ export interface Config {
     resources: Resource;
     testimonials: Testimonial;
     'bookstore-items': BookstoreItem;
+    donations: Donation;
     'prayer-requests': PrayerRequest;
     'form-submissions': FormSubmission;
     'payload-kv': PayloadKv;
@@ -98,6 +99,7 @@ export interface Config {
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     'bookstore-items': BookstoreItemsSelect<false> | BookstoreItemsSelect<true>;
+    donations: DonationsSelect<false> | DonationsSelect<true>;
     'prayer-requests': PrayerRequestsSelect<false> | PrayerRequestsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
@@ -729,6 +731,46 @@ export interface BookstoreItem {
   createdAt: string;
 }
 /**
+ * Records of online gifts made through Stripe. Created automatically when someone starts giving on /give/donate, and marked Completed by the Stripe webhook once payment succeeds.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "donations".
+ */
+export interface Donation {
+  id: number;
+  donorName: string;
+  donorEmail: string;
+  /**
+   * In pence (e.g. 2500 = £25.00), matching Stripe's own convention.
+   */
+  amount: number;
+  fund: string;
+  frequency: 'one-time' | 'monthly';
+  /**
+   * HMRC requires a home address + postcode for a valid Gift Aid declaration.
+   */
+  giftAid?: {
+    declared?: boolean | null;
+    fullName?: string | null;
+    address?: string | null;
+    postcode?: string | null;
+  };
+  status?: ('pending' | 'completed' | 'failed') | null;
+  /**
+   * When Stripe confirmed payment — distinct from createdAt (when the donor started checkout).
+   */
+  paidAt?: string | null;
+  stripeCheckoutSessionId?: string | null;
+  stripeCustomerId?: string | null;
+  stripeSubscriptionId?: string | null;
+  /**
+   * Set on recurring renewal charges (from invoice.paid) — prevents double-recording the same charge.
+   */
+  stripeInvoiceId?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "prayer-requests".
  */
@@ -835,6 +877,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'bookstore-items';
         value: number | BookstoreItem;
+      } | null)
+    | ({
+        relationTo: 'donations';
+        value: number | Donation;
       } | null)
     | ({
         relationTo: 'prayer-requests';
@@ -1258,6 +1304,33 @@ export interface BookstoreItemsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "donations_select".
+ */
+export interface DonationsSelect<T extends boolean = true> {
+  donorName?: T;
+  donorEmail?: T;
+  amount?: T;
+  fund?: T;
+  frequency?: T;
+  giftAid?:
+    | T
+    | {
+        declared?: T;
+        fullName?: T;
+        address?: T;
+        postcode?: T;
+      };
+  status?: T;
+  paidAt?: T;
+  stripeCheckoutSessionId?: T;
+  stripeCustomerId?: T;
+  stripeSubscriptionId?: T;
+  stripeInvoiceId?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "prayer-requests_select".
  */
 export interface PrayerRequestsSelect<T extends boolean = true> {
@@ -1412,7 +1485,17 @@ export interface Giving {
     referenceNote?: string | null;
   };
   /**
-   * A link to a card/online giving provider (e.g. Tithe.ly, GoCardless, a Stripe Payment Link). Leave URL blank to show "coming soon" instead.
+   * Funds a donor can choose from on the online giving page. The first one is used as the default selection.
+   */
+  funds?:
+    | {
+        name: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Fallback link shown only if Stripe isn't configured (no STRIPE_SECRET_KEY) — e.g. a Tithe.ly or GoCardless page. Once Stripe is set up, the "Give Online" button uses the native /give/donate flow instead and this is ignored. Leave URL blank to show "coming soon" in the meantime.
    */
   onlineGiving?: {
     url?: string | null;
@@ -1490,6 +1573,13 @@ export interface GivingSelect<T extends boolean = true> {
         sortCode?: T;
         accountNumber?: T;
         referenceNote?: T;
+      };
+  funds?:
+    | T
+    | {
+        name?: T;
+        description?: T;
+        id?: T;
       };
   onlineGiving?:
     | T

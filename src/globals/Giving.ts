@@ -36,11 +36,30 @@ export const Giving: GlobalConfig = {
       ],
     },
     {
+      name: 'funds',
+      type: 'array',
+      admin: {
+        description:
+          'Funds a donor can choose from on the online giving page. The first one is used as the default selection.',
+      },
+      access: { update: isAdminOrUpField },
+      fields: [
+        { name: 'name', type: 'text', required: true },
+        { name: 'description', type: 'text' },
+      ],
+      defaultValue: [
+        { name: 'General Fund / Tithe', description: 'Support the ongoing ministry and operations of the church.' },
+        { name: 'Missions', description: 'Support our missionary partners and outreach beyond our community.' },
+        { name: 'Building Fund', description: 'Help us build a house of worship for the next generation.' },
+        { name: 'Benevolence', description: 'Support members and the community facing financial hardship.' },
+      ],
+    },
+    {
       name: 'onlineGiving',
       type: 'group',
       admin: {
         description:
-          'A link to a card/online giving provider (e.g. Tithe.ly, GoCardless, a Stripe Payment Link). Leave URL blank to show "coming soon" instead.',
+          'Fallback link shown only if Stripe isn\'t configured (no STRIPE_SECRET_KEY) — e.g. a Tithe.ly or GoCardless page. Once Stripe is set up, the "Give Online" button uses the native /give/donate flow instead and this is ignored. Leave URL blank to show "coming soon" in the meantime.',
       },
       access: { update: isAdminOrUpField },
       fields: [

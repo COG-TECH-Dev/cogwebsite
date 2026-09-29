@@ -29,6 +29,7 @@ export default async function GivePage() {
 
   const bank = giving?.bankTransfer
   const hasBankDetails = Boolean(bank?.accountName && bank?.sortCode && bank?.accountNumber)
+  const stripeConfigured = Boolean(process.env.STRIPE_SECRET_KEY)
   const onlineUrl = giving?.onlineGiving?.url
 
   return (
@@ -86,7 +87,25 @@ export default async function GivePage() {
             <p className="mt-5 font-serif text-xl font-semibold text-brand-700">
               {giving?.onlineGiving?.label || 'Give Online'}
             </p>
-            {onlineUrl ? (
+            {stripeConfigured ? (
+              <>
+                <p className="mt-2 text-sm leading-relaxed text-ink-muted">
+                  Give quickly and securely online by card, as a one-time gift or on a recurring schedule.
+                </p>
+                <Link
+                  href="/give/donate"
+                  className="mt-5 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-600"
+                >
+                  Give Online
+                </Link>
+                <Link
+                  href="/give/manage"
+                  className="mt-3 block text-center text-sm font-semibold text-brand-600 hover:underline"
+                >
+                  Manage my recurring giving →
+                </Link>
+              </>
+            ) : onlineUrl ? (
               <>
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">
                   Give quickly and securely online by card, in one gift or on a recurring schedule.
@@ -142,7 +161,10 @@ export default async function GivePage() {
           <h3 className="mt-2 font-serif text-2xl font-semibold text-brand-700">Make Your Gift Go Further with Gift Aid</h3>
           <p className="mt-3 max-w-2xl text-ink-muted">
             If you&apos;re a UK taxpayer, Gift Aid lets us claim an extra 25p for every £1 you give — at no extra cost
-            to you. Ask us for a Gift Aid declaration form to get started.
+            to you.{' '}
+            {stripeConfigured
+              ? 'Tick the Gift Aid box when you give online and we\'ll take care of the rest.'
+              : 'Ask us for a Gift Aid declaration form to get started.'}
           </p>
           {giving?.charityNumber && (
             <p className="mt-4 text-sm font-medium text-ink-muted">Charity No. {giving.charityNumber}</p>

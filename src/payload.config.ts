@@ -18,6 +18,7 @@ import { MediaGalleryItems } from './collections/MediaGalleryItems'
 import { Resources } from './collections/Resources'
 import { Testimonials } from './collections/Testimonials'
 import { BookstoreItems } from './collections/BookstoreItems'
+import { Donations } from './collections/Donations'
 import { PrayerRequests } from './collections/PrayerRequests'
 import { FormSubmissions } from './collections/FormSubmissions'
 import { Giving } from './globals/Giving'
@@ -57,6 +58,7 @@ export default buildConfig({
     Resources,
     Testimonials,
     BookstoreItems,
+    Donations,
     PrayerRequests,
     FormSubmissions,
   ],

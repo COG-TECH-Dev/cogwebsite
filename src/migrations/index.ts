@@ -9,6 +9,7 @@ import * as migration_20260928_060444_add_youtube_channel_id from './20260928_06
 import * as migration_20260928_062931_add_reference_letter_and_start_here from './20260928_062931_add_reference_letter_and_start_here';
 import * as migration_20260928_082256_add_event_registrations from './20260928_082256_add_event_registrations';
 import * as migration_20260928_083012_add_testimonial_status from './20260928_083012_add_testimonial_status';
+import * as migration_20260929_041122_add_donations_and_funds from './20260929_041122_add_donations_and_funds';
 
 export const migrations = [
   {
@@ -64,6 +65,11 @@ export const migrations = [
   {
     up: migration_20260928_083012_add_testimonial_status.up,
     down: migration_20260928_083012_add_testimonial_status.down,
-    name: '20260928_083012_add_testimonial_status'
+    name: '20260928_083012_add_testimonial_status',
+  },
+  {
+    up: migration_20260929_041122_add_donations_and_funds.up,
+    down: migration_20260929_041122_add_donations_and_funds.down,
+    name: '20260929_041122_add_donations_and_funds'
   },
 ];
