@@ -38,12 +38,17 @@ export async function submitPrayerRequest(_prev: FormState, formData: FormData):
 }
 
 export async function submitEnquiry(
-  formType: 'contact' | 'appointment' | 'membership' | 'reference-letter',
+  formType: 'contact' | 'appointment' | 'membership' | 'reference-letter' | 'welfare',
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
+  const successMessage =
+    formType === 'welfare'
+      ? "Thank you for reaching out — someone from our welfare team will be in touch discreetly."
+      : "Thank you — we'll be in touch soon."
+
   if (isSpam(formData)) {
-    return { status: 'success', message: "Thank you — we'll be in touch soon." }
+    return { status: 'success', message: successMessage }
   }
 
   const payload = await getPayloadClient()
@@ -62,10 +67,46 @@ export async function submitEnquiry(
         letterType: (formData.get('letterType') as FormSubmission['letterType']) || undefined,
         purpose: formData.get('purpose') ? String(formData.get('purpose')) : undefined,
         requiredByDate: formData.get('requiredByDate') ? String(formData.get('requiredByDate')) : undefined,
+        supportType: (formData.get('supportType') as FormSubmission['supportType']) || undefined,
         message: String(formData.get('message') || ''),
       },
     })
-    return { status: 'success', message: "Thank you — we'll be in touch soon." }
+    return { status: 'success', message: successMessage }
+  } catch {
+    return { status: 'error', message: 'Something went wrong. Please try again.' }
+  }
+}
+
+export type StepOfFaithState = { status: 'idle' | 'success' | 'error'; message?: string }
+
+export async function submitStepOfFaith(_prev: StepOfFaithState, formData: FormData): Promise<StepOfFaithState> {
+  if (isSpam(formData)) {
+    return { status: 'success' }
+  }
+
+  const decisionType = formData.get('decisionType') as FormSubmission['decisionType']
+  if (!decisionType) {
+    return { status: 'error', message: 'Please choose the option that best describes your decision today.' }
+  }
+
+  const payload = await getPayloadClient()
+  const name = String(formData.get('name') || '').trim()
+  const email = String(formData.get('email') || '').trim()
+
+  try {
+    await payload.create({
+      collection: 'form-submissions',
+      data: {
+        formType: 'step-of-faith',
+        decisionType,
+        // Genuinely optional here — someone can respond fully anonymously
+        // and still see their next steps below.
+        name: name || undefined,
+        email: email || undefined,
+        phone: formData.get('phone') ? String(formData.get('phone')) : undefined,
+      },
+    })
+    return { status: 'success' }
   } catch {
     return { status: 'error', message: 'Something went wrong. Please try again.' }
   }

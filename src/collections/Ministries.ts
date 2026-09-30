@@ -63,5 +63,14 @@ export const Ministries: CollectionConfig = {
       ],
     },
     { name: 'featured', type: 'checkbox', defaultValue: false },
+    {
+      name: 'isChildrensMinistry',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        description:
+          "Shows a distinct, kid-friendly visual style and the photo consent / volunteer / pre-registration safeguarding forms on this ministry's page.",
+      },
+    },
   ],
 }

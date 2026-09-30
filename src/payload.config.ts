@@ -11,6 +11,7 @@ import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Ministries } from './collections/Ministries'
+import { Homegroups } from './collections/Homegroups'
 import { Events } from './collections/Events'
 import { EventRegistrations } from './collections/EventRegistrations'
 import { Sermons } from './collections/Sermons'
@@ -18,6 +19,7 @@ import { MediaGalleryItems } from './collections/MediaGalleryItems'
 import { Resources } from './collections/Resources'
 import { Testimonials } from './collections/Testimonials'
 import { BookstoreItems } from './collections/BookstoreItems'
+import { ChildSafeguardingForms } from './collections/ChildSafeguardingForms'
 import { Donations } from './collections/Donations'
 import { PrayerRequests } from './collections/PrayerRequests'
 import { FormSubmissions } from './collections/FormSubmissions'
@@ -51,6 +53,7 @@ export default buildConfig({
     Media,
     Pages,
     Ministries,
+    Homegroups,
     Events,
     EventRegistrations,
     Sermons,
@@ -58,6 +61,7 @@ export default buildConfig({
     Resources,
     Testimonials,
     BookstoreItems,
+    ChildSafeguardingForms,
     Donations,
     PrayerRequests,
     FormSubmissions,

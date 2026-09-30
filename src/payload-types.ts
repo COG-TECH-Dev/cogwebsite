@@ -71,6 +71,7 @@ export interface Config {
     media: Media;
     pages: Page;
     ministries: Ministry;
+    homegroups: Homegroup;
     events: Event;
     'event-registrations': EventRegistration;
     sermons: Sermon;
@@ -78,6 +79,7 @@ export interface Config {
     resources: Resource;
     testimonials: Testimonial;
     'bookstore-items': BookstoreItem;
+    'child-safeguarding-forms': ChildSafeguardingForm;
     donations: Donation;
     'prayer-requests': PrayerRequest;
     'form-submissions': FormSubmission;
@@ -92,6 +94,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     ministries: MinistriesSelect<false> | MinistriesSelect<true>;
+    homegroups: HomegroupsSelect<false> | HomegroupsSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     'event-registrations': EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
     sermons: SermonsSelect<false> | SermonsSelect<true>;
@@ -99,6 +102,7 @@ export interface Config {
     resources: ResourcesSelect<false> | ResourcesSelect<true>;
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     'bookstore-items': BookstoreItemsSelect<false> | BookstoreItemsSelect<true>;
+    'child-safeguarding-forms': ChildSafeguardingFormsSelect<false> | ChildSafeguardingFormsSelect<true>;
     donations: DonationsSelect<false> | DonationsSelect<true>;
     'prayer-requests': PrayerRequestsSelect<false> | PrayerRequestsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -252,6 +256,10 @@ export interface Ministry {
       }[]
     | null;
   featured?: boolean | null;
+  /**
+   * Shows a distinct, kid-friendly visual style and the photo consent / volunteer / pre-registration safeguarding forms on this ministry's page.
+   */
+  isChildrensMinistry?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -559,6 +567,31 @@ export interface Testimonial {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homegroups".
+ */
+export interface Homegroup {
+  id: number;
+  /**
+   * e.g. "Central Newcastle Homegroup"
+   */
+  name: string;
+  /**
+   * The neighbourhood/area it meets in — shown so people can find one near them.
+   */
+  area: string;
+  leaderName?: string | null;
+  contactEmail?: string | null;
+  contactPhone?: string | null;
+  /**
+   * e.g. "Every Tuesday, 7:00 PM"
+   */
+  meetingDay?: string | null;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
 export interface Event {
@@ -731,6 +764,46 @@ export interface BookstoreItem {
   createdAt: string;
 }
 /**
+ * Photo/media consent, volunteer interest, and pre-registration submissions from the Children's Ministry page. Contains data about minors — admin/super-admin only.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "child-safeguarding-forms".
+ */
+export interface ChildSafeguardingForm {
+  id: number;
+  formType: 'photo-consent' | 'volunteer-interest' | 'pre-registration';
+  parentName: string;
+  parentEmail: string;
+  parentPhone?: string | null;
+  childName?: string | null;
+  /**
+   * Used to place your child in the right age group.
+   */
+  childDOB?: string | null;
+  /**
+   * The explicit, recorded consent decision — never inferred, always one or the other (CLR-005).
+   */
+  photoConsent?: ('consent' | 'decline') | null;
+  /**
+   * Any allergies, medical conditions, or other information our team should know.
+   */
+  allergiesOrMedicalNotes?: string | null;
+  emergencyContactName?: string | null;
+  emergencyContactPhone?: string | null;
+  /**
+   * Days/times they could help.
+   */
+  availability?: string | null;
+  /**
+   * Confirms they were told a DBS/reference check is required before serving.
+   */
+  vettingAcknowledged?: boolean | null;
+  message?: string | null;
+  status?: ('new' | 'in-progress' | 'resolved') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
  * Records of online gifts made through Stripe. Created automatically when someone starts giving on /give/donate, and marked Completed by the Stripe webhook once payment succeeds.
  *
  * This interface was referenced by `Config`'s JSON-Schema
@@ -792,9 +865,9 @@ export interface PrayerRequest {
  */
 export interface FormSubmission {
   id: number;
-  formType: 'contact' | 'appointment' | 'membership' | 'reference-letter';
-  name: string;
-  email: string;
+  formType: 'contact' | 'appointment' | 'membership' | 'reference-letter' | 'welfare' | 'step-of-faith';
+  name?: string | null;
+  email?: string | null;
   phone?: string | null;
   preferredDate?: string | null;
   /**
@@ -807,6 +880,11 @@ export interface FormSubmission {
    */
   purpose?: string | null;
   requiredByDate?: string | null;
+  /**
+   * What kind of support they need.
+   */
+  supportType?: ('financial' | 'counselling' | 'food' | 'other') | null;
+  decisionType?: ('first-time' | 'recommitting' | 'learn-more') | null;
   message?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -852,6 +930,10 @@ export interface PayloadLockedDocument {
         value: number | Ministry;
       } | null)
     | ({
+        relationTo: 'homegroups';
+        value: number | Homegroup;
+      } | null)
+    | ({
         relationTo: 'events';
         value: number | Event;
       } | null)
@@ -878,6 +960,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'bookstore-items';
         value: number | BookstoreItem;
+      } | null)
+    | ({
+        relationTo: 'child-safeguarding-forms';
+        value: number | ChildSafeguardingForm;
       } | null)
     | ({
         relationTo: 'donations';
@@ -1184,6 +1270,22 @@ export interface MinistriesSelect<T extends boolean = true> {
         id?: T;
       };
   featured?: T;
+  isChildrensMinistry?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "homegroups_select".
+ */
+export interface HomegroupsSelect<T extends boolean = true> {
+  name?: T;
+  area?: T;
+  leaderName?: T;
+  contactEmail?: T;
+  contactPhone?: T;
+  meetingDay?: T;
+  description?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1305,6 +1407,28 @@ export interface BookstoreItemsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "child-safeguarding-forms_select".
+ */
+export interface ChildSafeguardingFormsSelect<T extends boolean = true> {
+  formType?: T;
+  parentName?: T;
+  parentEmail?: T;
+  parentPhone?: T;
+  childName?: T;
+  childDOB?: T;
+  photoConsent?: T;
+  allergiesOrMedicalNotes?: T;
+  emergencyContactName?: T;
+  emergencyContactPhone?: T;
+  availability?: T;
+  vettingAcknowledged?: T;
+  message?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "donations_select".
  */
 export interface DonationsSelect<T extends boolean = true> {
@@ -1359,6 +1483,8 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
   letterType?: T;
   purpose?: T;
   requiredByDate?: T;
+  supportType?: T;
+  decisionType?: T;
   message?: T;
   updatedAt?: T;
   createdAt?: T;

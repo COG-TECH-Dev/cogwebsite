@@ -1,4 +1,15 @@
-import { CalendarCheck, DoorOpen, FileText, Mail, MessageCircleHeart, Sparkles, UserPlus } from 'lucide-react'
+import {
+  CalendarCheck,
+  DoorOpen,
+  FileText,
+  Footprints,
+  HeartHandshake,
+  Mail,
+  MessageCircleHeart,
+  Sparkles,
+  UserPlus,
+  Users,
+} from 'lucide-react'
 import Link from 'next/link'
 import type { ComponentType } from 'react'
 
@@ -11,8 +22,11 @@ export const metadata = { title: 'Connect' }
 
 const sections: { label: string; href: string; description: string; icon: ComponentType<{ className?: string }> }[] = [
   { label: "I'm New Here", href: '/connect/new-here', description: 'Planning a visit? Start here.', icon: DoorOpen },
+  { label: 'Take a Step of Faith', href: '/connect/next-steps', description: 'Begin or recommit your journey with Jesus.', icon: Footprints },
+  { label: 'Find a Homegroup', href: '/connect/homegroups', description: 'Join a small group near you.', icon: Users },
   { label: 'Prayer Request', href: '/connect/prayer-request', description: "Share what's on your heart.", icon: MessageCircleHeart },
   { label: 'Share a Testimony', href: '/connect/share-testimony', description: 'Tell us what God has done in your life.', icon: Sparkles },
+  { label: 'Welfare & Support', href: '/connect/welfare', description: 'Discreet help in difficult times.', icon: HeartHandshake },
   { label: 'Contact Us', href: '/connect/contact', description: 'General questions and enquiries.', icon: Mail },
   { label: 'Appointments', href: '/connect/appointments', description: 'Book time with our pastoral team.', icon: CalendarCheck },
   { label: 'Membership', href: '/connect/membership', description: 'Take the next step and join us.', icon: UserPlus },

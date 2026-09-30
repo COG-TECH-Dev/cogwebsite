@@ -335,7 +335,7 @@ export default async function HomePage() {
                   Whatever brought you here today, God already knows — and He&apos;s inviting you to take the next
                   step. It only takes a moment to respond.
                 </p>
-                <Link href="/connect/prayer-request" className="mt-4 inline-block text-sm font-semibold text-brand-600 hover:underline">
+                <Link href="/connect/next-steps" className="mt-4 inline-block text-sm font-semibold text-brand-600 hover:underline">
                   Respond now →
                 </Link>
               </div>

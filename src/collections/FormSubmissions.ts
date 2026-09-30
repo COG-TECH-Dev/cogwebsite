@@ -14,7 +14,8 @@ export const FormSubmissions: CollectionConfig = {
     afterChange: [
       notifyOnSubmission(
         'New Website Enquiry',
-        (doc) => `${doc.name} (${doc.email}) submitted a ${doc.formType} form:\n\n${doc.message || '(no message)'}`,
+        (doc) =>
+          `${doc.name || 'Someone (anonymous)'}${doc.email ? ` (${doc.email})` : ''} submitted a ${doc.formType} form:\n\n${doc.message || '(no message)'}`,
       ),
     ],
   },
@@ -38,10 +39,29 @@ export const FormSubmissions: CollectionConfig = {
         { label: 'Appointment Request', value: 'appointment' },
         { label: 'Membership', value: 'membership' },
         { label: 'Reference Letter Request', value: 'reference-letter' },
+        { label: 'Welfare & Support Request', value: 'welfare' },
+        { label: 'Step of Faith', value: 'step-of-faith' },
       ],
     },
-    { name: 'name', type: 'text', required: true },
-    { name: 'email', type: 'text', required: true },
+    {
+      name: 'name',
+      type: 'text',
+      // Optional only for Step of Faith — that form explicitly lets someone
+      // respond anonymously and still see their next steps (matches the
+      // church's existing wording for this flow).
+      validate: (value: unknown, { siblingData }: { siblingData?: { formType?: string } }) => {
+        if (siblingData?.formType === 'step-of-faith') return true
+        return value ? true : 'Name is required.'
+      },
+    },
+    {
+      name: 'email',
+      type: 'text',
+      validate: (value: unknown, { siblingData }: { siblingData?: { formType?: string } }) => {
+        if (siblingData?.formType === 'step-of-faith') return true
+        return value ? true : 'Email is required.'
+      },
+    },
     { name: 'phone', type: 'text' },
     { name: 'preferredDate', type: 'date', admin: { condition: (data) => data.formType === 'appointment' } },
     {
@@ -76,6 +96,30 @@ export const FormSubmissions: CollectionConfig = {
       name: 'requiredByDate',
       type: 'date',
       admin: { condition: (data) => data.formType === 'reference-letter' },
+    },
+    {
+      name: 'supportType',
+      type: 'select',
+      options: [
+        { label: 'Financial', value: 'financial' },
+        { label: 'Counselling', value: 'counselling' },
+        { label: 'Food / Practical Needs', value: 'food' },
+        { label: 'Other', value: 'other' },
+      ],
+      admin: {
+        description: 'What kind of support they need.',
+        condition: (data) => data.formType === 'welfare',
+      },
+    },
+    {
+      name: 'decisionType',
+      type: 'select',
+      options: [
+        { label: "I'm trusting Jesus for the first time", value: 'first-time' },
+        { label: "I'm recommitting my life to Christ", value: 'recommitting' },
+        { label: 'I want to learn more before deciding', value: 'learn-more' },
+      ],
+      admin: { condition: (data) => data.formType === 'step-of-faith' },
     },
     { name: 'message', type: 'textarea' },
   ],

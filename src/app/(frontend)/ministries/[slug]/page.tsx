@@ -8,6 +8,7 @@ import { notFound } from 'next/navigation'
 import { getPayloadClient } from '@/lib/payload'
 import { guessMinistryIcon } from '@/lib/guessMinistryIcon'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
+import { ChildrenMinistryForms } from '@/components/site/ChildrenMinistryForms'
 import { BrandPanel } from '@/components/ui/BrandVisuals'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
@@ -121,6 +122,25 @@ export default async function MinistryPage({ params }: Args) {
           </aside>
         </Reveal>
       </Container>
+
+      {ministry.isChildrensMinistry && (
+        <div className="bg-linear-to-br from-sky-400 via-sky-500 to-orange-400">
+          <Container className="py-16">
+            <div className="mx-auto max-w-3xl text-center text-white">
+              <p className="text-sm font-bold uppercase tracking-[0.2em] text-white/80">Keeping Your Child Safe</p>
+              <h2 className="mt-2 font-serif text-3xl font-bold">Consent, Volunteering & Registration</h2>
+              <p className="mt-3 text-white/90">
+                Your child&apos;s safety is our top priority. Use the forms below to give photo consent, express
+                interest in volunteering with our children&apos;s team, or pre-register your child before your
+                first visit.
+              </p>
+            </div>
+            <div className="mx-auto mt-10 max-w-2xl">
+              <ChildrenMinistryForms />
+            </div>
+          </Container>
+        </div>
+      )}
 
       {others.length > 0 && (
         <div className="border-t border-border bg-brand-50">

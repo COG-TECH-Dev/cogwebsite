@@ -59,10 +59,12 @@ export const navLinks: NavLink[] = [
     href: '/connect',
     children: [
       { label: "I'm New Here", href: '/connect/new-here' },
+      { label: 'Find a Homegroup', href: '/connect/homegroups' },
       { label: 'Prayer Request', href: '/connect/prayer-request' },
       { label: 'Share a Testimony', href: '/connect/share-testimony' },
       { label: 'Contact Us', href: '/connect/contact' },
       { label: 'Appointments', href: '/connect/appointments' },
+      { label: 'Welfare & Support', href: '/connect/welfare' },
       { label: 'Membership', href: '/connect/membership' },
       { label: 'Reference Letter', href: '/connect/reference-letter' },
     ],

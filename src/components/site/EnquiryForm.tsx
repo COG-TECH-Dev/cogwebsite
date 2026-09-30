@@ -15,12 +15,20 @@ const LETTER_TYPES = [
   { value: 'other', label: 'Other' },
 ]
 
+const SUPPORT_TYPES = [
+  { value: 'financial', label: 'Financial' },
+  { value: 'counselling', label: 'Counselling' },
+  { value: 'food', label: 'Food / Practical Needs' },
+  { value: 'other', label: 'Other' },
+]
+
 export function EnquiryForm({
   action,
   showPreferredDate = false,
   ministries,
   defaultMinistryId,
   showReferenceLetterFields = false,
+  showSupportType = false,
   submitLabel = 'Send',
 }: {
   action: (prev: FormState, formData: FormData) => Promise<FormState>
@@ -28,6 +36,7 @@ export function EnquiryForm({
   ministries?: { id: number; name: string }[]
   defaultMinistryId?: number
   showReferenceLetterFields?: boolean
+  showSupportType?: boolean
   submitLabel?: string
 }) {
   const [state, formAction, pending] = useActionState(action, initialState)
@@ -77,6 +86,20 @@ export function EnquiryForm({
             {ministries.map((ministry) => (
               <option key={ministry.id} value={ministry.id}>
                 {ministry.name}
+              </option>
+            ))}
+          </select>
+        </div>
+      )}
+      {showSupportType && (
+        <div>
+          <label htmlFor="supportType" className="mb-1 block text-sm font-medium text-ink">
+            What kind of support are you looking for?
+          </label>
+          <select id="supportType" name="supportType" required className="input">
+            {SUPPORT_TYPES.map((type) => (
+              <option key={type.value} value={type.value}>
+                {type.label}
               </option>
             ))}
           </select>

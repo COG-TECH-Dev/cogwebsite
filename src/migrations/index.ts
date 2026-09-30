@@ -11,6 +11,7 @@ import * as migration_20260928_082256_add_event_registrations from './20260928_0
 import * as migration_20260928_083012_add_testimonial_status from './20260928_083012_add_testimonial_status';
 import * as migration_20260929_041122_add_donations_and_funds from './20260929_041122_add_donations_and_funds';
 import * as migration_20260929_083042_add_donation_branch from './20260929_083042_add_donation_branch';
+import * as migration_20260930_230943_add_homegroups_welfare_stepoffaith_childsafeguarding from './20260930_230943_add_homegroups_welfare_stepoffaith_childsafeguarding';
 
 export const migrations = [
   {
@@ -76,6 +77,11 @@ export const migrations = [
   {
     up: migration_20260929_083042_add_donation_branch.up,
     down: migration_20260929_083042_add_donation_branch.down,
-    name: '20260929_083042_add_donation_branch'
+    name: '20260929_083042_add_donation_branch',
+  },
+  {
+    up: migration_20260930_230943_add_homegroups_welfare_stepoffaith_childsafeguarding.up,
+    down: migration_20260930_230943_add_homegroups_welfare_stepoffaith_childsafeguarding.down,
+    name: '20260930_230943_add_homegroups_welfare_stepoffaith_childsafeguarding'
   },
 ];
