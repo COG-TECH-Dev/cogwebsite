@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Mail, MapPin, Phone } from 'lucide-react'
 
 import { getPayloadClient } from '@/lib/payload'
+import { HomegroupJoinForm } from '@/components/site/HomegroupJoinForm'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Reveal } from '@/components/ui/Reveal'
@@ -63,6 +64,21 @@ export default async function HomegroupsPage() {
           <Reveal className="rounded-2xl border border-border bg-surface p-10 text-center">
             <p className="text-ink-muted">Homegroups will appear here once added in the admin panel.</p>
           </Reveal>
+        )}
+
+        {homegroups.docs.length > 0 && (
+          <div id="join" className="mx-auto mt-16 max-w-xl scroll-mt-28">
+            <Reveal>
+              <h2 className="font-serif text-2xl font-semibold text-brand-700">Join a Homegroup</h2>
+              <p className="mt-2 mb-8 text-ink-muted">
+                Choose a group below, or tell us you&apos;re not sure and we&apos;ll help you find one near you.
+                We&apos;ll call you to get you connected.
+              </p>
+              <HomegroupJoinForm
+                homegroups={homegroups.docs.map((g) => ({ id: g.id, name: g.name, area: g.area }))}
+              />
+            </Reveal>
+          </div>
         )}
       </Container>
     </div>

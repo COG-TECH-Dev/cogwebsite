@@ -14,8 +14,17 @@ export const FormSubmissions: CollectionConfig = {
     afterChange: [
       notifyOnSubmission(
         'New Website Enquiry',
-        (doc) =>
-          `${doc.name || 'Someone (anonymous)'}${doc.email ? ` (${doc.email})` : ''} submitted a ${doc.formType} form:\n\n${doc.message || '(no message)'}`,
+        (doc) => {
+          const group = doc.interestedHomegroup
+          const groupName =
+            group && typeof group === 'object' && 'name' in group
+              ? String((group as { name: unknown }).name)
+              : group
+                ? `homegroup #${String(group)}`
+                : null
+          const contact = [doc.email, doc.phone].filter(Boolean).join(', ')
+          return `${doc.name || 'Someone (anonymous)'}${contact ? ` (${contact})` : ''} submitted a ${doc.formType} form${groupName ? ` for ${groupName}` : ''}:\n\n${doc.message || '(no message)'}`
+        },
       ),
     ],
   },
@@ -41,6 +50,7 @@ export const FormSubmissions: CollectionConfig = {
         { label: 'Reference Letter Request', value: 'reference-letter' },
         { label: 'Welfare & Support Request', value: 'welfare' },
         { label: 'Step of Faith', value: 'step-of-faith' },
+        { label: 'Join a Homegroup', value: 'homegroup-join' },
       ],
     },
     {
@@ -57,12 +67,21 @@ export const FormSubmissions: CollectionConfig = {
     {
       name: 'email',
       type: 'text',
+      // Optional for Step of Faith (anonymous allowed) and Join a Homegroup
+      // (phone is the required way to reach them there instead).
       validate: (value: unknown, { siblingData }: { siblingData?: { formType?: string } }) => {
-        if (siblingData?.formType === 'step-of-faith') return true
+        if (siblingData?.formType === 'step-of-faith' || siblingData?.formType === 'homegroup-join') return true
         return value ? true : 'Email is required.'
       },
     },
-    { name: 'phone', type: 'text' },
+    {
+      name: 'phone',
+      type: 'text',
+      validate: (value: unknown, { siblingData }: { siblingData?: { formType?: string } }) => {
+        if (siblingData?.formType === 'homegroup-join') return value ? true : 'Phone number is required.'
+        return true
+      },
+    },
     { name: 'preferredDate', type: 'date', admin: { condition: (data) => data.formType === 'appointment' } },
     {
       name: 'interestedMinistry',
@@ -71,6 +90,15 @@ export const FormSubmissions: CollectionConfig = {
       admin: {
         description: 'Which ministry they want to join.',
         condition: (data) => data.formType === 'membership',
+      },
+    },
+    {
+      name: 'interestedHomegroup',
+      type: 'relationship',
+      relationTo: 'homegroups',
+      admin: {
+        description: 'The homegroup they asked to join. Empty means "not sure — help me find one near me".',
+        condition: (data) => data.formType === 'homegroup-join',
       },
     },
     {

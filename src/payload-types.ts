@@ -865,7 +865,8 @@ export interface PrayerRequest {
  */
 export interface FormSubmission {
   id: number;
-  formType: 'contact' | 'appointment' | 'membership' | 'reference-letter' | 'welfare' | 'step-of-faith';
+  formType:
+    'contact' | 'appointment' | 'membership' | 'reference-letter' | 'welfare' | 'step-of-faith' | 'homegroup-join';
   name?: string | null;
   email?: string | null;
   phone?: string | null;
@@ -874,6 +875,10 @@ export interface FormSubmission {
    * Which ministry they want to join.
    */
   interestedMinistry?: (number | null) | Ministry;
+  /**
+   * The homegroup they asked to join. Empty means "not sure — help me find one near me".
+   */
+  interestedHomegroup?: (number | null) | Homegroup;
   letterType?: ('character' | 'membership-confirmation' | 'financial' | 'other') | null;
   /**
    * What the reference letter is for.
@@ -1480,6 +1485,7 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
   phone?: T;
   preferredDate?: T;
   interestedMinistry?: T;
+  interestedHomegroup?: T;
   letterType?: T;
   purpose?: T;
   requiredByDate?: T;

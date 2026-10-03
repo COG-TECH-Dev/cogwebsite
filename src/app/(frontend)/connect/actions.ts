@@ -77,6 +77,45 @@ export async function submitEnquiry(
   }
 }
 
+export async function submitHomegroupJoin(_prev: FormState, formData: FormData): Promise<FormState> {
+  const successMessage = 'Thank you — our team will connect you with a homegroup leader soon.'
+
+  if (isSpam(formData)) {
+    return { status: 'success', message: successMessage }
+  }
+
+  const name = String(formData.get('name') || '').trim()
+  const phone = String(formData.get('phone') || '').trim()
+  // Name and phone are the required way to reach people for this form (email
+  // is optional) — enforced here as well as in the collection, not just by
+  // the browser's `required` attribute.
+  if (!name || !phone) {
+    return { status: 'error', message: 'Please enter your name and phone number.' }
+  }
+
+  const homegroup = formData.get('interestedHomegroup')
+  const email = String(formData.get('email') || '').trim()
+  const payload = await getPayloadClient()
+
+  try {
+    await payload.create({
+      collection: 'form-submissions',
+      data: {
+        formType: 'homegroup-join',
+        name,
+        phone,
+        email: email || undefined,
+        // Empty = "not sure — help me find one near me".
+        interestedHomegroup: homegroup ? Number(homegroup) : undefined,
+        message: formData.get('message') ? String(formData.get('message')) : undefined,
+      },
+    })
+    return { status: 'success', message: successMessage }
+  } catch {
+    return { status: 'error', message: 'Something went wrong. Please try again.' }
+  }
+}
+
 export type StepOfFaithState = { status: 'idle' | 'success' | 'error'; message?: string }
 
 export async function submitStepOfFaith(_prev: StepOfFaithState, formData: FormData): Promise<StepOfFaithState> {
