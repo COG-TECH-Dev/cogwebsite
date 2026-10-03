@@ -83,19 +83,19 @@ export default async function HomePage() {
             />
           )
         )}
-        <Container className="relative py-28 text-center sm:py-36">
+        <Container className="relative py-8 text-center sm:py-20">
           <HeroContent>
             <p className="font-serif text-sm uppercase tracking-[0.3em] text-gold-300">
               Welcome Home
             </p>
-            <h1 className="mx-auto mt-6 max-w-3xl font-serif text-5xl font-semibold leading-tight sm:text-6xl">
+            <h1 className="mx-auto mt-4 max-w-3xl font-serif text-3xl font-semibold leading-tight sm:mt-6 sm:text-5xl">
               {hero?.headline || 'A Place where God lives and Miracles happen Naturally.'}
             </h1>
-            <p className="mx-auto mt-6 max-w-xl text-lg text-white/80">
+            <p className="mx-auto mt-4 max-w-xl text-base text-white/80 sm:mt-6 sm:text-lg">
               {hero?.tagline ||
                 'Join City of God Christian Centre for worship, community, and growth in Newcastle upon Tyne.'}
             </p>
-            <div className="mt-10 flex flex-wrap items-center justify-center gap-4">
+            <div className="mt-8 flex flex-wrap items-center justify-center gap-4 sm:mt-10">
               <Button href="/connect/new-here" variant="primary">
                 Plan Your Visit
               </Button>
@@ -159,11 +159,14 @@ export default async function HomePage() {
       {/* Service times */}
       {serviceTimes.length > 0 && (
         <section className="border-b border-border bg-surface">
-          <Container className="flex flex-wrap items-center justify-center gap-x-10 gap-y-3 py-6 text-sm">
+          <Container className="grid gap-y-3 py-6 text-sm sm:flex sm:flex-wrap sm:items-center sm:justify-center sm:gap-x-10">
             {serviceTimes.map((service, i) => (
-              <div key={i} className="flex items-center gap-2">
+              <div
+                key={i}
+                className="flex items-baseline justify-between gap-4 border-b border-border pb-3 last:border-b-0 last:pb-0 sm:items-center sm:justify-start sm:gap-2 sm:border-b-0 sm:pb-0"
+              >
                 <span className="font-semibold text-brand-600">{service.label}</span>
-                <span className="text-ink-muted">{service.time}</span>
+                <span className="whitespace-nowrap text-right text-ink-muted sm:text-left">{service.time}</span>
               </div>
             ))}
           </Container>
