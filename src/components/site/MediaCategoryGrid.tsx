@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { getPayloadClient } from '@/lib/payload'
 import { publishedOnly } from '@/lib/published'
 import { youtubeVideoId } from '@/lib/youtube'
+import { getChannelFeed } from '@/lib/youtubeFeed'
 import { YouTubePlayer } from '@/components/site/YouTubePlayer'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
@@ -44,6 +45,12 @@ export async function MediaCategoryGrid({
   const radioUrl = settings?.socialLinks?.radioUrl
   const youtubeChannelId = settings?.socialLinks?.youtubeChannelId
 
+  // COG TV is everything on the YouTube channel (prayer streams included), after
+  // any items picked by hand in the admin. A video that was picked by hand isn't repeated.
+  const pickedIds = new Set(items.docs.map((i) => (i.videoEmbedUrl ? youtubeVideoId(i.videoEmbedUrl) : null)).filter(Boolean))
+  const channelVideos =
+    category === 'cog-tv' ? ((await getChannelFeed(youtubeChannelId))?.videos ?? []).filter((v) => !pickedIds.has(v.id)) : []
+
   return (
     <div>
       <PageHeader eyebrow={eyebrow} title={title} description={description} />
@@ -78,7 +85,7 @@ export async function MediaCategoryGrid({
           </div>
         )}
 
-        {items.docs.length > 0 ? (
+        {items.docs.length > 0 || channelVideos.length > 0 ? (
           <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {items.docs.map((item, i) => {
               const images = (item.images ?? []).filter((img): img is Exclude<typeof img, number> => typeof img === 'object')
@@ -161,7 +168,38 @@ export async function MediaCategoryGrid({
             })}
           </StaggerGroup>
         ) : (
-          <p className="text-ink-muted">Content will appear here once added in the admin panel.</p>
+          <p className="text-ink-muted">Content will appear here soon.</p>
+        )}
+
+        {channelVideos.length > 0 && (
+          <section className={items.docs.length > 0 ? 'mt-16' : undefined}>
+            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-2">
+              <h2 className="font-serif text-xl font-semibold text-brand-700">Latest from our YouTube channel</h2>
+              <a
+                href={`https://www.youtube.com/channel/${youtubeChannelId}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-semibold text-brand-600 hover:underline"
+              >
+                See everything on YouTube →
+              </a>
+            </div>
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {channelVideos.map((video) => (
+                <div key={video.id} className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
+                  <div className="relative aspect-video">
+                    <YouTubePlayer videoId={video.id} title={video.title} />
+                  </div>
+                  <div className="flex flex-1 flex-col gap-1 p-4">
+                    <h3 className="font-medium text-brand-700">{video.title}</h3>
+                    <p className="text-xs text-ink-muted">
+                      {new Date(video.published).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
         )}
       </Container>
     </div>

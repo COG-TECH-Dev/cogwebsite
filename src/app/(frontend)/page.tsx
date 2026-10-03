@@ -4,6 +4,7 @@ import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
 import { upcomingEventsWhere } from '@/lib/eventWindow'
+import { getSermonItems } from '@/lib/sermons'
 import { publishedOnly } from '@/lib/published'
 import { guessMinistryIcon } from '@/lib/guessMinistryIcon'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
@@ -27,7 +28,7 @@ function mediaUrl(image: unknown): string | null {
 export default async function HomePage() {
   const payload = await getPayloadClient()
 
-  const [settings, ministries, events, sermons, testimonials, news] = await Promise.all([
+  const [settings, ministries, events, testimonials, news] = await Promise.all([
     payload.findGlobal({ slug: 'settings' }).catch(() => null),
     payload.find({ collection: 'ministries', where: { featured: { equals: true } }, limit: 4 }),
     payload.find({
@@ -37,7 +38,6 @@ export default async function HomePage() {
       limit: 3,
       draft: false,
     }),
-    payload.find({ collection: 'sermons', sort: '-date', limit: 1 }),
     payload.find({
       collection: 'testimonials',
       where: { and: [{ featured: { equals: true } }, { status: { equals: 'approved' } }] },
@@ -57,7 +57,8 @@ export default async function HomePage() {
   const heroVideo = hero?.backgroundVideoUrl
   const serviceTimes = settings?.serviceTimes ?? []
   const youtubeChannelId = settings?.socialLinks?.youtubeChannelId?.trim()
-  const latestSermon = sermons.docs[0]
+  // Newest message: the latest of the sermons added in the admin and the channel's uploads.
+  const latestSermon = (await getSermonItems(payload, youtubeChannelId))[0]
 
   return (
     <div>
@@ -313,15 +314,16 @@ export default async function HomePage() {
 
             {latestSermon ? (
               <Link
-                href={`/media/sermons/${latestSermon.slug}`}
+                href={latestSermon.href}
                 className="mt-8 block overflow-hidden rounded-2xl border border-border bg-surface transition-all hover:-translate-y-1 hover:shadow-lg"
               >
                 <div className="relative aspect-video bg-brand-100">
-                  {mediaUrl(latestSermon.thumbnail) && (
+                  {latestSermon.image && (
                     <Image
-                      src={mediaUrl(latestSermon.thumbnail)!}
-                      alt={latestSermon.title}
+                      src={latestSermon.image}
+                      alt=""
                       fill
+                      sizes="(min-width: 1024px) 50vw, 100vw"
                       className="object-cover"
                     />
                   )}
@@ -336,7 +338,7 @@ export default async function HomePage() {
                 </div>
               </Link>
             ) : (
-              <p className="mt-8 text-ink-muted">Sermons will appear here once added in the admin panel.</p>
+              <p className="mt-8 text-ink-muted">Sermons will appear here soon.</p>
             )}
           </Reveal>
         </Container>

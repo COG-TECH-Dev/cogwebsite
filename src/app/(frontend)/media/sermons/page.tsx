@@ -2,34 +2,28 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
+import { getSermonItems } from '@/lib/sermons'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 
 export const revalidate = 60
 export const metadata = { title: 'Sermons' }
 
-function mediaUrl(image: unknown): string | null {
-  if (image && typeof image === 'object' && 'url' in image && typeof image.url === 'string') {
-    return image.url
-  }
-  return null
-}
-
 type Args = { searchParams: Promise<{ q?: string; speaker?: string; series?: string }> }
 
 export default async function SermonsPage({ searchParams }: Args) {
   const { q, speaker, series } = await searchParams
   const payload = await getPayloadClient()
-  // Dataset is small enough that filtering in-memory (after one query) is
-  // simpler and cheaper than round-tripping a separate `where` query per
-  // filter combination, and lets us derive the speaker/series option lists
-  // from the same fetch.
-  const sermons = await payload.find({ collection: 'sermons', sort: '-date', limit: 500 })
+  const settings = await payload.findGlobal({ slug: 'settings' }).catch(() => null)
+  // Sermons added by hand in the admin plus the channel's latest messages (see
+  // lib/sermons). Small enough to filter in-memory after one fetch, which also
+  // lets the speaker/series option lists come from the same data.
+  const sermons = await getSermonItems(payload, settings?.socialLinks?.youtubeChannelId)
 
-  const speakers = Array.from(new Set(sermons.docs.map((s) => s.speaker).filter(Boolean))).sort() as string[]
-  const seriesList = Array.from(new Set(sermons.docs.map((s) => s.series).filter(Boolean))).sort() as string[]
+  const speakers = Array.from(new Set(sermons.map((s) => s.speaker).filter(Boolean))).sort() as string[]
+  const seriesList = Array.from(new Set(sermons.map((s) => s.series).filter(Boolean))).sort() as string[]
 
-  const filtered = sermons.docs.filter((s) => {
+  const filtered = sermons.filter((s) => {
     if (q && !s.title.toLowerCase().includes(q.toLowerCase())) return false
     if (speaker && s.speaker !== speaker) return false
     if (series && s.series !== series) return false
@@ -42,7 +36,7 @@ export default async function SermonsPage({ searchParams }: Args) {
     <div>
       <PageHeader eyebrow="Media" title="Sermons" description="Recent messages from City of God Christian Centre." />
       <Container className="py-16">
-        {sermons.docs.length > 0 ? (
+        {sermons.length > 0 ? (
           <>
             <form className="mb-10 flex flex-wrap items-end gap-4 rounded-2xl border border-border bg-surface p-5">
               <div className="min-w-[180px] flex-1">
@@ -99,15 +93,23 @@ export default async function SermonsPage({ searchParams }: Args) {
             {filtered.length > 0 ? (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {filtered.map((sermon) => {
-                  const img = mediaUrl(sermon.thumbnail)
+                  const img = sermon.image
                   return (
                     <Link
-                      key={sermon.id}
-                      href={`/media/sermons/${sermon.slug}`}
+                      key={sermon.key}
+                      href={sermon.href}
                       className="group overflow-hidden rounded-2xl border border-border bg-surface transition-shadow hover:shadow-lg"
                     >
                       <div className="relative aspect-video bg-brand-100">
-                        {img && <Image src={img} alt={sermon.title} fill className="object-cover" />}
+                        {img && (
+                          <Image
+                            src={img}
+                            alt=""
+                            fill
+                            sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                            className="object-cover"
+                          />
+                        )}
                       </div>
                       <div className="p-5">
                         <h2 className="font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
@@ -118,7 +120,7 @@ export default async function SermonsPage({ searchParams }: Args) {
                             .filter(Boolean)
                             .join(' · ')}
                         </p>
-                        {sermon.series && <p className="mt-1 text-xs text-ink-muted">{sermon.series}</p>}
+                        {sermon.seriesLabel && <p className="mt-1 text-xs text-ink-muted">{sermon.seriesLabel}</p>}
                       </div>
                     </Link>
                   )
@@ -129,7 +131,7 @@ export default async function SermonsPage({ searchParams }: Args) {
             )}
           </>
         ) : (
-          <p className="text-ink-muted">Sermons will appear here once added in the admin panel.</p>
+          <p className="text-ink-muted">Sermons will appear here soon.</p>
         )}
       </Container>
     </div>
