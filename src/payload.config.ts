@@ -42,6 +42,7 @@ export default buildConfig({
     },
     components: {
       afterLogin: ['/components/admin/PoweredBy#PoweredBy'],
+      beforeDashboard: ['/components/admin/ExportPanel#ExportPanel'],
       graphics: {
         Icon: '/components/admin/Icon#Icon',
         Logo: '/components/admin/Logo#Logo',
