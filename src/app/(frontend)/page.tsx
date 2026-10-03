@@ -6,6 +6,7 @@ import { getPayloadClient } from '@/lib/payload'
 import { guessMinistryIcon } from '@/lib/guessMinistryIcon'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { HeroContent } from '@/components/site/HeroContent'
+import { LiveStreamPlayer } from '@/components/site/LiveStreamPlayer'
 import { BrandPanel } from '@/components/ui/BrandVisuals'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
@@ -53,6 +54,7 @@ export default async function HomePage() {
   const heroImage = mediaUrl(hero?.backgroundImage)
   const heroVideo = hero?.backgroundVideoUrl
   const serviceTimes = settings?.serviceTimes ?? []
+  const youtubeChannelId = settings?.socialLinks?.youtubeChannelId?.trim()
   const latestSermon = sermons.docs[0]
 
   return (
@@ -161,6 +163,30 @@ export default async function HomePage() {
                 <span className="text-ink-muted">{service.time}</span>
               </div>
             ))}
+          </Container>
+        </section>
+      )}
+
+      {/* Live stream — only once the YouTube channel ID is set in Settings (FR-011) */}
+      {youtubeChannelId && (
+        <section className="py-20">
+          <Container>
+            <Reveal className="mx-auto max-w-3xl text-center">
+              <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-600">Watch Live</p>
+              <h2 className="mt-2 font-serif text-3xl font-semibold text-brand-700">Join Us Online</h2>
+              <p className="mt-3 text-ink-muted">
+                Can&apos;t be with us in person? Worship with us live during our services.
+              </p>
+              <div className="relative mt-8 aspect-video overflow-hidden rounded-2xl border border-border shadow-lg">
+                <LiveStreamPlayer channelId={youtubeChannelId} />
+              </div>
+              <p className="mt-4 text-sm text-ink-muted">
+                Nothing streaming right now?{' '}
+                <Link href="/media/sermons" className="font-semibold text-brand-600 hover:underline">
+                  Catch up on past messages →
+                </Link>
+              </p>
+            </Reveal>
           </Container>
         </section>
       )}
