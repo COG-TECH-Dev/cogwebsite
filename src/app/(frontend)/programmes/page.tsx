@@ -113,9 +113,9 @@ export default async function ProgrammesPage({ searchParams }: Args) {
                       <p className="text-xs font-semibold uppercase tracking-wide text-gold-600">
                         {TYPE_LABELS[event.type] ?? event.type}
                       </p>
-                      <h3 className="mt-1 font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
+                      <h2 className="mt-1 font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
                         {event.title}
-                      </h3>
+                      </h2>
                       {event.location && <p className="mt-1 text-sm text-ink-muted">{event.location}</p>}
                       {event.registrationEnabled && (
                         <span className="mt-3 inline-flex w-fit items-center rounded-full bg-gold-100 px-3 py-1 text-xs font-semibold text-gold-700">

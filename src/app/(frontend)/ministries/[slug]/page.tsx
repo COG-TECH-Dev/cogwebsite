@@ -103,7 +103,7 @@ export default async function MinistryPage({ params }: Args) {
                   <UserRound className="h-4 w-4" aria-hidden="true" />
                   Led By
                 </p>
-                <h3 className="mt-2 font-serif text-lg font-semibold text-brand-700">{ministry.leaderName}</h3>
+                <h2 className="mt-2 font-serif text-lg font-semibold text-brand-700">{ministry.leaderName}</h2>
               </div>
             )}
             {ministry.meetingTimes && ministry.meetingTimes.length > 0 && (
@@ -168,7 +168,7 @@ export default async function MinistryPage({ params }: Args) {
                   >
                     <div className="relative aspect-video">
                       {otherImg ? (
-                        <Image src={otherImg} alt={other.name} fill sizes="33vw" className="object-cover" />
+                        <Image src={otherImg} alt="" fill sizes="33vw" className="object-cover" />
                       ) : (
                         <BrandPanel className="absolute inset-0 flex items-center justify-center">
                           <BlockIcon name={otherIcon} className="h-8 w-8 text-gold-300" />

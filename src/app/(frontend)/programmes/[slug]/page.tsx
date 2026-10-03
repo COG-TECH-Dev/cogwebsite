@@ -197,7 +197,7 @@ export default async function EventPage({ params }: Args) {
                   >
                     <div className="relative aspect-video">
                       {otherImg ? (
-                        <Image src={otherImg} alt={other.title} fill sizes="33vw" className="object-cover" />
+                        <Image src={otherImg} alt="" fill sizes="33vw" className="object-cover" />
                       ) : (
                         <BrandPanel className="absolute inset-0 flex items-center justify-center">
                           <BlockIcon name={otherIcon} className="h-8 w-8 text-gold-300" />
