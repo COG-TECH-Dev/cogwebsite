@@ -1,3 +1,4 @@
+import { DoorOpen, HandCoins, MapPin, Newspaper, Tv } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -23,7 +24,7 @@ function mediaUrl(image: unknown): string | null {
 export default async function HomePage() {
   const payload = await getPayloadClient()
 
-  const [settings, ministries, events, sermons, testimonials] = await Promise.all([
+  const [settings, ministries, events, sermons, testimonials, news] = await Promise.all([
     payload.findGlobal({ slug: 'settings' }).catch(() => null),
     payload.find({ collection: 'ministries', where: { featured: { equals: true } }, limit: 4 }),
     payload.find({
@@ -38,6 +39,13 @@ export default async function HomePage() {
       collection: 'testimonials',
       where: { and: [{ featured: { equals: true } }, { status: { equals: 'approved' } }] },
       limit: 3,
+    }),
+    payload.find({
+      collection: 'news',
+      where: { _status: { equals: 'published' } },
+      sort: ['-pinned', '-publishedDate'],
+      limit: 3,
+      draft: false,
     }),
   ])
 
@@ -92,6 +100,39 @@ export default async function HomePage() {
               </Button>
             </div>
           </HeroContent>
+        </Container>
+      </section>
+
+      {/* Quick actions — the four things most visitors come for (UX-001) */}
+      <section className="border-b border-border bg-surface">
+        <Container className="py-6">
+          <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+            {[
+              { href: '/media/cog-tv', label: 'Watch Live', hint: 'Join our service online', icon: Tv },
+              { href: '/connect/new-here', label: 'Plan Your Visit', hint: 'What to expect', icon: DoorOpen },
+              { href: '/give', label: 'Give Online', hint: 'Tithes & offerings', icon: HandCoins },
+              { href: '/connect/find-a-campus', label: 'Find a Church', hint: 'Near you', icon: MapPin },
+            ].map((item) => {
+              const Icon = item.icon
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="group flex items-center gap-3 rounded-2xl border border-border p-4 transition-colors hover:border-gold-300 hover:bg-brand-50"
+                >
+                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gold-100 text-gold-600">
+                    <Icon className="h-5 w-5" aria-hidden="true" />
+                  </span>
+                  <span>
+                    <span className="block font-serif font-semibold text-brand-700 group-hover:text-brand-600">
+                      {item.label}
+                    </span>
+                    <span className="block text-xs text-ink-muted">{item.hint}</span>
+                  </span>
+                </Link>
+              )
+            })}
+          </div>
         </Container>
       </section>
 
@@ -269,6 +310,46 @@ export default async function HomePage() {
         </Container>
       </section>
 
+      {/* Latest news */}
+      {news.docs.length > 0 && (
+        <section className="py-20">
+          <Container>
+            <Reveal className="flex items-end justify-between gap-4">
+              <div>
+                <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-600">Latest</p>
+                <h2 className="mt-2 font-serif text-3xl font-semibold text-brand-700">News &amp; Announcements</h2>
+              </div>
+              <Link href="/news" className="text-sm font-semibold text-brand-600 hover:underline">
+                All news →
+              </Link>
+            </Reveal>
+            <StaggerGroup className="mt-10 grid gap-6 md:grid-cols-3">
+              {news.docs.map((post) => (
+                <StaggerItem key={post.id} className="h-full">
+                  <Link
+                    href={`/news/${post.slug}`}
+                    className="group flex h-full flex-col rounded-2xl border border-border bg-surface p-6 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
+                  >
+                    <p className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-gold-600">
+                      <Newspaper className="h-3.5 w-3.5" aria-hidden="true" />
+                      {new Date(post.publishedDate).toLocaleDateString('en-GB', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric',
+                      })}
+                    </p>
+                    <p className="mt-2 font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
+                      {post.title}
+                    </p>
+                    {post.summary && <p className="mt-2 text-sm text-ink-muted">{post.summary}</p>}
+                  </Link>
+                </StaggerItem>
+              ))}
+            </StaggerGroup>
+          </Container>
+        </section>
+      )}
+
       {/* Testimonials */}
       {testimonials.docs.length > 0 && (
         <section className="py-24">
@@ -323,8 +404,8 @@ export default async function HomePage() {
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">
                   We&apos;d love to hear from you and help you take your next step.
                 </p>
-                <Link href="/connect/contact" className="mt-4 inline-block text-sm font-semibold text-brand-600 hover:underline">
-                  Get in touch →
+                <Link href="/connect/new-here#visited" className="mt-4 inline-block text-sm font-semibold text-brand-600 hover:underline">
+                  Let us know →
                 </Link>
               </div>
             </StaggerItem>

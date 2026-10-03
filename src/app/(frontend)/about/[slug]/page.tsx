@@ -4,6 +4,8 @@ import { notFound } from 'next/navigation'
 import { getPageBySlug } from '@/lib/getPageBySlug'
 import { BlockRenderer } from '@/components/blocks/BlockRenderer'
 import { AboutSubNav } from '@/components/site/AboutSubNav'
+import { DutyPastorCard } from '@/components/site/DutyPastorCard'
+import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 
 export const revalidate = 60
@@ -27,6 +29,11 @@ export default async function AboutSubPage({ params }: Args) {
       <PageHeader eyebrow="About Us" title={page.title} description={page.subtitle ?? undefined}>
         <AboutSubNav />
       </PageHeader>
+      {slug === 'leadership' && (
+        <Container className="max-w-3xl pt-10">
+          <DutyPastorCard />
+        </Container>
+      )}
       <BlockRenderer layout={page.layout} />
     </div>
   )

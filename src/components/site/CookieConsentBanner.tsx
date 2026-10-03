@@ -46,6 +46,10 @@ export function CookieConsentBanner() {
       <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-ink-muted">
           We use cookies to understand how visitors use our site. Read our{' '}
+          <Link href="/cookie-policy" className="font-medium text-brand-600 underline hover:text-brand-700">
+            Cookie Policy
+          </Link>{' '}
+          and{' '}
           <Link href="/privacy-policy" className="font-medium text-brand-600 underline hover:text-brand-700">
             Privacy Policy
           </Link>

@@ -72,6 +72,9 @@ export interface Config {
     pages: Page;
     ministries: Ministry;
     homegroups: Homegroup;
+    news: News;
+    'mission-projects': MissionProject;
+    missionaries: Missionary;
     events: Event;
     'event-registrations': EventRegistration;
     sermons: Sermon;
@@ -95,6 +98,9 @@ export interface Config {
     pages: PagesSelect<false> | PagesSelect<true>;
     ministries: MinistriesSelect<false> | MinistriesSelect<true>;
     homegroups: HomegroupsSelect<false> | HomegroupsSelect<true>;
+    news: NewsSelect<false> | NewsSelect<true>;
+    'mission-projects': MissionProjectsSelect<false> | MissionProjectsSelect<true>;
+    missionaries: MissionariesSelect<false> | MissionariesSelect<true>;
     events: EventsSelect<false> | EventsSelect<true>;
     'event-registrations': EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
     sermons: SermonsSelect<false> | SermonsSelect<true>;
@@ -592,6 +598,146 @@ export interface Homegroup {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news".
+ */
+export interface News {
+  id: number;
+  title: string;
+  /**
+   * Auto-generated from the title if left blank. Used in the page URL.
+   */
+  slug: string;
+  /**
+   * Shown on the post and used to order the news page (newest first).
+   */
+  publishedDate: string;
+  /**
+   * One or two sentences — shown on the homepage and the news list.
+   */
+  summary?: string | null;
+  body?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Optional.
+   */
+  image?: (number | null) | Media;
+  /**
+   * Pinned posts stay at the top of the news page and the homepage.
+   */
+  pinned?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mission-projects".
+ */
+export interface MissionProject {
+  id: number;
+  title: string;
+  /**
+   * Auto-generated from the title if left blank.
+   */
+  slug: string;
+  /**
+   * Country or region, e.g. "Northern Ghana".
+   */
+  location?: string | null;
+  status: 'active' | 'completed';
+  /**
+   * A short description shown on the Missions page.
+   */
+  summary?: string | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  /**
+   * Main photo.
+   */
+  image?: (number | null) | Media;
+  /**
+   * More photos from the project — shown as the multimedia archive.
+   */
+  gallery?:
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * Optional YouTube link to a video about the project.
+   */
+  videoUrl?: string | null;
+  /**
+   * Shown as "Pray for this project".
+   */
+  prayerNeeds?: string | null;
+  /**
+   * Optional. The exact name of a fund from Settings → Giving → Funds. Adds a "Give to this project" button that pre-selects that fund.
+   */
+  givingFund?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "missionaries".
+ */
+export interface Missionary {
+  id: number;
+  name: string;
+  /**
+   * Only with the missionary's consent.
+   */
+  photo?: (number | null) | Media;
+  /**
+   * Where they serve, e.g. "Kumasi, Ghana".
+   */
+  location?: string | null;
+  bio?: string | null;
+  /**
+   * Shown as "Pray for …".
+   */
+  prayerNeeds?: string | null;
+  /**
+   * Optional — the project they are part of.
+   */
+  project?: (number | null) | MissionProject;
+  /**
+   * Untick to stop showing them on the Missions page.
+   */
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events".
  */
 export interface Event {
@@ -854,6 +1000,14 @@ export interface PrayerRequest {
   email?: string | null;
   phone?: string | null;
   request: string;
+  /**
+   * Who the person said may see this request.
+   */
+  visibility: 'private' | 'ministry-team' | 'public';
+  /**
+   * Public prayer wall only: tick to show this on the wall. Read it first, and edit out anything that identifies someone or is not suitable. Only the first name is ever displayed.
+   */
+  approved?: boolean | null;
   isConfidential?: boolean | null;
   status?: ('new' | 'in-progress' | 'prayed-for') | null;
   updatedAt: string;
@@ -866,7 +1020,16 @@ export interface PrayerRequest {
 export interface FormSubmission {
   id: number;
   formType:
-    'contact' | 'appointment' | 'membership' | 'reference-letter' | 'welfare' | 'step-of-faith' | 'homegroup-join';
+    | 'contact'
+    | 'appointment'
+    | 'membership'
+    | 'reference-letter'
+    | 'welfare'
+    | 'step-of-faith'
+    | 'homegroup-join'
+    | 'first-timer'
+    | 'mission-trip'
+    | 'campus-connect';
   name?: string | null;
   email?: string | null;
   phone?: string | null;
@@ -879,6 +1042,18 @@ export interface FormSubmission {
    * The homegroup they asked to join. Empty means "not sure — help me find one near me".
    */
   interestedHomegroup?: (number | null) | Homegroup;
+  /**
+   * The mission project they are interested in (if they chose one).
+   */
+  interestedProject?: (number | null) | MissionProject;
+  /**
+   * First-timer: the campus they attended. Campus connection: the campus they want to connect with.
+   */
+  campus?: string | null;
+  /**
+   * Which service they attended.
+   */
+  serviceAttended?: string | null;
   letterType?: ('character' | 'membership-confirmation' | 'financial' | 'other') | null;
   /**
    * What the reference letter is for.
@@ -937,6 +1112,18 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'homegroups';
         value: number | Homegroup;
+      } | null)
+    | ({
+        relationTo: 'news';
+        value: number | News;
+      } | null)
+    | ({
+        relationTo: 'mission-projects';
+        value: number | MissionProject;
+      } | null)
+    | ({
+        relationTo: 'missionaries';
+        value: number | Missionary;
       } | null)
     | ({
         relationTo: 'events';
@@ -1296,6 +1483,61 @@ export interface HomegroupsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "news_select".
+ */
+export interface NewsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  publishedDate?: T;
+  summary?: T;
+  body?: T;
+  image?: T;
+  pinned?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "mission-projects_select".
+ */
+export interface MissionProjectsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  location?: T;
+  status?: T;
+  summary?: T;
+  description?: T;
+  image?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  videoUrl?: T;
+  prayerNeeds?: T;
+  givingFund?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "missionaries_select".
+ */
+export interface MissionariesSelect<T extends boolean = true> {
+  name?: T;
+  photo?: T;
+  location?: T;
+  bio?: T;
+  prayerNeeds?: T;
+  project?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "events_select".
  */
 export interface EventsSelect<T extends boolean = true> {
@@ -1469,6 +1711,8 @@ export interface PrayerRequestsSelect<T extends boolean = true> {
   email?: T;
   phone?: T;
   request?: T;
+  visibility?: T;
+  approved?: T;
   isConfidential?: T;
   status?: T;
   updatedAt?: T;
@@ -1486,6 +1730,9 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
   preferredDate?: T;
   interestedMinistry?: T;
   interestedHomegroup?: T;
+  interestedProject?: T;
+  campus?: T;
+  serviceAttended?: T;
   letterType?: T;
   purpose?: T;
   requiredByDate?: T;
@@ -1556,6 +1803,24 @@ export interface Setting {
   };
   contactEmail?: string | null;
   contactPhone?: string | null;
+  /**
+   * The pastor on call this week. Shown on the Leadership page and the Connect page when ticked on. Only publish contact details you are comfortable having public.
+   */
+  dutyPastor?: {
+    show?: boolean | null;
+    /**
+     * e.g. "Pastor Udu"
+     */
+    name?: string | null;
+    /**
+     * Optional. Leave empty to show the name and note only.
+     */
+    phone?: string | null;
+    /**
+     * e.g. "On call 24/7 this week for urgent pastoral needs."
+     */
+    note?: string | null;
+  };
   socialLinks?: {
     facebook?: string | null;
     instagram?: string | null;
@@ -1673,6 +1938,14 @@ export interface SettingsSelect<T extends boolean = true> {
       };
   contactEmail?: T;
   contactPhone?: T;
+  dutyPastor?:
+    | T
+    | {
+        show?: T;
+        name?: T;
+        phone?: T;
+        note?: T;
+      };
   socialLinks?:
     | T
     | {

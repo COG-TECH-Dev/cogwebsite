@@ -3,8 +3,10 @@ import {
   DoorOpen,
   FileText,
   Footprints,
+  Heart,
   HeartHandshake,
   Mail,
+  MapPin,
   MessageCircleHeart,
   Sparkles,
   UserPlus,
@@ -13,6 +15,7 @@ import {
 import Link from 'next/link'
 import type { ComponentType } from 'react'
 
+import { DutyPastorCard } from '@/components/site/DutyPastorCard'
 import { ACCENTS } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -25,6 +28,8 @@ const sections: { label: string; href: string; description: string; icon: Compon
   { label: 'Take a Step of Faith', href: '/connect/next-steps', description: 'Begin or recommit your journey with Jesus.', icon: Footprints },
   { label: 'Find a Homegroup', href: '/connect/homegroups', description: 'Join a small group near you.', icon: Users },
   { label: 'Prayer Request', href: '/connect/prayer-request', description: "Share what's on your heart.", icon: MessageCircleHeart },
+  { label: 'Prayer Wall', href: '/connect/prayer-wall', description: 'Pray for requests shared by our church family.', icon: Heart },
+  { label: 'Find a Church', href: '/connect/find-a-campus', description: 'Moving away? Find the church closest to you.', icon: MapPin },
   { label: 'Share a Testimony', href: '/connect/share-testimony', description: 'Tell us what God has done in your life.', icon: Sparkles },
   { label: 'Welfare & Support', href: '/connect/welfare', description: 'Discreet help in difficult times.', icon: HeartHandshake },
   { label: 'Contact Us', href: '/connect/contact', description: 'General questions and enquiries.', icon: Mail },
@@ -38,6 +43,7 @@ export default function ConnectPage() {
     <div>
       <PageHeader eyebrow="Connect" title="We'd Love to Hear From You" />
       <Container className="py-16">
+        <DutyPastorCard className="mx-auto mb-10 max-w-xl" />
         <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {sections.map((section, i) => {
             const accent = ACCENTS[i % ACCENTS.length]

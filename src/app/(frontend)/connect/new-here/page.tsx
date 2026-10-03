@@ -3,6 +3,8 @@ import { Baby, Clock, Coffee, MapPin, Shirt } from 'lucide-react'
 import { getPayloadClient } from '@/lib/payload'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
+import { FirstTimerForm } from '@/components/site/FirstTimerForm'
+import { navLinks } from '@/components/site/navLinks'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Reveal } from '@/components/ui/Reveal'
 import { StaggerGroup, StaggerItem } from '@/components/ui/Stagger'
@@ -81,6 +83,18 @@ export default async function NewHerePage() {
             )
           })}
         </StaggerGroup>
+
+        <div id="visited" className="mx-auto mt-16 max-w-xl scroll-mt-28">
+          <Reveal>
+            <h2 className="font-serif text-2xl font-semibold text-brand-700 sm:text-3xl">Visited us? Say hello</h2>
+            <p className="mt-2 mb-8 text-ink-muted">
+              We&apos;d love to know you came and to help you take a next step. It only takes a minute.
+            </p>
+            <FirstTimerForm
+              campuses={(navLinks.find((l) => l.label === 'Branches')?.children ?? []).map((b) => b.label)}
+            />
+          </Reveal>
+        </div>
 
         <Reveal className="mt-16 rounded-3xl bg-brand-50 p-8 text-center sm:p-12">
           <h2 className="font-serif text-2xl font-semibold text-brand-700 sm:text-3xl">Ready to Join Us?</h2>

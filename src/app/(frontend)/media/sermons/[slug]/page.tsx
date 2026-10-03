@@ -19,7 +19,12 @@ async function getSermon(slug: string) {
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { slug } = await params
   const sermon = await getSermon(slug)
-  return { title: sermon?.title }
+  if (!sermon) return {}
+  const thumb = sermon.thumbnail && typeof sermon.thumbnail === 'object' ? sermon.thumbnail.url : null
+  return {
+    title: sermon.title,
+    openGraph: { title: sermon.title, ...(thumb ? { images: [thumb] } : {}) },
+  }
 }
 
 function toEmbedUrl(url: string): string {

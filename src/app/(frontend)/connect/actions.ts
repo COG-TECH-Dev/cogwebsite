@@ -1,7 +1,7 @@
 'use server'
 
 import { getPayloadClient } from '@/lib/payload'
-import type { FormSubmission } from '@/payload-types'
+import type { FormSubmission, PrayerRequest } from '@/payload-types'
 
 export type FormState = { status: 'idle' | 'success' | 'error'; message?: string }
 
@@ -18,6 +18,11 @@ export async function submitPrayerRequest(_prev: FormState, formData: FormData):
     return { status: 'success', message: "Thank you — we've received your prayer request." }
   }
 
+  // Anything other than a recognised choice falls back to the safest one.
+  const choice = String(formData.get('visibility') || '')
+  const visibility: PrayerRequest['visibility'] =
+    choice === 'ministry-team' || choice === 'public' ? choice : 'private'
+
   const payload = await getPayloadClient()
 
   try {
@@ -28,10 +33,95 @@ export async function submitPrayerRequest(_prev: FormState, formData: FormData):
         email: String(formData.get('email') || ''),
         phone: String(formData.get('phone') || ''),
         request: String(formData.get('request') || ''),
-        isConfidential: formData.get('isConfidential') === 'on',
+        visibility,
+        isConfidential: visibility === 'private',
+        // A public request never appears on the wall until someone approves it.
+        approved: false,
       },
     })
-    return { status: 'success', message: "Thank you — we've received your prayer request." }
+    return {
+      status: 'success',
+      message:
+        visibility === 'public'
+          ? "Thank you — we've received your prayer request. Our team will read it before it appears on the prayer wall."
+          : "Thank you — we've received your prayer request.",
+    }
+  } catch {
+    return { status: 'error', message: 'Something went wrong. Please try again.' }
+  }
+}
+
+// Shared by the forms below that ask for at least a name plus a way to reach
+// the person. Returns a friendly message, or null when the details are fine.
+function missingContact(name: string, email: string, phone: string, need: 'email' | 'either'): string | null {
+  if (!name) return 'Please enter your name.'
+  if (need === 'email' && !email) return 'Please enter your email.'
+  if (need === 'either' && !email && !phone) return 'Please give an email or a phone number so we can reach you.'
+  return null
+}
+
+export async function submitFirstTimer(_prev: FormState, formData: FormData): Promise<FormState> {
+  const successMessage = "Thank you for visiting us — we're so glad you came! Someone from our team will be in touch soon."
+
+  if (isSpam(formData)) {
+    return { status: 'success', message: successMessage }
+  }
+
+  const name = String(formData.get('name') || '').trim()
+  const email = String(formData.get('email') || '').trim()
+  const phone = String(formData.get('phone') || '').trim()
+  const problem = missingContact(name, email, phone, 'either')
+  if (problem) return { status: 'error', message: problem }
+
+  const payload = await getPayloadClient()
+
+  try {
+    await payload.create({
+      collection: 'form-submissions',
+      data: {
+        formType: 'first-timer',
+        name,
+        email: email || undefined,
+        phone: phone || undefined,
+        campus: formData.get('campus') ? String(formData.get('campus')) : undefined,
+        serviceAttended: formData.get('serviceAttended') ? String(formData.get('serviceAttended')) : undefined,
+        message: formData.get('message') ? String(formData.get('message')) : undefined,
+      },
+    })
+    return { status: 'success', message: successMessage }
+  } catch {
+    return { status: 'error', message: 'Something went wrong. Please try again.' }
+  }
+}
+
+export async function submitCampusConnect(_prev: FormState, formData: FormData): Promise<FormState> {
+  const successMessage =
+    "Thank you — we'll put you in touch with the church closest to where you're moving."
+
+  if (isSpam(formData)) {
+    return { status: 'success', message: successMessage }
+  }
+
+  const name = String(formData.get('name') || '').trim()
+  const email = String(formData.get('email') || '').trim()
+  const problem = missingContact(name, email, '', 'email')
+  if (problem) return { status: 'error', message: problem }
+
+  const payload = await getPayloadClient()
+
+  try {
+    await payload.create({
+      collection: 'form-submissions',
+      data: {
+        formType: 'campus-connect',
+        name,
+        email,
+        phone: formData.get('phone') ? String(formData.get('phone')) : undefined,
+        campus: formData.get('campus') ? String(formData.get('campus')) : undefined,
+        message: formData.get('message') ? String(formData.get('message')) : undefined,
+      },
+    })
+    return { status: 'success', message: successMessage }
   } catch {
     return { status: 'error', message: 'Something went wrong. Please try again.' }
   }

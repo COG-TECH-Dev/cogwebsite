@@ -12,6 +12,9 @@ import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { Ministries } from './collections/Ministries'
 import { Homegroups } from './collections/Homegroups'
+import { News } from './collections/News'
+import { MissionProjects } from './collections/MissionProjects'
+import { Missionaries } from './collections/Missionaries'
 import { Events } from './collections/Events'
 import { EventRegistrations } from './collections/EventRegistrations'
 import { Sermons } from './collections/Sermons'
@@ -55,6 +58,9 @@ export default buildConfig({
     Pages,
     Ministries,
     Homegroups,
+    News,
+    MissionProjects,
+    Missionaries,
     Events,
     EventRegistrations,
     Sermons,

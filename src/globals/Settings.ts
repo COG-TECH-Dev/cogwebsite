@@ -52,6 +52,21 @@ export const Settings: GlobalConfig = {
     { name: 'contactEmail', type: 'text', access: { update: isAdminOrUpField } },
     { name: 'contactPhone', type: 'text', access: { update: isAdminOrUpField } },
     {
+      name: 'dutyPastor',
+      type: 'group',
+      access: { update: isAdminOrUpField },
+      admin: {
+        description:
+          'The pastor on call this week. Shown on the Leadership page and the Connect page when ticked on. Only publish contact details you are comfortable having public.',
+      },
+      fields: [
+        { name: 'show', type: 'checkbox', defaultValue: false, label: 'Show on the website' },
+        { name: 'name', type: 'text', admin: { description: 'e.g. "Pastor Udu"' } },
+        { name: 'phone', type: 'text', admin: { description: 'Optional. Leave empty to show the name and note only.' } },
+        { name: 'note', type: 'textarea', admin: { description: 'e.g. "On call 24/7 this week for urgent pastoral needs."' } },
+      ],
+    },
+    {
       name: 'socialLinks',
       type: 'group',
       fields: [

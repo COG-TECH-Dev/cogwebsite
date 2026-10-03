@@ -51,6 +51,9 @@ export const FormSubmissions: CollectionConfig = {
         { label: 'Welfare & Support Request', value: 'welfare' },
         { label: 'Step of Faith', value: 'step-of-faith' },
         { label: 'Join a Homegroup', value: 'homegroup-join' },
+        { label: 'First-Time Visitor', value: 'first-timer' },
+        { label: 'Mission Trip / Volunteer Sign-Up', value: 'mission-trip' },
+        { label: 'Campus Connection (relocating student)', value: 'campus-connect' },
       ],
     },
     {
@@ -69,8 +72,10 @@ export const FormSubmissions: CollectionConfig = {
       type: 'text',
       // Optional for Step of Faith (anonymous allowed) and Join a Homegroup
       // (phone is the required way to reach them there instead).
-      validate: (value: unknown, { siblingData }: { siblingData?: { formType?: string } }) => {
+      validate: (value: unknown, { siblingData }: { siblingData?: { formType?: string; phone?: string } }) => {
         if (siblingData?.formType === 'step-of-faith' || siblingData?.formType === 'homegroup-join') return true
+        // A first-time visitor can give either an email or a phone number.
+        if (siblingData?.formType === 'first-timer') return value || siblingData.phone ? true : 'Please give an email or phone number.'
         return value ? true : 'Email is required.'
       },
     },
@@ -99,6 +104,31 @@ export const FormSubmissions: CollectionConfig = {
       admin: {
         description: 'The homegroup they asked to join. Empty means "not sure — help me find one near me".',
         condition: (data) => data.formType === 'homegroup-join',
+      },
+    },
+    {
+      name: 'interestedProject',
+      type: 'relationship',
+      relationTo: 'mission-projects',
+      admin: {
+        description: 'The mission project they are interested in (if they chose one).',
+        condition: (data) => data.formType === 'mission-trip',
+      },
+    },
+    {
+      name: 'campus',
+      type: 'text',
+      admin: {
+        description: 'First-timer: the campus they attended. Campus connection: the campus they want to connect with.',
+        condition: (data) => data.formType === 'first-timer' || data.formType === 'campus-connect',
+      },
+    },
+    {
+      name: 'serviceAttended',
+      type: 'text',
+      admin: {
+        description: 'Which service they attended.',
+        condition: (data) => data.formType === 'first-timer',
       },
     },
     {

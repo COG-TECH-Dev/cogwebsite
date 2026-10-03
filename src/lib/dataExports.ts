@@ -26,7 +26,7 @@ export type ExportConfig = {
  */
 export const DATA_EXPORTS: Record<string, ExportConfig> = {
   'form-submissions': {
-    label: 'Enquiries & sign-ups (contact, appointments, membership, reference letters, welfare, step of faith, homegroups)',
+    label: 'Enquiries & sign-ups (contact, appointments, membership, reference letters, welfare, step of faith, homegroups, first-time visitors, mission trips, campus connections)',
     collection: 'form-submissions',
     columns: [
       ['ID', (d) => d.id],
@@ -37,6 +37,9 @@ export const DATA_EXPORTS: Record<string, ExportConfig> = {
       ['Phone', (d) => d.phone],
       ['Ministry', (d) => rel(d.interestedMinistry)],
       ['Homegroup', (d) => rel(d.interestedHomegroup)],
+      ['Mission Project', (d) => rel(d.interestedProject)],
+      ['Campus', (d) => d.campus],
+      ['Service Attended', (d) => d.serviceAttended],
       ['Preferred Date', (d) => d.preferredDate],
       ['Letter Type', (d) => d.letterType],
       ['Purpose', (d) => d.purpose],
@@ -56,7 +59,9 @@ export const DATA_EXPORTS: Record<string, ExportConfig> = {
       ['Email', (d) => d.email],
       ['Phone', (d) => d.phone],
       ['Request', (d) => d.request],
-      ['Confidential', (d) => (d.isConfidential ? 'Yes' : 'No')],
+      // Requests from before the three-way choice default to Private (the safe side).
+      ['Who May See It', (d) => d.visibility ?? 'private'],
+      ['Approved For Prayer Wall', (d) => (d.visibility === 'public' ? (d.approved ? 'Yes' : 'No') : '')],
       ['Status', (d) => d.status],
     ],
   },

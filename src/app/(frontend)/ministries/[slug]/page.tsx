@@ -46,7 +46,17 @@ async function getOtherMinistries(excludeId: number) {
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { slug } = await params
   const ministry = await getMinistry(slug)
-  return { title: ministry?.name, description: ministry?.summary ?? undefined }
+  if (!ministry) return {}
+  const img = mediaUrl(ministry.image)
+  return {
+    title: ministry.name,
+    description: ministry.summary ?? undefined,
+    openGraph: {
+      title: ministry.name,
+      description: ministry.summary ?? undefined,
+      ...(img ? { images: [img] } : {}),
+    },
+  }
 }
 
 export default async function MinistryPage({ params }: Args) {

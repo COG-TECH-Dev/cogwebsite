@@ -8,7 +8,10 @@ import { PageHeader } from '@/components/ui/PageHeader'
 
 export const metadata: Metadata = { title: 'Give Online' }
 
-export default async function DonatePage() {
+type Args = { searchParams: Promise<{ fund?: string }> }
+
+export default async function DonatePage({ searchParams }: Args) {
+  const { fund: requestedFund } = await searchParams
   const payload = await getPayloadClient()
   const giving = await payload.findGlobal({ slug: 'giving' }).catch(() => null)
   const funds = (giving?.funds ?? []).filter((f): f is { name: string; description?: string | null; id?: string | null } => Boolean(f.name))
@@ -26,6 +29,7 @@ export default async function DonatePage() {
         {stripeConfigured ? (
           <DonateForm
             branches={branches.map((b) => b.name)}
+            defaultFund={requestedFund}
             funds={funds.map((f) => ({ name: f.name, description: f.description ?? undefined }))}
           />
         ) : (

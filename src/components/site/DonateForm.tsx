@@ -12,9 +12,11 @@ const QUICK_AMOUNTS = [10, 25, 50, 100]
 export function DonateForm({
   branches,
   funds,
+  defaultFund,
 }: {
   branches: string[]
   funds: { name: string; description?: string }[]
+  defaultFund?: string
 }) {
   const [state, formAction, pending] = useActionState(createDonationCheckout, initialState)
   const [amount, setAmount] = useState<number | null>(25)
@@ -111,7 +113,12 @@ export function DonateForm({
           <label htmlFor="fund" className="mb-1 block text-sm font-medium text-ink">
             Fund
           </label>
-          <select id="fund" name="fund" className="input" defaultValue={funds[0]?.name}>
+          <select
+            id="fund"
+            name="fund"
+            className="input"
+            defaultValue={funds.some((f) => f.name === defaultFund) ? defaultFund : funds[0]?.name}
+          >
             {funds.map((f) => (
               <option key={f.name} value={f.name}>
                 {f.name}

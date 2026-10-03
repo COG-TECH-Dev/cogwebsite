@@ -20,10 +20,18 @@ export const navLinks: NavLink[] = [
     ],
   },
   { label: 'Ministries', href: '/ministries' },
-  { label: 'Programmes', href: '/programmes' },
+  {
+    label: 'Programmes',
+    href: '/programmes',
+    children: [
+      { label: 'All Programmes', href: '/programmes' },
+      { label: 'News & Announcements', href: '/news' },
+      { label: 'Missions', href: '/missions' },
+    ],
+  },
   {
     label: 'Branches',
-    href: '/',
+    href: '/connect/find-a-campus',
     children: [
       { label: 'Newcastle Church', href: '/' },
       { label: 'Sunderland Church', href: 'https://cityofgodsunderland.org/', external: true },
@@ -61,6 +69,7 @@ export const navLinks: NavLink[] = [
       { label: "I'm New Here", href: '/connect/new-here' },
       { label: 'Find a Homegroup', href: '/connect/homegroups' },
       { label: 'Prayer Request', href: '/connect/prayer-request' },
+      { label: 'Prayer Wall', href: '/connect/prayer-wall' },
       { label: 'Share a Testimony', href: '/connect/share-testimony' },
       { label: 'Contact Us', href: '/connect/contact' },
       { label: 'Appointments', href: '/connect/appointments' },

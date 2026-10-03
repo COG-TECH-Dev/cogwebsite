@@ -52,7 +52,12 @@ async function getOtherEvents(excludeId: number) {
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { slug } = await params
   const event = await getEvent(slug)
-  return { title: event?.title }
+  if (!event) return {}
+  const img = mediaUrl(event.featuredImage)
+  return {
+    title: event.title,
+    openGraph: { title: event.title, ...(img ? { images: [img] } : {}) },
+  }
 }
 
 export default async function EventPage({ params }: Args) {
