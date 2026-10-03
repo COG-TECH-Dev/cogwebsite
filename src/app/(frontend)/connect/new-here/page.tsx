@@ -76,7 +76,7 @@ export default async function NewHerePage() {
                   <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold-100 text-gold-600">
                     <Icon className="h-6 w-6" aria-hidden="true" />
                   </span>
-                  <p className="mt-5 font-serif text-lg font-semibold text-brand-700">{card.title}</p>
+                  <h2 className="mt-5 font-serif text-lg font-semibold text-brand-700">{card.title}</h2>
                   <p className="mt-2 text-sm leading-relaxed text-ink-muted">{card.body}</p>
                 </div>
               </StaggerItem>

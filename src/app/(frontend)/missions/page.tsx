@@ -114,7 +114,7 @@ export default async function MissionsPage() {
                       <div className="mt-6 flex flex-wrap items-center gap-4">
                         <Link
                           href={giveHref(project.givingFund)}
-                          className="inline-flex items-center gap-2 rounded-full bg-gold-500 px-5 py-2.5 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-600"
+                          className="inline-flex items-center gap-2 rounded-full bg-gold-500 px-5 py-2.5 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-300"
                         >
                           <Heart className="h-4 w-4" aria-hidden="true" />
                           Give to this project
@@ -166,7 +166,7 @@ export default async function MissionsPage() {
                           )}
                         </div>
                         <div>
-                          <p className="font-serif text-lg font-semibold text-brand-700">{m.name}</p>
+                          <h3 className="font-serif text-lg font-semibold text-brand-700">{m.name}</h3>
                           {m.location && <p className="text-sm text-ink-muted">{m.location}</p>}
                         </div>
                       </div>
@@ -194,7 +194,7 @@ export default async function MissionsPage() {
             <ul className="space-y-3">
               {completed.map((p) => (
                 <li key={p.id} className="rounded-xl border border-border bg-surface p-4">
-                  <p className="font-semibold text-brand-700">{p.title}</p>
+                  <h3 className="font-semibold text-brand-700">{p.title}</h3>
                   {(p.location || p.summary) && (
                     <p className="mt-1 text-sm text-ink-muted">{[p.location, p.summary].filter(Boolean).join(' — ')}</p>
                   )}

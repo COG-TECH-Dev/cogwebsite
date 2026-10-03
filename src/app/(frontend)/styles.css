@@ -29,7 +29,7 @@
 
   --color-gold-100: #fbeedd;
   --color-gold-300: #e8a661;
-  --color-gold-500: #c2660a;
+  --color-gold-500: #d0700e;
   --color-gold-600: #9c5208;
 
   --color-flame-500: #e8532b;
@@ -74,6 +74,6 @@ body {
 
   .btn-primary {
     @apply inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700;
-    @apply transition-colors hover:bg-gold-600 disabled:cursor-not-allowed disabled:opacity-60;
+    @apply transition-colors hover:bg-gold-300 disabled:cursor-not-allowed disabled:opacity-60;
   }
 }

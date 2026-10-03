@@ -59,7 +59,7 @@ export function EventRegistrationForm({ eventId }: { eventId: number }) {
       <button
         type="submit"
         disabled={pending}
-        className="w-full rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-600 disabled:opacity-60"
+        className="w-full rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-300 disabled:opacity-60"
       >
         {pending ? 'Reserving…' : 'Reserve My Spot'}
       </button>

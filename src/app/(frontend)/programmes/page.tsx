@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
 import { formatEventDateRange, TYPE_ICONS, TYPE_LABELS } from '@/lib/eventDisplay'
+import { pastEventsWhere, upcomingEventsWhere } from '@/lib/eventWindow'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
@@ -25,21 +26,20 @@ type Args = { searchParams: Promise<{ type?: string }> }
 export default async function ProgrammesPage({ searchParams }: Args) {
   const { type } = await searchParams
   const payload = await getPayloadClient()
-  const now = new Date().toISOString()
 
   const typeConditions = type ? [{ type: { equals: type } }] : []
 
   const [upcoming, past] = await Promise.all([
     payload.find({
       collection: 'events',
-      where: { and: [...typeConditions, { startDate: { greater_than_equal: now } }] },
+      where: { and: [...typeConditions, upcomingEventsWhere()] },
       sort: 'startDate',
       limit: 50,
       draft: false,
     }),
     payload.find({
       collection: 'events',
-      where: { and: [...typeConditions, { startDate: { less_than: now } }] },
+      where: { and: [...typeConditions, pastEventsWhere()] },
       sort: '-startDate',
       limit: 12,
       draft: false,
@@ -113,9 +113,9 @@ export default async function ProgrammesPage({ searchParams }: Args) {
                       <p className="text-xs font-semibold uppercase tracking-wide text-gold-600">
                         {TYPE_LABELS[event.type] ?? event.type}
                       </p>
-                      <p className="mt-1 font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
+                      <h3 className="mt-1 font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
                         {event.title}
-                      </p>
+                      </h3>
                       {event.location && <p className="mt-1 text-sm text-ink-muted">{event.location}</p>}
                       {event.registrationEnabled && (
                         <span className="mt-3 inline-flex w-fit items-center rounded-full bg-gold-100 px-3 py-1 text-xs font-semibold text-gold-700">
@@ -140,7 +140,7 @@ export default async function ProgrammesPage({ searchParams }: Args) {
                 <li key={event.id}>
                   <Link
                     href={`/programmes/${event.slug}`}
-                    className="flex flex-col gap-1 rounded-xl border border-border bg-surface p-4 opacity-80 transition-opacity hover:opacity-100 sm:flex-row sm:items-center sm:justify-between"
+                    className="flex flex-col gap-1 rounded-xl border border-border bg-surface p-4 transition-colors hover:border-gold-300 sm:flex-row sm:items-center sm:justify-between"
                   >
                     <div>
                       <span className="text-xs font-semibold uppercase tracking-wide text-ink-muted">

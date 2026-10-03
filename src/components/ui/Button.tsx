@@ -5,7 +5,7 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 
 const styles = {
-  primary: 'bg-gold-500 text-brand-700 hover:bg-gold-600',
+  primary: 'bg-gold-500 text-brand-700 hover:bg-gold-300',
   secondary: 'bg-brand-600 text-white hover:bg-brand-500',
   outline: 'border border-current text-current hover:bg-white/10',
 } as const

@@ -28,6 +28,13 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: '*.public.blob.vercel-storage.com',
       },
+      // Video thumbnails for the click-to-play YouTube player, fetched by our
+      // server so visitors' browsers don't contact Google until they press play.
+      {
+        protocol: 'https',
+        hostname: 'i.ytimg.com',
+        pathname: '/vi/**',
+      },
     ],
   },
   webpack: (webpackConfig) => {
@@ -138,4 +145,27 @@ const nextConfig: NextConfig = {
   },
 }
 
-export default withPayload(nextConfig, { devBundleServerPackages: false })
+const config = withPayload(nextConfig, { devBundleServerPackages: false })
+
+// Payload adds a colour-scheme client hint (Accept-CH / Critical-CH) to every
+// route so its admin can follow the browser's light/dark setting. On the public
+// site, Critical-CH makes Chrome repeat the very first page request — about a
+// third of a second on a good connection, and Lighthouse reports it as an
+// "avoid multiple page redirects" warning on every page — for no benefit, so
+// keep those headers on the admin only.
+const payloadHeaders = config.headers
+const CLIENT_HINT_HEADERS = new Set(['accept-ch', 'critical-ch', 'vary'])
+config.headers = async () => {
+  const rules = (await payloadHeaders?.()) ?? []
+  return rules.flatMap((rule) => {
+    if (!rule.headers.some((h) => h.key.toLowerCase() === 'critical-ch')) return [rule]
+    const hints = rule.headers.filter((h) => CLIENT_HINT_HEADERS.has(h.key.toLowerCase()))
+    const rest = rule.headers.filter((h) => !CLIENT_HINT_HEADERS.has(h.key.toLowerCase()))
+    return [
+      ...(rest.length > 0 ? [{ ...rule, headers: rest }] : []),
+      { source: '/admin/:path*', headers: hints },
+    ]
+  })
+}
+
+export default config

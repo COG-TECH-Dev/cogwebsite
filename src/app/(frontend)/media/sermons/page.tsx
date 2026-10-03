@@ -110,9 +110,9 @@ export default async function SermonsPage({ searchParams }: Args) {
                         {img && <Image src={img} alt={sermon.title} fill className="object-cover" />}
                       </div>
                       <div className="p-5">
-                        <p className="font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
+                        <h2 className="font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
                           {sermon.title}
-                        </p>
+                        </h2>
                         <p className="mt-1 text-sm text-ink-muted">
                           {[sermon.speaker, new Date(sermon.date).toLocaleDateString('en-GB')]
                             .filter(Boolean)

@@ -52,7 +52,7 @@ export default async function PrayerWallPage() {
         )}
 
         <div className="mx-auto mt-16 max-w-xl rounded-3xl bg-brand-50 p-8 text-center">
-          <p className="font-serif text-xl font-semibold text-brand-700">Need prayer?</p>
+          <h3 className="font-serif text-xl font-semibold text-brand-700">Need prayer?</h3>
           <p className="mt-2 text-sm text-ink-muted">
             Share a request privately, with our ministry team, or here on the wall. Anything for the wall is read
             by our team first.

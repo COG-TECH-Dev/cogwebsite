@@ -19,7 +19,7 @@ export async function DutyPastorCard({ className = '' }: { className?: string })
         <ShieldPlus className="h-4 w-4" aria-hidden="true" />
         Duty Pastor This Week
       </p>
-      <p className="mt-2 font-serif text-xl font-semibold text-brand-700">{duty.name}</p>
+      <h3 className="mt-2 font-serif text-xl font-semibold text-brand-700">{duty.name}</h3>
       {duty.note && <p className="mt-1 text-sm text-ink-muted">{duty.note}</p>}
       {duty.phone && (
         <a

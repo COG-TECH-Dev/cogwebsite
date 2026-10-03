@@ -32,7 +32,7 @@ export default async function HomegroupsPage() {
                     <MapPin className="h-3.5 w-3.5" aria-hidden="true" />
                     {group.area}
                   </p>
-                  <p className="mt-2 font-serif text-lg font-semibold text-brand-700">{group.name}</p>
+                  <h3 className="mt-2 font-serif text-lg font-semibold text-brand-700">{group.name}</h3>
                   {group.meetingDay && <p className="mt-1 text-sm text-ink-muted">{group.meetingDay}</p>}
                   {group.description && <p className="mt-3 flex-1 text-sm text-ink-muted">{group.description}</p>}
                   <div className="mt-4 space-y-1.5 border-t border-border pt-4">

@@ -15,7 +15,8 @@ type Args = { params: Promise<{ slug: string }> }
 export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { slug } = await params
   const page = await getPageBySlug(slug)
-  return { title: page?.seo?.metaTitle || page?.title, description: page?.seo?.metaDescription ?? undefined }
+  // An explicit `description: undefined` would wipe the site-wide default, so only set it when there is one.
+  return { title: page?.seo?.metaTitle || page?.title, ...(page?.seo?.metaDescription ? { description: page.seo.metaDescription } : {}) }
 }
 
 export default async function AboutSubPage({ params }: Args) {

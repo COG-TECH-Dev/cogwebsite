@@ -4,6 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import type { Page, Testimonial } from '@/payload-types'
+import { youtubeVideoId } from '@/lib/youtube'
+import { YouTubePlayer } from '@/components/site/YouTubePlayer'
 import { ACCENTS, BrandPanel, Glows } from '@/components/ui/BrandVisuals'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
@@ -261,7 +263,7 @@ function Block({ block }: { block: LayoutBlock }) {
                       />
                     )}
                   </div>
-                  <p className="mt-5 font-serif text-xl font-semibold text-brand-700">{item.title}</p>
+                  <h3 className="mt-5 font-serif text-xl font-semibold text-brand-700">{item.title}</h3>
                   <p className="mt-2 text-[0.95rem] leading-relaxed text-ink-muted">{item.body}</p>
                   {item.footnote && (
                     <p className="mt-4 border-t border-border pt-3 text-sm font-medium text-gold-600">{item.footnote}</p>
@@ -305,13 +307,13 @@ function Block({ block }: { block: LayoutBlock }) {
                 const right = i % 2 === 1
                 return (
                   <li key={i} className="relative pb-12 pl-14 last:pb-0 md:grid md:grid-cols-2 md:gap-x-20 md:pl-0">
-                    <span className="absolute left-4 top-1 flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full bg-gold-500 text-sm font-bold text-white ring-8 ring-brand-50 md:left-1/2">
+                    <span className="absolute left-4 top-1 flex h-9 w-9 -translate-x-1/2 items-center justify-center rounded-full bg-gold-600 text-sm font-bold text-white ring-8 ring-brand-50 md:left-1/2">
                       {i + 1}
                     </span>
                     <Reveal className={right ? 'md:col-start-2' : 'md:col-start-1 md:text-right'}>
                       <div className="rounded-2xl border border-border bg-surface p-6 shadow-sm">
                         <p className="text-xs font-bold uppercase tracking-[0.18em] text-gold-600">{item.label}</p>
-                        <p className="mt-2 font-serif text-2xl font-semibold text-brand-700">{item.title}</p>
+                        <h3 className="mt-2 font-serif text-2xl font-semibold text-brand-700">{item.title}</h3>
                         {item.body && <p className="mt-3 leading-relaxed text-ink-muted">{item.body}</p>}
                       </div>
                     </Reveal>
@@ -383,7 +385,7 @@ function Block({ block }: { block: LayoutBlock }) {
                     <MemberVisual photo={member.photo} name={member.name} />
                   </div>
                   <div className="p-6">
-                    <p className="font-serif text-xl font-semibold text-brand-700">{member.name}</p>
+                    <h3 className="font-serif text-xl font-semibold text-brand-700">{member.name}</h3>
                     {member.title && <p className="mt-1 text-sm font-semibold text-gold-600">{member.title}</p>}
                     {member.bio && (
                       <p className="mt-3 text-[0.95rem] leading-relaxed text-ink-muted">{member.bio}</p>
@@ -453,8 +455,16 @@ function Block({ block }: { block: LayoutBlock }) {
       return (
         <Container className="py-16">
           {block.heading && <h2 className="mb-4 font-serif text-2xl font-semibold text-brand-700">{block.heading}</h2>}
-          <div className="aspect-video overflow-hidden rounded-2xl border border-border">
-            <iframe src={block.url} className="h-full w-full" allowFullScreen title={block.heading || 'Embed'} />
+          <div className="relative aspect-video overflow-hidden rounded-2xl border border-border">
+            {youtubeVideoId(block.url) ? (
+              <YouTubePlayer
+                videoId={youtubeVideoId(block.url)!}
+                title={block.heading || 'Video'}
+                sizes="(min-width: 1280px) 1152px, 100vw"
+              />
+            ) : (
+              <iframe src={block.url} className="h-full w-full" allowFullScreen loading="lazy" title={block.heading || 'Embed'} />
+            )}
           </div>
         </Container>
       )

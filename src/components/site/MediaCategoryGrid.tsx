@@ -3,6 +3,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
+import { youtubeVideoId } from '@/lib/youtube'
+import { YouTubePlayer } from '@/components/site/YouTubePlayer'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -13,11 +15,6 @@ function mediaUrl(image: unknown): string | null {
     return image.url
   }
   return null
-}
-
-function toEmbedUrl(url: string): string {
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([\w-]+)/)
-  return match ? `https://www.youtube.com/embed/${match[1]}` : url
 }
 
 export async function MediaCategoryGrid({
@@ -58,7 +55,7 @@ export async function MediaCategoryGrid({
               href={radioUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-5 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-600"
+              className="mt-5 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-300"
             >
               Listen Live
             </a>
@@ -71,14 +68,8 @@ export async function MediaCategoryGrid({
               <Tv className="h-5 w-5 text-gold-600" aria-hidden="true" />
               <h2 className="font-serif text-xl font-semibold text-brand-700">Watch Live</h2>
             </div>
-            <div className="aspect-video overflow-hidden rounded-2xl border border-border shadow-lg">
-              <iframe
-                src={`https://www.youtube.com/embed/live_stream?channel=${youtubeChannelId}`}
-                className="h-full w-full"
-                allowFullScreen
-                allow="autoplay; encrypted-media"
-                title="Live stream"
-              />
+            <div className="relative aspect-video overflow-hidden rounded-2xl border border-border shadow-lg">
+              <YouTubePlayer channelId={youtubeChannelId} title="City of God Christian Centre live stream" />
             </div>
             <p className="mt-3 text-sm text-ink-muted">
               Nothing streaming right now? Check back during a service, or browse past messages below.
@@ -100,12 +91,17 @@ export async function MediaCategoryGrid({
                     {item.videoEmbedUrl ? (
                       <div className="relative aspect-video">
                         <span aria-hidden="true" className={`absolute inset-x-0 top-0 z-10 h-1 bg-linear-to-r ${accent.bar}`} />
-                        <iframe
-                          src={toEmbedUrl(item.videoEmbedUrl)}
-                          className="h-full w-full"
-                          allowFullScreen
-                          title={item.title}
-                        />
+                        {youtubeVideoId(item.videoEmbedUrl) ? (
+                          <YouTubePlayer videoId={youtubeVideoId(item.videoEmbedUrl)!} title={item.title} />
+                        ) : (
+                          <iframe
+                            src={item.videoEmbedUrl}
+                            className="h-full w-full"
+                            allowFullScreen
+                            loading="lazy"
+                            title={item.title}
+                          />
+                        )}
                       </div>
                     ) : images.length > 1 ? (
                       <div className="relative grid aspect-4/3 grid-cols-2 grid-rows-2 gap-0.5 overflow-hidden">

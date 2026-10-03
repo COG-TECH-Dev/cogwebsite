@@ -42,7 +42,8 @@ export function CookieConsentBanner() {
   if (!visible) return null
 
   return (
-    <div className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface p-4 shadow-lg sm:p-5">
+    // A labelled region, so the banner is a landmark screen-reader users can find and jump to.
+    <section aria-label="Cookie consent" className="fixed inset-x-0 bottom-0 z-50 border-t border-border bg-surface p-4 shadow-lg sm:p-5">
       <div className="mx-auto flex max-w-5xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-sm text-ink-muted">
           We use cookies to understand how visitors use our site. Read our{' '}
@@ -72,6 +73,6 @@ export function CookieConsentBanner() {
           </button>
         </div>
       </div>
-    </div>
+    </section>
   )
 }

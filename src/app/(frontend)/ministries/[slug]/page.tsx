@@ -103,7 +103,7 @@ export default async function MinistryPage({ params }: Args) {
                   <UserRound className="h-4 w-4" aria-hidden="true" />
                   Led By
                 </p>
-                <p className="mt-2 font-serif text-lg font-semibold text-brand-700">{ministry.leaderName}</p>
+                <h3 className="mt-2 font-serif text-lg font-semibold text-brand-700">{ministry.leaderName}</h3>
               </div>
             )}
             {ministry.meetingTimes && ministry.meetingTimes.length > 0 && (
@@ -176,7 +176,7 @@ export default async function MinistryPage({ params }: Args) {
                       )}
                     </div>
                     <div className="p-4">
-                      <p className="font-serif font-semibold text-brand-700 group-hover:text-brand-600">{other.name}</p>
+                      <h3 className="font-serif font-semibold text-brand-700 group-hover:text-brand-600">{other.name}</h3>
                     </div>
                   </Link>
                 )

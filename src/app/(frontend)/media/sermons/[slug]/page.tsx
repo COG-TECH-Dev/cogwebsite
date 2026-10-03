@@ -3,6 +3,8 @@ import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import { getPayloadClient } from '@/lib/payload'
+import { youtubeVideoId } from '@/lib/youtube'
+import { YouTubePlayer } from '@/components/site/YouTubePlayer'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 
@@ -27,11 +29,6 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   }
 }
 
-function toEmbedUrl(url: string): string {
-  const match = url.match(/(?:youtu\.be\/|youtube\.com\/watch\?v=)([\w-]+)/)
-  return match ? `https://www.youtube.com/embed/${match[1]}` : url
-}
-
 export default async function SermonPage({ params }: Args) {
   const { slug } = await params
   const sermon = await getSermon(slug)
@@ -48,13 +45,16 @@ export default async function SermonPage({ params }: Args) {
       />
       <Container className="py-16">
         {sermon.videoUrl ? (
-          <div className="aspect-video overflow-hidden rounded-2xl border border-border">
-            <iframe
-              src={toEmbedUrl(sermon.videoUrl)}
-              className="h-full w-full"
-              allowFullScreen
-              title={sermon.title}
-            />
+          <div className="relative aspect-video overflow-hidden rounded-2xl border border-border">
+            {youtubeVideoId(sermon.videoUrl) ? (
+              <YouTubePlayer
+                videoId={youtubeVideoId(sermon.videoUrl)!}
+                title={sermon.title}
+                sizes="(min-width: 1280px) 1152px, 100vw"
+              />
+            ) : (
+              <iframe src={sermon.videoUrl} className="h-full w-full" allowFullScreen loading="lazy" title={sermon.title} />
+            )}
           </div>
         ) : sermon.audioUrl ? (
           <audio controls src={sermon.audioUrl} className="w-full" />

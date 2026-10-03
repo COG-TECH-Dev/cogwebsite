@@ -122,9 +122,9 @@ export default async function ResourcePage({ params }: Args) {
                   className="group rounded-2xl border border-border bg-surface p-5 shadow-sm transition-all hover:-translate-y-1 hover:shadow-lg"
                 >
                   <BlockIcon name={icon} className="h-6 w-6 text-gold-600" />
-                  <p className="mt-3 font-serif font-semibold text-brand-700 group-hover:text-brand-600">
+                  <h3 className="mt-3 font-serif font-semibold text-brand-700 group-hover:text-brand-600">
                     {other.title}
-                  </p>
+                  </h3>
                 </Link>
               ))}
             </div>

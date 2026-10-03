@@ -58,9 +58,9 @@ export default function ConnectPage() {
                   <span className={`flex h-12 w-12 items-center justify-center rounded-xl ${accent.badge}`}>
                     <Icon className="h-6 w-6" />
                   </span>
-                  <p className="mt-5 font-serif text-xl font-semibold text-brand-700 group-hover:text-brand-600">
+                  <h2 className="mt-5 font-serif text-xl font-semibold text-brand-700 group-hover:text-brand-600">
                     {section.label}
-                  </p>
+                  </h2>
                   <p className="mt-2 text-sm text-ink-muted">{section.description}</p>
                 </Link>
               </StaggerItem>

@@ -39,7 +39,7 @@ export default async function FindACampusPage() {
                 <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-gold-100 text-gold-600">
                   <MapPin className="h-5 w-5" aria-hidden="true" />
                 </span>
-                <p className="mt-4 font-serif text-xl font-semibold text-brand-700">{branch.label}</p>
+                <h2 className="mt-4 font-serif text-xl font-semibold text-brand-700">{branch.label}</h2>
                 {branch.label.startsWith('Newcastle') && address && (
                   <p className="mt-2 flex-1 text-sm text-ink-muted">{address}</p>
                 )}

@@ -4,6 +4,7 @@ import type { ComponentType } from 'react'
 
 import { getPayloadClient } from '@/lib/payload'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
+import { YouTubePlayer } from '@/components/site/YouTubePlayer'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { StaggerGroup, StaggerItem } from '@/components/ui/Stagger'
@@ -42,7 +43,7 @@ export default async function MediaHubPage() {
                   <span className={`flex h-12 w-12 items-center justify-center rounded-xl ${accent.badge}`}>
                     <Icon className="h-6 w-6" />
                   </span>
-                  <p className="mt-5 font-serif text-xl font-semibold text-brand-700">{section.label}</p>
+                  <h3 className="mt-5 font-serif text-xl font-semibold text-brand-700">{section.label}</h3>
                   <p className="mt-2 text-sm text-ink-muted">{section.description}</p>
                 </Link>
               </StaggerItem>
@@ -56,14 +57,8 @@ export default async function MediaHubPage() {
               <Tv className="h-5 w-5 text-gold-600" aria-hidden="true" />
               <h2 className="font-serif text-xl font-semibold text-brand-700">Watch Live</h2>
             </div>
-            <div className="aspect-video overflow-hidden rounded-2xl border border-border shadow-lg">
-              <iframe
-                src={`https://www.youtube.com/embed/live_stream?channel=${youtubeChannelId}`}
-                className="h-full w-full"
-                allowFullScreen
-                allow="autoplay; encrypted-media"
-                title="Live stream"
-              />
+            <div className="relative aspect-video overflow-hidden rounded-2xl border border-border shadow-lg">
+              <YouTubePlayer channelId={youtubeChannelId} title="City of God Christian Centre live stream" />
             </div>
             <p className="mt-3 text-sm text-ink-muted">
               Nothing streaming right now? Check back during a service, or watch{' '}
@@ -86,7 +81,7 @@ export default async function MediaHubPage() {
               href={radioUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-600"
+              className="mt-6 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-300"
             >
               Listen Live
             </a>

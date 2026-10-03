@@ -18,8 +18,9 @@ export function Nav({ churchName }: { churchName: string }) {
           <Image
             src="/images/COG-logo.webp"
             alt={churchName}
-            width={1600}
-            height={900}
+            // Displayed ~78x44. Declaring the real size stops Next requesting a 3840px-wide copy (70KB) on every page.
+            width={78}
+            height={44}
             priority
             className="h-11 w-auto"
           />
@@ -57,7 +58,7 @@ export function Nav({ churchName }: { churchName: string }) {
 
         <Link
           href="/give"
-          className="hidden rounded-full bg-gold-500 px-5 py-2.5 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-600 lg:inline-flex"
+          className="hidden rounded-full bg-gold-500 px-5 py-2.5 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-300 lg:inline-flex"
         >
           Give
         </Link>

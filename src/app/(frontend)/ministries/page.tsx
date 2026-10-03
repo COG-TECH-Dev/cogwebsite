@@ -63,9 +63,9 @@ export default async function MinistriesPage() {
                       <span aria-hidden="true" className={`absolute inset-x-0 top-0 h-1 bg-linear-to-r ${accent.bar}`} />
                     </div>
                     <div className="flex flex-1 flex-col p-6">
-                      <p className="font-serif text-xl font-semibold text-brand-700 group-hover:text-brand-600">
+                      <h2 className="font-serif text-xl font-semibold text-brand-700 group-hover:text-brand-600">
                         {ministry.name}
-                      </p>
+                      </h2>
                       {ministry.summary && (
                         <p className="mt-2 line-clamp-3 text-sm leading-relaxed text-ink-muted">{ministry.summary}</p>
                       )}
@@ -96,7 +96,7 @@ export default async function MinistriesPage() {
           </p>
           <Link
             href="/connect/membership"
-            className="mt-6 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-600"
+            className="mt-6 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-300"
           >
             Get Connected
           </Link>

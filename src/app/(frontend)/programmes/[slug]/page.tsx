@@ -7,6 +7,7 @@ import { notFound } from 'next/navigation'
 
 import { getPayloadClient } from '@/lib/payload'
 import { formatEventDateRange, TYPE_ICONS, TYPE_LABELS } from '@/lib/eventDisplay'
+import { upcomingEventsWhere } from '@/lib/eventWindow'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { BrandPanel } from '@/components/ui/BrandVisuals'
 import { Button } from '@/components/ui/Button'
@@ -41,7 +42,7 @@ async function getOtherEvents(excludeId: number) {
   const payload = await getPayloadClient()
   const result = await payload.find({
     collection: 'events',
-    where: { and: [{ id: { not_equals: excludeId } }, { startDate: { greater_than_equal: new Date().toISOString() } }] },
+    where: { and: [{ id: { not_equals: excludeId } }, upcomingEventsWhere()] },
     sort: 'startDate',
     limit: 3,
     draft: false,
@@ -207,9 +208,9 @@ export default async function EventPage({ params }: Args) {
                       <p className="text-xs font-semibold uppercase tracking-wide text-gold-600">
                         {formatEventDateRange(other.startDate, other.endDate)}
                       </p>
-                      <p className="mt-1 font-serif font-semibold text-brand-700 group-hover:text-brand-600">
+                      <h3 className="mt-1 font-serif font-semibold text-brand-700 group-hover:text-brand-600">
                         {other.title}
-                      </p>
+                      </h3>
                     </div>
                   </Link>
                 )

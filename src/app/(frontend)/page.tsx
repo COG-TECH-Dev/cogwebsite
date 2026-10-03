@@ -3,10 +3,11 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
+import { upcomingEventsWhere } from '@/lib/eventWindow'
 import { guessMinistryIcon } from '@/lib/guessMinistryIcon'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { HeroContent } from '@/components/site/HeroContent'
-import { LiveStreamPlayer } from '@/components/site/LiveStreamPlayer'
+import { YouTubePlayer } from '@/components/site/YouTubePlayer'
 import { BrandPanel } from '@/components/ui/BrandVisuals'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
@@ -30,7 +31,7 @@ export default async function HomePage() {
     payload.find({ collection: 'ministries', where: { featured: { equals: true } }, limit: 4 }),
     payload.find({
       collection: 'events',
-      where: { startDate: { greater_than_equal: new Date().toISOString() } },
+      where: upcomingEventsWhere(),
       sort: 'startDate',
       limit: 3,
       draft: false,
@@ -178,7 +179,7 @@ export default async function HomePage() {
                 Can&apos;t be with us in person? Worship with us live during our services.
               </p>
               <div className="relative mt-8 aspect-video overflow-hidden rounded-2xl border border-border shadow-lg">
-                <LiveStreamPlayer channelId={youtubeChannelId} />
+                <YouTubePlayer channelId={youtubeChannelId} title="City of God Christian Centre live stream" />
               </div>
               <p className="mt-4 text-sm text-ink-muted">
                 Nothing streaming right now?{' '}
@@ -245,9 +246,9 @@ export default async function HomePage() {
                         )}
                       </div>
                       <div className="p-5">
-                        <p className="font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
+                        <h3 className="font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
                           {ministry.name}
-                        </p>
+                        </h3>
                         {ministry.summary && (
                           <p className="mt-1 line-clamp-2 text-sm text-ink-muted">{ministry.summary}</p>
                         )}
@@ -279,7 +280,7 @@ export default async function HomePage() {
                       className="flex items-center justify-between gap-4 rounded-xl border border-border bg-surface p-5 transition-all hover:-translate-y-0.5 hover:shadow-md"
                     >
                       <div>
-                        <p className="font-semibold text-brand-700">{event.title}</p>
+                        <h3 className="font-semibold text-brand-700">{event.title}</h3>
                         {event.location && <p className="text-sm text-ink-muted">{event.location}</p>}
                       </div>
                       <span className="shrink-0 text-sm font-medium text-gold-600">
@@ -321,7 +322,7 @@ export default async function HomePage() {
                   )}
                 </div>
                 <div className="p-6">
-                  <p className="font-serif text-xl font-semibold text-brand-700">{latestSermon.title}</p>
+                  <h3 className="font-serif text-xl font-semibold text-brand-700">{latestSermon.title}</h3>
                   <p className="mt-1 text-sm text-ink-muted">
                     {[latestSermon.speaker, new Date(latestSermon.date).toLocaleDateString('en-GB')]
                       .filter(Boolean)
@@ -364,9 +365,9 @@ export default async function HomePage() {
                         year: 'numeric',
                       })}
                     </p>
-                    <p className="mt-2 font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
+                    <h3 className="mt-2 font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
                       {post.title}
-                    </p>
+                    </h3>
                     {post.summary && <p className="mt-2 text-sm text-ink-muted">{post.summary}</p>}
                   </Link>
                 </StaggerItem>
@@ -414,7 +415,7 @@ export default async function HomePage() {
           <StaggerGroup className="grid gap-6 sm:grid-cols-3">
             <StaggerItem>
               <div className="h-full rounded-2xl border border-border bg-surface p-7">
-                <p className="font-serif text-xl font-semibold text-brand-700">I&apos;m New Here</p>
+                <h3 className="font-serif text-xl font-semibold text-brand-700">I&apos;m New Here</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">
                   Whether it&apos;s your first time or you&apos;re looking for a church home, we&apos;re glad
                   you&apos;re here. Join us this Sunday and experience real community.
@@ -426,7 +427,7 @@ export default async function HomePage() {
             </StaggerItem>
             <StaggerItem>
               <div className="h-full rounded-2xl border border-border bg-surface p-7">
-                <p className="font-serif text-xl font-semibold text-brand-700">Just Visited Us?</p>
+                <h3 className="font-serif text-xl font-semibold text-brand-700">Just Visited Us?</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">
                   We&apos;d love to hear from you and help you take your next step.
                 </p>
@@ -437,7 +438,7 @@ export default async function HomePage() {
             </StaggerItem>
             <StaggerItem>
               <div className="h-full rounded-2xl border border-border bg-surface p-7">
-                <p className="font-serif text-xl font-semibold text-brand-700">Take a Step of Faith</p>
+                <h3 className="font-serif text-xl font-semibold text-brand-700">Take a Step of Faith</h3>
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">
                   Whatever brought you here today, God already knows — and He&apos;s inviting you to take the next
                   step. It only takes a moment to respond.

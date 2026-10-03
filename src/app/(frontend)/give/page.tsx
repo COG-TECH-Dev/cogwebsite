@@ -16,7 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const page = await getPageBySlug('give')
   return {
     title: page?.seo?.metaTitle || page?.title || 'Give',
-    description: page?.seo?.metaDescription ?? undefined,
+    description:
+      page?.seo?.metaDescription ||
+      'Give your tithes and offerings to City of God Christian Centre — online, by bank transfer, or in person.',
   }
 }
 
@@ -56,7 +58,7 @@ export default async function GivePage() {
             <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold-100 text-gold-600">
               <Building2 className="h-6 w-6" aria-hidden="true" />
             </span>
-            <p className="mt-5 font-serif text-xl font-semibold text-brand-700">Bank Transfer</p>
+            <h3 className="mt-5 font-serif text-xl font-semibold text-brand-700">Bank Transfer</h3>
             {hasBankDetails ? (
               <>
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">
@@ -84,9 +86,9 @@ export default async function GivePage() {
             <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-flame-500/10 text-flame-500">
               <HandCoins className="h-6 w-6" aria-hidden="true" />
             </span>
-            <p className="mt-5 font-serif text-xl font-semibold text-brand-700">
+            <h3 className="mt-5 font-serif text-xl font-semibold text-brand-700">
               {giving?.onlineGiving?.label || 'Give Online'}
-            </p>
+            </h3>
             {stripeConfigured ? (
               <>
                 <p className="mt-2 text-sm leading-relaxed text-ink-muted">
@@ -94,7 +96,7 @@ export default async function GivePage() {
                 </p>
                 <Link
                   href="/give/donate"
-                  className="mt-5 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-600"
+                  className="mt-5 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-300"
                 >
                   Give Online
                 </Link>
@@ -114,7 +116,7 @@ export default async function GivePage() {
                   href={onlineUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="mt-5 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-600"
+                  className="mt-5 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-300"
                 >
                   {giving?.onlineGiving?.label || 'Give Online'}
                 </a>
@@ -131,7 +133,7 @@ export default async function GivePage() {
             <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/10 text-sky-500">
               <HeartHandshake className="h-6 w-6" aria-hidden="true" />
             </span>
-            <p className="mt-5 font-serif text-xl font-semibold text-brand-700">In Person</p>
+            <h3 className="mt-5 font-serif text-xl font-semibold text-brand-700">In Person</h3>
             <p className="mt-2 text-sm leading-relaxed text-ink-muted">
               Give by cash or card at any Sunday service — an offering point is available at each of our locations.
             </p>
@@ -142,7 +144,7 @@ export default async function GivePage() {
             <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold-100 text-gold-600">
               <BookOpen className="h-6 w-6" aria-hidden="true" />
             </span>
-            <p className="mt-5 font-serif text-xl font-semibold text-brand-700">Bookstore</p>
+            <h3 className="mt-5 font-serif text-xl font-semibold text-brand-700">Bookstore</h3>
             <p className="mt-2 text-sm leading-relaxed text-ink-muted">
               Support the ministry by picking up a book or resource from our bookstore.
             </p>

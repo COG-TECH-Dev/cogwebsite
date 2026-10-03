@@ -21,7 +21,7 @@ export function StepOfFaithForm() {
   if (state.status === 'success') {
     return (
       <div className="rounded-2xl border border-border bg-brand-50 p-8">
-        <p className="font-serif text-xl font-semibold text-brand-700">What&apos;s Next?</p>
+        <h3 className="font-serif text-xl font-semibold text-brand-700">What&apos;s Next?</h3>
         <p className="mt-2 text-ink-muted">Wherever you are in your journey, here are a few ways to keep going:</p>
         <ul className="mt-5 space-y-3">
           <li>

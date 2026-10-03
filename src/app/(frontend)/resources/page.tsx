@@ -85,9 +85,9 @@ export default async function ResourcesPage({ searchParams }: Args) {
                     <p className="mt-5 text-xs font-semibold uppercase tracking-wide text-gold-600">
                       {TYPE_LABELS[resource.type] ?? resource.type}
                     </p>
-                    <p className="mt-1 font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
+                    <h2 className="mt-1 font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
                       {resource.title}
-                    </p>
+                    </h2>
                     {tags.length > 0 && (
                       <div className="mt-auto flex flex-wrap gap-1.5 pt-4">
                         {tags.map((t, tagIdx) => (
@@ -116,7 +116,7 @@ export default async function ResourcesPage({ searchParams }: Args) {
           </p>
           <Link
             href="/connect/contact"
-            className="mt-6 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-600"
+            className="mt-6 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-300"
           >
             Contact Us
           </Link>

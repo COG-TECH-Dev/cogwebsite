@@ -56,7 +56,7 @@ export default function CookiePolicyPage() {
             <div className="mt-4 space-y-4">
               {rows.map((row) => (
                 <div key={row.name} className="rounded-2xl border border-border bg-surface p-5">
-                  <p className="font-semibold text-brand-700">{row.name}</p>
+                  <h3 className="font-semibold text-brand-700">{row.name}</h3>
                   <p className="mt-1 text-sm">{row.purpose}</p>
                   <p className="mt-2 text-xs font-semibold uppercase tracking-wide text-gold-600">{row.kind}</p>
                   <p className="mt-1 text-xs">{row.detail}</p>

@@ -74,9 +74,9 @@ export default async function NewsPage() {
                           year: 'numeric',
                         })}
                       </p>
-                      <p className="mt-1 font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
+                      <h3 className="mt-1 font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
                         {post.title}
-                      </p>
+                      </h3>
                       {post.summary && <p className="mt-2 text-sm text-ink-muted">{post.summary}</p>}
                     </div>
                   </Link>
