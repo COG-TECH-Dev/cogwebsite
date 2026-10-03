@@ -14,6 +14,7 @@ import * as migration_20260929_083042_add_donation_branch from './20260929_08304
 import * as migration_20260930_230943_add_homegroups_welfare_stepoffaith_childsafeguarding from './20260930_230943_add_homegroups_welfare_stepoffaith_childsafeguarding';
 import * as migration_20261003_072828_add_homegroup_join from './20261003_072828_add_homegroup_join';
 import * as migration_20261003_081222_add_news_missions_prayer_routing_firsttimer from './20261003_081222_add_news_missions_prayer_routing_firsttimer';
+import * as migration_20261003_190037_media_item_multiple_pages from './20261003_190037_media_item_multiple_pages';
 
 export const migrations = [
   {
@@ -94,6 +95,11 @@ export const migrations = [
   {
     up: migration_20261003_081222_add_news_missions_prayer_routing_firsttimer.up,
     down: migration_20261003_081222_add_news_missions_prayer_routing_firsttimer.down,
-    name: '20261003_081222_add_news_missions_prayer_routing_firsttimer'
+    name: '20261003_081222_add_news_missions_prayer_routing_firsttimer',
+  },
+  {
+    up: migration_20261003_190037_media_item_multiple_pages.up,
+    down: migration_20261003_190037_media_item_multiple_pages.down,
+    name: '20261003_190037_media_item_multiple_pages'
   },
 ];

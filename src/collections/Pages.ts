@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { isContentEditorOrUp } from '../access'
+import { isContentEditorOrUp, readPublishedOrStaff } from '../access'
 import { formatSlug } from '../hooks/formatSlug'
 import { revalidateCollection, revalidateCollectionOnDelete } from '../hooks/revalidate'
 import {
@@ -37,7 +37,7 @@ export const Pages: CollectionConfig = {
     afterDelete: [revalidateCollectionOnDelete(paths)],
   },
   access: {
-    read: () => true,
+    read: readPublishedOrStaff,
     create: isContentEditorOrUp,
     update: isContentEditorOrUp,
     delete: isContentEditorOrUp,

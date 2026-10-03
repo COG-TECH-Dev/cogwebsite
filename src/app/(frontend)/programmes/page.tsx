@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { getPayloadClient } from '@/lib/payload'
 import { formatEventDateRange, TYPE_ICONS, TYPE_LABELS } from '@/lib/eventDisplay'
 import { pastEventsWhere, upcomingEventsWhere } from '@/lib/eventWindow'
+import { publishedOnly } from '@/lib/published'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
@@ -32,14 +33,14 @@ export default async function ProgrammesPage({ searchParams }: Args) {
   const [upcoming, past] = await Promise.all([
     payload.find({
       collection: 'events',
-      where: { and: [...typeConditions, upcomingEventsWhere()] },
+      where: { and: [...typeConditions, upcomingEventsWhere(), publishedOnly] },
       sort: 'startDate',
       limit: 50,
       draft: false,
     }),
     payload.find({
       collection: 'events',
-      where: { and: [...typeConditions, pastEventsWhere()] },
+      where: { and: [...typeConditions, pastEventsWhere(), publishedOnly] },
       sort: '-startDate',
       limit: 12,
       draft: false,

@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { isContentEditorOrUp } from '../access'
+import { isContentEditorOrUp, readPublishedOrStaff } from '../access'
 import { formatSlug } from '../hooks/formatSlug'
 import { restrictPublishToContentEditor } from '../hooks/restrictPublishToContentEditor'
 import { revalidateCollection, revalidateCollectionOnDelete } from '../hooks/revalidate'
@@ -23,7 +23,7 @@ export const News: CollectionConfig = {
   },
   access: {
     // The public only ever sees published posts; signed-in staff also see drafts.
-    read: ({ req: { user } }) => (user ? true : { _status: { equals: 'published' } }),
+    read: readPublishedOrStaff,
     create: isContentEditorOrUp,
     update: isContentEditorOrUp,
     delete: isContentEditorOrUp,

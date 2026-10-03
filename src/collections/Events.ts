@@ -1,6 +1,6 @@
 import type { CollectionConfig } from 'payload'
 
-import { isMinistryLeaderOfDoc } from '../access'
+import { isMinistryLeaderOfDoc, readPublishedOrStaff } from '../access'
 import { formatSlug } from '../hooks/formatSlug'
 import { restrictPublishToContentEditor } from '../hooks/restrictPublishToContentEditor'
 import { revalidateCollection, revalidateCollectionOnDelete } from '../hooks/revalidate'
@@ -21,7 +21,7 @@ export const Events: CollectionConfig = {
     afterDelete: [revalidateCollectionOnDelete(paths)],
   },
   access: {
-    read: () => true,
+    read: readPublishedOrStaff,
     // Any signed-in staff/volunteer can propose an event; Content Editor+
     // can publish, Ministry Leaders publish within their own scope, and a
     // Volunteer's submission is force-kept as a draft (see the hook above).

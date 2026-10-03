@@ -1,10 +1,12 @@
 import type { CollectionConfig } from 'payload'
 
-import { isMinistryLeaderOfDoc } from '../access'
+import { isMinistryLeaderOfDoc, readPublishedOrStaff } from '../access'
 import { restrictPublishToContentEditor } from '../hooks/restrictPublishToContentEditor'
 import { revalidateCollection, revalidateCollectionOnDelete } from '../hooks/revalidate'
 
-const paths = (doc: Record<string, unknown>) => ['/media', `/media/${doc.category}`]
+// An item can now appear on several media pages, and un-ticking a page has to
+// clear that page's cache too, so every media page is refreshed on any change.
+const paths = () => ['/media', '/media/gallery', '/media/cog-tv', '/media/cog-grand-radio']
 
 export const MediaGalleryItems: CollectionConfig = {
   slug: 'media-gallery-items',
@@ -21,7 +23,7 @@ export const MediaGalleryItems: CollectionConfig = {
     afterDelete: [revalidateCollectionOnDelete(paths)],
   },
   access: {
-    read: () => true,
+    read: readPublishedOrStaff,
     create: ({ req: { user } }) => Boolean(user),
     update: isMinistryLeaderOfDoc('relatedMinistry'),
     delete: isMinistryLeaderOfDoc('relatedMinistry'),
@@ -30,14 +32,19 @@ export const MediaGalleryItems: CollectionConfig = {
     { name: 'title', type: 'text', required: true },
     {
       name: 'category',
+      label: 'Show on',
       type: 'select',
+      hasMany: true,
       required: true,
-      defaultValue: 'gallery',
+      defaultValue: ['gallery'],
       options: [
         { label: 'Gallery', value: 'gallery' },
         { label: 'COG TV', value: 'cog-tv' },
         { label: 'COG Grand Radio', value: 'cog-grand-radio' },
       ],
+      admin: {
+        description: 'Tick every media page this should appear on — more than one is fine.',
+      },
     },
     {
       name: 'images',

@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
+import { publishedOnly } from '@/lib/published'
 import { youtubeVideoId } from '@/lib/youtube'
 import { YouTubePlayer } from '@/components/site/YouTubePlayer'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
@@ -32,7 +33,7 @@ export async function MediaCategoryGrid({
   const [items, settings] = await Promise.all([
     payload.find({
       collection: 'media-gallery-items',
-      where: { category: { equals: category } },
+      where: { and: [{ category: { in: [category] } }, publishedOnly] },
       limit: 50,
       draft: false,
     }),

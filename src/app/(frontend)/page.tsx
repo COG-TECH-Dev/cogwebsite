@@ -4,6 +4,7 @@ import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
 import { upcomingEventsWhere } from '@/lib/eventWindow'
+import { publishedOnly } from '@/lib/published'
 import { guessMinistryIcon } from '@/lib/guessMinistryIcon'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { HeroContent } from '@/components/site/HeroContent'
@@ -31,7 +32,7 @@ export default async function HomePage() {
     payload.find({ collection: 'ministries', where: { featured: { equals: true } }, limit: 4 }),
     payload.find({
       collection: 'events',
-      where: upcomingEventsWhere(),
+      where: { and: [upcomingEventsWhere(), publishedOnly] },
       sort: 'startDate',
       limit: 3,
       draft: false,
@@ -111,7 +112,8 @@ export default async function HomePage() {
         <Container className="py-6">
           <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
             {[
-              { href: '/media/cog-tv', label: 'Watch Live', hint: 'Join our service online', icon: Tv },
+              // Straight to the player further down this page when there is one, rather than off to another page.
+              { href: youtubeChannelId ? '#watch-live' : '/media/cog-tv', label: 'Watch Live', hint: 'Join our service online', icon: Tv },
               { href: '/connect/new-here', label: 'Plan Your Visit', hint: 'What to expect', icon: DoorOpen },
               { href: '/give', label: 'Give Online', hint: 'Tithes & offerings', icon: HandCoins },
               { href: '/connect/find-a-campus', label: 'Find a Church', hint: 'Near you', icon: MapPin },
@@ -170,7 +172,7 @@ export default async function HomePage() {
 
       {/* Live stream — only once the YouTube channel ID is set in Settings (FR-011) */}
       {youtubeChannelId && (
-        <section className="py-20">
+        <section id="watch-live" className="scroll-mt-24 py-20">
           <Container>
             <Reveal className="mx-auto max-w-3xl text-center">
               <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-600">Watch Live</p>

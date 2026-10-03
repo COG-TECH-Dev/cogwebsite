@@ -843,7 +843,10 @@ export interface Sermon {
 export interface MediaGalleryItem {
   id: number;
   title: string;
-  category: 'gallery' | 'cog-tv' | 'cog-grand-radio';
+  /**
+   * Tick every media page this should appear on — more than one is fine.
+   */
+  category: ('gallery' | 'cog-tv' | 'cog-grand-radio')[];
   images?: (number | Media)[] | null;
   /**
    * YouTube or other video URL, for COG TV items.

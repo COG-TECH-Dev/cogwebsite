@@ -8,6 +8,7 @@ import { notFound } from 'next/navigation'
 import { getPayloadClient } from '@/lib/payload'
 import { formatEventDateRange, TYPE_ICONS, TYPE_LABELS } from '@/lib/eventDisplay'
 import { upcomingEventsWhere } from '@/lib/eventWindow'
+import { publishedOnly } from '@/lib/published'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { BrandPanel } from '@/components/ui/BrandVisuals'
 import { Button } from '@/components/ui/Button'
@@ -31,7 +32,7 @@ async function getEvent(slug: string) {
   const payload = await getPayloadClient()
   const result = await payload.find({
     collection: 'events',
-    where: { slug: { equals: slug } },
+    where: { and: [{ slug: { equals: slug } }, publishedOnly] },
     limit: 1,
     draft: false,
   })
@@ -42,7 +43,7 @@ async function getOtherEvents(excludeId: number) {
   const payload = await getPayloadClient()
   const result = await payload.find({
     collection: 'events',
-    where: { and: [{ id: { not_equals: excludeId } }, upcomingEventsWhere()] },
+    where: { and: [{ id: { not_equals: excludeId } }, upcomingEventsWhere(), publishedOnly] },
     sort: 'startDate',
     limit: 3,
     draft: false,
