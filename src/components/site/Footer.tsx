@@ -91,7 +91,8 @@ export function Footer({ settings, churchName }: { settings: Setting | null; chu
         </div>
       </Container>
 
-      <div className="border-t border-white/10 py-6">
+      {/* Extra bottom room so the floating WhatsApp button never covers the credits. */}
+      <div className="border-t border-white/10 pb-20 pt-6">
         <Container className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xs text-white/50">
             &copy; {new Date().getFullYear()} {churchName}. All rights reserved.
