@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 
 import { Container } from '../ui/Container'
+import { LiveNowButton } from './LiveNowButton'
 import { navLinks } from './navLinks'
 
 export function Nav({ churchName }: { churchName: string }) {
@@ -14,24 +15,28 @@ export function Nav({ churchName }: { churchName: string }) {
   return (
     <header className="sticky top-0 z-50 border-b border-border bg-paper/90 backdrop-blur">
       <Container className="flex h-20 items-center justify-between">
-        <Link href="/" className="flex items-center">
-          <Image
-            src="/images/COG-logo.webp"
-            alt={churchName}
-            // Displayed ~78x44. Declaring the real size stops Next requesting a 3840px-wide copy (70KB) on every page.
-            width={78}
-            height={44}
-            priority
-            className="h-11 w-auto"
-          />
-        </Link>
+        <div className="flex items-center gap-3">
+          <Link href="/" className="flex items-center">
+            <Image
+              src="/images/COG-logo.webp"
+              alt={churchName}
+              // Displayed ~78x44. Declaring the real size stops Next requesting a 3840px-wide copy (70KB) on every page.
+              width={78}
+              height={44}
+              priority
+              className="h-11 w-auto"
+            />
+          </Link>
+          {/* Appears only while the church is live on YouTube. */}
+          <LiveNowButton />
+        </div>
 
-        <nav className="hidden items-center gap-1 lg:flex">
+        <nav className="hidden items-center gap-1 xl:flex">
           {navLinks.map((link) => (
             <div key={link.label} className="group relative">
               <Link
                 href={link.href}
-                className="flex items-center gap-1 rounded-full px-4 py-2 text-sm font-medium text-ink hover:bg-brand-50 hover:text-brand-600"
+                className="flex items-center gap-1 rounded-full px-1.5 py-2 text-sm font-medium text-ink hover:bg-brand-50 hover:text-brand-600 min-[1340px]:px-2 min-[1440px]:px-3"
               >
                 {link.label}
               </Link>
@@ -58,7 +63,7 @@ export function Nav({ churchName }: { churchName: string }) {
 
         <Link
           href="/give"
-          className="hidden rounded-full bg-gold-500 px-5 py-2.5 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-300 lg:inline-flex"
+          className="hidden rounded-full bg-gold-500 px-5 py-2.5 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-300 xl:inline-flex"
         >
           Give
         </Link>
@@ -68,7 +73,7 @@ export function Nav({ churchName }: { churchName: string }) {
           onClick={() => setMobileOpen((open) => !open)}
           aria-expanded={mobileOpen}
           aria-label="Toggle menu"
-          className="flex h-10 w-10 items-center justify-center rounded-full border border-border lg:hidden"
+          className="flex h-10 w-10 items-center justify-center rounded-full border border-border xl:hidden"
         >
           <span className="sr-only">Menu</span>
           <div className="flex flex-col gap-1.5">
@@ -95,7 +100,7 @@ export function Nav({ churchName }: { churchName: string }) {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden border-t border-border bg-paper lg:hidden"
+            className="overflow-hidden border-t border-border bg-paper xl:hidden"
           >
             <Container className="flex flex-col gap-1 py-4">
               {navLinks.map((link) => (
