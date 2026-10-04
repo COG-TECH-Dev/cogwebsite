@@ -45,6 +45,11 @@ export async function submitChildSafeguardingForm(_prev: ChildFormState, formDat
         allergiesOrMedicalNotes: formData.get('allergiesOrMedicalNotes')
           ? String(formData.get('allergiesOrMedicalNotes'))
           : undefined,
+        additionalNeeds: formData.get('additionalNeeds') ? String(formData.get('additionalNeeds')) : undefined,
+        authorisedCollectors: formData.get('authorisedCollectors')
+          ? String(formData.get('authorisedCollectors'))
+          : undefined,
+        medicalTreatmentConsent: formData.get('medicalTreatmentConsent') === 'on',
         emergencyContactName: formData.get('emergencyContactName')
           ? String(formData.get('emergencyContactName'))
           : undefined,

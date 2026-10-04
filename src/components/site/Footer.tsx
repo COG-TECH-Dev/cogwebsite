@@ -107,6 +107,11 @@ export function Footer({ settings, churchName }: { settings: Setting | null; chu
             <Link href="/cookie-policy" className="underline hover:text-gold-300">
               Cookie Policy
             </Link>
+            {settings?.safeguarding?.enabled && (
+              <Link href="/safeguarding" className="underline hover:text-gold-300">
+                Safeguarding
+              </Link>
+            )}
             <a
               href="https://www.elmorilx.com/"
               target="_blank"

@@ -67,6 +67,10 @@ export default async function MinistryPage({ params }: Args) {
   const img = mediaUrl(ministry.image)
   const icon = ministry.icon || guessMinistryIcon(ministry.name)
   const others = await getOtherMinistries(ministry.id)
+  const safeguardingOn = Boolean(
+    ministry.isChildrensMinistry &&
+      (await (await getPayloadClient()).findGlobal({ slug: 'settings' }).catch(() => null))?.safeguarding?.enabled,
+  )
 
   return (
     <div>
@@ -147,6 +151,15 @@ export default async function MinistryPage({ params }: Args) {
             </div>
             <div className="mx-auto mt-10 max-w-2xl">
               <ChildrenMinistryForms />
+              {safeguardingOn && (
+                <p className="mt-6 text-center text-sm text-white/90">
+                  Read how we keep children safe, or raise a concern, on our{' '}
+                  <Link href="/safeguarding" className="font-semibold underline">
+                    Safeguarding page
+                  </Link>
+                  .
+                </p>
+              )}
             </div>
           </Container>
         </div>

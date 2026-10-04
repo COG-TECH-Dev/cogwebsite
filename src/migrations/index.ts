@@ -15,6 +15,7 @@ import * as migration_20260930_230943_add_homegroups_welfare_stepoffaith_childsa
 import * as migration_20261003_072828_add_homegroup_join from './20261003_072828_add_homegroup_join';
 import * as migration_20261003_081222_add_news_missions_prayer_routing_firsttimer from './20261003_081222_add_news_missions_prayer_routing_firsttimer';
 import * as migration_20261003_190037_media_item_multiple_pages from './20261003_190037_media_item_multiple_pages';
+import * as migration_20261004_070759_safeguarding_page_and_concerns from './20261004_070759_safeguarding_page_and_concerns';
 
 export const migrations = [
   {
@@ -100,6 +101,11 @@ export const migrations = [
   {
     up: migration_20261003_190037_media_item_multiple_pages.up,
     down: migration_20261003_190037_media_item_multiple_pages.down,
-    name: '20261003_190037_media_item_multiple_pages'
+    name: '20261003_190037_media_item_multiple_pages',
+  },
+  {
+    up: migration_20261004_070759_safeguarding_page_and_concerns.up,
+    down: migration_20261004_070759_safeguarding_page_and_concerns.down,
+    name: '20261004_070759_safeguarding_page_and_concerns'
   },
 ];

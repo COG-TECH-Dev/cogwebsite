@@ -83,6 +83,7 @@ export interface Config {
     testimonials: Testimonial;
     'bookstore-items': BookstoreItem;
     'child-safeguarding-forms': ChildSafeguardingForm;
+    'safeguarding-concerns': SafeguardingConcern;
     donations: Donation;
     'prayer-requests': PrayerRequest;
     'form-submissions': FormSubmission;
@@ -109,6 +110,7 @@ export interface Config {
     testimonials: TestimonialsSelect<false> | TestimonialsSelect<true>;
     'bookstore-items': BookstoreItemsSelect<false> | BookstoreItemsSelect<true>;
     'child-safeguarding-forms': ChildSafeguardingFormsSelect<false> | ChildSafeguardingFormsSelect<true>;
+    'safeguarding-concerns': SafeguardingConcernsSelect<false> | SafeguardingConcernsSelect<true>;
     donations: DonationsSelect<false> | DonationsSelect<true>;
     'prayer-requests': PrayerRequestsSelect<false> | PrayerRequestsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -937,6 +939,18 @@ export interface ChildSafeguardingForm {
    * Any allergies, medical conditions, or other information our team should know.
    */
   allergiesOrMedicalNotes?: string | null;
+  /**
+   * Special educational needs, disabilities or anything that helps us support the child.
+   */
+  additionalNeeds?: string | null;
+  /**
+   * The adults who may collect the child. Staff only release a child to someone on this list.
+   */
+  authorisedCollectors?: string | null;
+  /**
+   * Parent/carer gave permission for first aid / emergency medical treatment if they cannot be reached straight away.
+   */
+  medicalTreatmentConsent?: boolean | null;
   emergencyContactName?: string | null;
   emergencyContactPhone?: string | null;
   /**
@@ -949,6 +963,46 @@ export interface ChildSafeguardingForm {
   vettingAcknowledged?: boolean | null;
   message?: string | null;
   status?: ('new' | 'in-progress' | 'resolved') | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * Concerns about a child, sent from the Safeguarding page. Highly sensitive: Admin / Pastor and Super Admin only. Do not delete records — keep them as your safeguarding policy and adviser require. Not included in the data exports.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "safeguarding-concerns".
+ */
+export interface SafeguardingConcern {
+  id: number;
+  reference?: string | null;
+  status: 'new' | 'reviewing' | 'referred' | 'closed';
+  /**
+   * Ticked means the sender was told to call 999 first. Treat as urgent.
+   */
+  immediateDanger?: boolean | null;
+  /**
+   * Allegations about a person in a position of trust go to the Local Authority Designated Officer (LADO).
+   */
+  involvesStaffOrVolunteer?: boolean | null;
+  concern: string;
+  whenAndWhere?: string | null;
+  childName?: string | null;
+  childAgeOrDob?: string | null;
+  othersTold?: string | null;
+  reporter?: {
+    name?: string | null;
+    relationship?: ('member' | 'parent' | 'volunteer' | 'visitor' | 'child' | 'other') | null;
+    phone?: string | null;
+    email?: string | null;
+    wantsContact?: boolean | null;
+  };
+  lead?: {
+    referredTo?: ('social-care' | 'police' | 'lado' | 'adviser' | 'charity-commission' | 'other' | 'none')[] | null;
+    /**
+     * Record what was decided, who was contacted, when, and why.
+     */
+    notes?: string | null;
+  };
   updatedAt: string;
   createdAt: string;
 }
@@ -1159,6 +1213,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'child-safeguarding-forms';
         value: number | ChildSafeguardingForm;
+      } | null)
+    | ({
+        relationTo: 'safeguarding-concerns';
+        value: number | SafeguardingConcern;
       } | null)
     | ({
         relationTo: 'donations';
@@ -1668,12 +1726,47 @@ export interface ChildSafeguardingFormsSelect<T extends boolean = true> {
   childDOB?: T;
   photoConsent?: T;
   allergiesOrMedicalNotes?: T;
+  additionalNeeds?: T;
+  authorisedCollectors?: T;
+  medicalTreatmentConsent?: T;
   emergencyContactName?: T;
   emergencyContactPhone?: T;
   availability?: T;
   vettingAcknowledged?: T;
   message?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "safeguarding-concerns_select".
+ */
+export interface SafeguardingConcernsSelect<T extends boolean = true> {
+  reference?: T;
+  status?: T;
+  immediateDanger?: T;
+  involvesStaffOrVolunteer?: T;
+  concern?: T;
+  whenAndWhere?: T;
+  childName?: T;
+  childAgeOrDob?: T;
+  othersTold?: T;
+  reporter?:
+    | T
+    | {
+        name?: T;
+        relationship?: T;
+        phone?: T;
+        email?: T;
+        wantsContact?: T;
+      };
+  lead?:
+    | T
+    | {
+        referredTo?: T;
+        notes?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1824,6 +1917,25 @@ export interface Setting {
      */
     note?: string | null;
   };
+  /**
+   * Switches on the Safeguarding page and its "raise a concern" form. It stays hidden until you tick the box, so fill in the Safeguarding Lead details and have the page reviewed first. Someone must be reading the alerts before this goes on.
+   */
+  safeguarding?: {
+    enabled?: boolean | null;
+    leadName?: string | null;
+    leadPhone?: string | null;
+    leadEmail?: string | null;
+    deputyName?: string | null;
+    deputyPhone?: string | null;
+    /**
+     * Leave empty to use the lead's email. The alert never contains the details of the concern.
+     */
+    alertEmail?: string | null;
+    /**
+     * e.g. "October 2026". Shown on the page.
+     */
+    reviewedOn?: string | null;
+  };
   socialLinks?: {
     facebook?: string | null;
     instagram?: string | null;
@@ -1948,6 +2060,18 @@ export interface SettingsSelect<T extends boolean = true> {
         name?: T;
         phone?: T;
         note?: T;
+      };
+  safeguarding?:
+    | T
+    | {
+        enabled?: T;
+        leadName?: T;
+        leadPhone?: T;
+        leadEmail?: T;
+        deputyName?: T;
+        deputyPhone?: T;
+        alertEmail?: T;
+        reviewedOn?: T;
       };
   socialLinks?:
     | T

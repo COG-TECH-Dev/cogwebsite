@@ -109,6 +109,22 @@ export function ChildrenMinistryForms() {
               </label>
               <textarea id="allergiesOrMedicalNotes" name="allergiesOrMedicalNotes" rows={3} className="input" />
             </div>
+            <div>
+              <label htmlFor="additionalNeeds" className="mb-1 block text-sm font-medium text-ink">
+                Additional needs or anything that helps us support your child (optional)
+              </label>
+              <textarea id="additionalNeeds" name="additionalNeeds" rows={3} className="input" />
+            </div>
+            <div>
+              <label htmlFor="authorisedCollectors" className="mb-1 block text-sm font-medium text-ink">
+                Who may collect your child?
+              </label>
+              <p className="mb-2 text-sm text-ink-muted">
+                Names of the adults allowed to collect your child. Our team will only hand your child to someone on
+                this list.
+              </p>
+              <textarea id="authorisedCollectors" name="authorisedCollectors" rows={2} required className="input" />
+            </div>
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
                 <label htmlFor="emergencyContactName" className="mb-1 block text-sm font-medium text-ink">
@@ -130,6 +146,19 @@ export function ChildrenMinistryForms() {
               </div>
             </div>
           </>
+        )}
+
+        {tab === 'pre-registration' && (
+          <label className="flex items-start gap-2 text-sm text-ink">
+            <input
+              type="checkbox"
+              name="medicalTreatmentConsent"
+              required
+              className="mt-0.5 h-4 w-4 shrink-0 rounded border-border"
+            />
+            If my child needs first aid or urgent medical treatment and the team cannot reach me straight away, I give
+            permission for a leader to arrange it. I understand I will be contacted as soon as possible.
+          </label>
         )}
 
         {tab === 'volunteer-interest' && (

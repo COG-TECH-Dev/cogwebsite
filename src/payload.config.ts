@@ -23,6 +23,7 @@ import { Resources } from './collections/Resources'
 import { Testimonials } from './collections/Testimonials'
 import { BookstoreItems } from './collections/BookstoreItems'
 import { ChildSafeguardingForms } from './collections/ChildSafeguardingForms'
+import { SafeguardingConcerns } from './collections/SafeguardingConcerns'
 import { Donations } from './collections/Donations'
 import { PrayerRequests } from './collections/PrayerRequests'
 import { FormSubmissions } from './collections/FormSubmissions'
@@ -69,6 +70,7 @@ export default buildConfig({
     Testimonials,
     BookstoreItems,
     ChildSafeguardingForms,
+    SafeguardingConcerns,
     Donations,
     PrayerRequests,
     FormSubmissions,

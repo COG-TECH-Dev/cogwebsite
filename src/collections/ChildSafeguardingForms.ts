@@ -75,6 +75,30 @@ export const ChildSafeguardingForms: CollectionConfig = {
       },
     },
     {
+      name: 'additionalNeeds',
+      type: 'textarea',
+      admin: {
+        description: 'Special educational needs, disabilities or anything that helps us support the child.',
+        condition: (data) => data.formType === 'pre-registration',
+      },
+    },
+    {
+      name: 'authorisedCollectors',
+      type: 'textarea',
+      admin: {
+        description: 'The adults who may collect the child. Staff only release a child to someone on this list.',
+        condition: (data) => data.formType === 'pre-registration',
+      },
+    },
+    {
+      name: 'medicalTreatmentConsent',
+      type: 'checkbox',
+      admin: {
+        description: 'Parent/carer gave permission for first aid / emergency medical treatment if they cannot be reached straight away.',
+        condition: (data) => data.formType === 'pre-registration',
+      },
+    },
+    {
       name: 'emergencyContactName',
       type: 'text',
       admin: { condition: (data) => data.formType === 'pre-registration' },

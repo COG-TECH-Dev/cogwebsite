@@ -67,6 +67,30 @@ export const Settings: GlobalConfig = {
       ],
     },
     {
+      name: 'safeguarding',
+      type: 'group',
+      access: { update: isAdminOrUpField },
+      admin: {
+        description:
+          'Switches on the Safeguarding page and its "raise a concern" form. It stays hidden until you tick the box, so fill in the Safeguarding Lead details and have the page reviewed first. Someone must be reading the alerts before this goes on.',
+      },
+      fields: [
+        { name: 'enabled', type: 'checkbox', defaultValue: false, label: 'Show the Safeguarding page and concern form on the website' },
+        { name: 'leadName', type: 'text', label: 'Safeguarding Lead — name' },
+        { name: 'leadPhone', type: 'text', label: 'Safeguarding Lead — phone' },
+        { name: 'leadEmail', type: 'text', label: 'Safeguarding Lead — email' },
+        { name: 'deputyName', type: 'text', label: 'Deputy Safeguarding Lead — name' },
+        { name: 'deputyPhone', type: 'text', label: 'Deputy Safeguarding Lead — phone' },
+        {
+          name: 'alertEmail',
+          type: 'text',
+          label: 'Send "new concern" alerts to',
+          admin: { description: "Leave empty to use the lead's email. The alert never contains the details of the concern." },
+        },
+        { name: 'reviewedOn', type: 'text', label: 'Policy last reviewed', admin: { description: 'e.g. "October 2026". Shown on the page.' } },
+      ],
+    },
+    {
       name: 'socialLinks',
       type: 'group',
       fields: [
