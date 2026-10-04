@@ -1,4 +1,4 @@
-import { Baby, Clock, Coffee, MapPin, Shirt } from 'lucide-react'
+import { Baby, Car, Clock, Coffee, MapPin, Shirt } from 'lucide-react'
 
 import { getPayloadClient } from '@/lib/payload'
 import { Button } from '@/components/ui/Button'
@@ -12,13 +12,19 @@ import { StaggerGroup, StaggerItem } from '@/components/ui/Stagger'
 export const revalidate = 60
 export const metadata = { title: "I'm New Here" }
 
+// Where visitors can park, and the map link the church supplied for it.
+const PARKING =
+  'You can park in the car park at the back of the church, or nearby at the shopping centre.'
+const PARKING_MAP_URL = 'https://maps.app.goo.gl/PWsPPVr7gPtfA8NG8'
+
 export default async function NewHerePage() {
   const payload = await getPayloadClient()
   const settings = await payload.findGlobal({ slug: 'settings' }).catch(() => null)
   const sundayServices = (settings?.serviceTimes ?? []).filter((s) => s.label.toLowerCase().includes('sunday'))
   const address = settings?.address
+  const addressLine = [address?.line1, address?.city, address?.postcode].filter(Boolean).join(', ')
 
-  const cards = [
+  const cards: { icon: typeof Clock; title: string; body: string; link?: { href: string; label: string } }[] = [
     {
       icon: Clock,
       title: 'Sunday Service Times',
@@ -34,6 +40,19 @@ export default async function NewHerePage() {
         address?.line1 || address?.city
           ? [address?.line1, [address?.city, address?.postcode].filter(Boolean).join(', ')].filter(Boolean).join(', ')
           : 'Address coming soon.',
+      // A plain place search (no fixed start point), so Google Maps offers directions from wherever the visitor is.
+      link: addressLine
+        ? {
+            href: `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressLine)}`,
+            label: 'Open in Google Maps',
+          }
+        : undefined,
+    },
+    {
+      icon: Car,
+      title: 'Parking',
+      body: PARKING,
+      link: { href: PARKING_MAP_URL, label: 'See where to park on the map' },
     },
     {
       icon: Shirt,
@@ -78,6 +97,17 @@ export default async function NewHerePage() {
                   </span>
                   <h2 className="mt-5 font-serif text-lg font-semibold text-brand-700">{card.title}</h2>
                   <p className="mt-2 text-sm leading-relaxed text-ink-muted">{card.body}</p>
+                  {card.link && (
+                    <a
+                      href={card.link.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-3 inline-block text-sm font-semibold text-brand-600 hover:underline"
+                    >
+                      {card.link.label} <span aria-hidden="true">→</span>
+                      <span className="sr-only"> (opens in a new tab)</span>
+                    </a>
+                  )}
                 </div>
               </StaggerItem>
             )
