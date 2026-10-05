@@ -111,6 +111,21 @@ export const Ministries: CollectionConfig = {
         description: 'Gives this ministry\'s page the bold youth look. Ablaze Youth gets it automatically.',
       },
     },
+    {
+      name: 'category',
+      type: 'select',
+      options: [
+        { label: 'Children & youth', value: 'children-youth' },
+        { label: 'Worship & arts', value: 'worship-arts' },
+        { label: 'Fellowship & family', value: 'fellowship-family' },
+        { label: 'Outreach & missions', value: 'outreach-missions' },
+        { label: 'Prayer & care', value: 'prayer-care' },
+        { label: 'Service teams', value: 'service-teams' },
+      ],
+      admin: {
+        description: 'Which group this ministry appears under in the directory\'s filter. Optional: if left empty, it is worked out from the ministry\'s name.',
+      },
+    },
     { name: 'featured', type: 'checkbox', defaultValue: false },
     {
       name: 'isChildrensMinistry',

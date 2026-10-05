@@ -1,5 +1,6 @@
 'use client'
 
+import { Lock } from 'lucide-react'
 import { useActionState, useState, startTransition, type FormEvent } from 'react'
 
 import { createDonationCheckout, type DonateState } from '@/app/(frontend)/give/donate/actions'
@@ -256,8 +257,12 @@ export function DonateForm({
       <button type="submit" disabled={pending} className="btn-primary w-full">
         {pending ? 'Redirecting to secure checkout…' : 'Continue to Payment'}
       </button>
-      <p className="text-center text-xs text-ink-muted">
-        You&apos;ll be securely redirected to Stripe to complete your payment.
+      <p className="flex items-start justify-center gap-1.5 text-center text-xs text-ink-muted">
+        <Lock className="mt-0.5 h-3.5 w-3.5 shrink-0" aria-hidden="true" />
+        <span>
+          Secure payment by Stripe. You&apos;ll be redirected to complete it over HTTPS, and we never see or store your card
+          details.
+        </span>
       </p>
     </form>
   )

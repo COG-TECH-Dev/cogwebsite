@@ -3,6 +3,7 @@ import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
 import { guessMinistryIcon } from '@/lib/guessMinistryIcon'
+import { MINISTRY_CATEGORIES, isMinistryCategory, ministryCategory } from '@/lib/ministryCategories'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
@@ -20,20 +21,32 @@ function mediaUrl(image: unknown): string | null {
   return null
 }
 
-type Args = { searchParams: Promise<{ q?: string }> }
+type Args = { searchParams: Promise<{ q?: string; category?: string }> }
+
+// Keeps the search words when the category changes, and the other way round.
+function listHref(params: { q?: string; category?: string }) {
+  const qs = new URLSearchParams()
+  if (params.q) qs.set('q', params.q)
+  if (params.category) qs.set('category', params.category)
+  const s = qs.toString()
+  return s ? `/ministries?${s}` : '/ministries'
+}
 
 export default async function MinistriesPage({ searchParams }: Args) {
-  const { q } = await searchParams
-  const query = (q ?? '').trim().slice(0, 80)
+  const sp = await searchParams
+  const query = (sp.q ?? '').trim().slice(0, 80)
+  const category = isMinistryCategory(sp.category) ? sp.category : undefined
   const payload = await getPayloadClient()
   const all = await payload.find({ collection: 'ministries', limit: 100, sort: 'name' })
-  // A short list, so match in memory on the name, the summary and the leader.
+  // A short list, so match in memory on the name, the summary and the leader, then on the category.
   const needle = query.toLowerCase()
   const ministries = {
-    docs: needle
-      ? all.docs.filter((m) => [m.name, m.summary, m.leaderName].some((v) => v?.toLowerCase().includes(needle)))
-      : all.docs,
+    docs: all.docs
+      .filter((m) => !needle || [m.name, m.summary, m.leaderName].some((v) => v?.toLowerCase().includes(needle)))
+      .filter((m) => !category || ministryCategory(m) === category),
   }
+  // Only offer groups that have at least one ministry in them.
+  const categoryOptions = MINISTRY_CATEGORIES.filter((c) => all.docs.some((m) => ministryCategory(m) === c.value))
 
   return (
     <div>
@@ -63,11 +76,12 @@ export default async function MinistriesPage({ searchParams }: Args) {
                 className="input"
               />
             </div>
+            {category && <input type="hidden" name="category" value={category} />}
             <div className="flex gap-2">
               <button type="submit" className="btn-primary">
                 Search
               </button>
-              {query && (
+              {(query || category) && (
                 <Link
                   href="/ministries"
                   className="inline-flex items-center rounded-full border border-border px-5 py-2.5 text-sm font-medium text-ink hover:bg-brand-50"
@@ -77,6 +91,23 @@ export default async function MinistriesPage({ searchParams }: Args) {
               )}
             </div>
           </form>
+        )}
+
+        {categoryOptions.length > 1 && (
+          <nav aria-label="Filter ministries by category" className="mb-8 flex flex-wrap gap-2">
+            {[{ value: undefined as string | undefined, label: 'All' }, ...categoryOptions].map((c) => (
+              <Link
+                key={c.label}
+                href={listHref({ q: query || undefined, category: c.value })}
+                aria-current={category === c.value ? 'true' : undefined}
+                className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
+                  category === c.value ? 'bg-gold-500 text-brand-700' : 'border border-border text-ink hover:bg-brand-50'
+                }`}
+              >
+                {c.label}
+              </Link>
+            ))}
+          </nav>
         )}
 
         {ministries.docs.length > 0 ? (
@@ -128,9 +159,9 @@ export default async function MinistriesPage({ searchParams }: Args) {
               )
             })}
           </StaggerGroup>
-        ) : query ? (
+        ) : query || category ? (
           <p className="text-ink-muted">
-            No ministries match &ldquo;{query}&rdquo;. Try a different word, or{' '}
+            No ministries match{query ? <> &ldquo;{query}&rdquo;</> : ' that group'}. Try a different word, or{' '}
             <Link href="/ministries" className="font-medium text-brand-600 underline hover:text-brand-700">
               see them all
             </Link>

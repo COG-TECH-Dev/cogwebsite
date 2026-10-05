@@ -20,6 +20,7 @@ import * as migration_20261005_060443_event_time_label from './20261005_060443_e
 import * as migration_20261005_061445_resource_ebook_and_form_types from './20261005_061445_resource_ebook_and_form_types';
 import * as migration_20261005_062541_ministry_classes_and_contact from './20261005_062541_ministry_classes_and_contact';
 import * as migration_20261005_065146_first_timer_youth_volunteer_weekly from './20261005_065146_first_timer_youth_volunteer_weekly';
+import * as migration_20261005_094630_ministry_category from './20261005_094630_ministry_category';
 
 export const migrations = [
   {
@@ -130,6 +131,11 @@ export const migrations = [
   {
     up: migration_20261005_065146_first_timer_youth_volunteer_weekly.up,
     down: migration_20261005_065146_first_timer_youth_volunteer_weekly.down,
-    name: '20261005_065146_first_timer_youth_volunteer_weekly'
+    name: '20261005_065146_first_timer_youth_volunteer_weekly',
+  },
+  {
+    up: migration_20261005_094630_ministry_category.up,
+    down: migration_20261005_094630_ministry_category.down,
+    name: '20261005_094630_ministry_category'
   },
 ];

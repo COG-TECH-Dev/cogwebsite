@@ -310,6 +310,12 @@ export interface Ministry {
    * Gives this ministry's page the bold youth look. Ablaze Youth gets it automatically.
    */
   isYouthMinistry?: boolean | null;
+  /**
+   * Which group this ministry appears under in the directory's filter. Optional: if left empty, it is worked out from the ministry's name.
+   */
+  category?:
+    | ('children-youth' | 'worship-arts' | 'fellowship-family' | 'outreach-missions' | 'prayer-care' | 'service-teams')
+    | null;
   featured?: boolean | null;
   /**
    * Shows a distinct, kid-friendly visual style and the photo consent / volunteer / pre-registration safeguarding forms on this ministry's page.
@@ -1619,6 +1625,7 @@ export interface MinistriesSelect<T extends boolean = true> {
   communityLink?: T;
   communityLabel?: T;
   isYouthMinistry?: T;
+  category?: T;
   featured?: T;
   isChildrensMinistry?: T;
   updatedAt?: T;

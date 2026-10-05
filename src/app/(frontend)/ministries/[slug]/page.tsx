@@ -1,11 +1,14 @@
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { Metadata } from 'next'
-import { Clock, ExternalLink, Mail, MessageCircle, Phone, UserRound } from 'lucide-react'
+import { Calendar, Clock, ExternalLink, Mail, MessageCircle, Phone, UserRound } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { getPayloadClient } from '@/lib/payload'
+import { formatEventDateRange } from '@/lib/eventDisplay'
+import { upcomingEventsWhere } from '@/lib/eventWindow'
+import { publishedOnly } from '@/lib/published'
 import { DEFAULT_CLASSES, DEFAULT_SCHEDULE, classColours } from '@/lib/childrensMinistry'
 import { guessMinistryIcon } from '@/lib/guessMinistryIcon'
 import { YOUTH_ACTIVITIES, YOUTH_INTRO, isYouthMinistry } from '@/lib/youthMinistry'
@@ -94,15 +97,26 @@ export default async function MinistryPage({ params }: Args) {
   const communityHref = safeWebUrl(ministry.communityLink)
   const community = communityHref ? { href: communityHref, label: ministry.communityLabel || 'Join our online community' } : null
   const joinHref = `/connect/membership?ministry=${ministry.id}`
-  const kidsSettings = ministry.isChildrensMinistry
-    ? await (await getPayloadClient()).findGlobal({ slug: 'settings' }).catch(() => null)
-    : null
-  const safeguardingOn = Boolean(kidsSettings?.safeguarding?.enabled)
-  // Until the children's team has its own contact, parents are pointed to the church office.
-  const kidsFallback =
-    ministry.isChildrensMinistry && !ministry.contactEmail && !ministry.contactPhone
-      ? { email: kidsSettings?.contactEmail, phone: kidsSettings?.contactPhone }
-      : null
+  const payload = await getPayloadClient()
+  const [settings, upcomingEvents] = await Promise.all([
+    payload.findGlobal({ slug: 'settings' }).catch(() => null),
+    // Events this ministry is hosting. Local-API queries skip access rules, so drafts are excluded here.
+    payload
+      .find({
+        collection: 'events',
+        where: { and: [{ relatedMinistry: { equals: ministry.id } }, upcomingEventsWhere(), publishedOnly] },
+        sort: 'startDate',
+        limit: 4,
+        depth: 0,
+        draft: false,
+      })
+      .then((r) => r.docs)
+      .catch(() => []),
+  ])
+  const safeguardingOn = Boolean(ministry.isChildrensMinistry && settings?.safeguarding?.enabled)
+  // With no contact of its own, a ministry points people to the church office until one is added.
+  const askOffice = !ministry.contactEmail && !ministry.contactPhone
+  const who = youth ? 'the youth team' : ministry.isChildrensMinistry ? 'the children’s team' : 'this ministry'
 
   return (
     <div>
@@ -135,6 +149,37 @@ export default async function MinistryPage({ params }: Args) {
               <p className="text-lg leading-relaxed text-ink-muted">{YOUTH_INTRO}</p>
             ) : (
               ministry.summary && <p className="text-lg leading-relaxed text-ink-muted">{ministry.summary}</p>
+            )}
+
+            {upcomingEvents.length > 0 && (
+              <section aria-labelledby="events-heading" className="mt-12">
+                <h2 id="events-heading" className="font-serif text-2xl font-semibold text-brand-700">
+                  Upcoming events
+                </h2>
+                <ul className="mt-6 space-y-3">
+                  {upcomingEvents.map((e) => (
+                    <li key={e.id}>
+                      <Link
+                        href={`/programmes/${e.slug}`}
+                        className="group flex items-start gap-4 rounded-2xl border border-border bg-surface p-4 shadow-sm transition-colors hover:border-gold-300"
+                      >
+                        <span className="mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-brand-50 text-brand-600">
+                          <Calendar className="h-5 w-5" aria-hidden="true" />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block font-serif font-semibold text-brand-700 group-hover:text-brand-600">{e.title}</span>
+                          <span className="mt-0.5 block text-sm text-ink-muted">
+                            {[formatEventDateRange(e.startDate, e.endDate), e.timeLabel, e.location].filter(Boolean).join(' · ')}
+                          </span>
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+                <Link href={`/programmes?ministry=${ministry.id}`} className="mt-4 inline-block text-sm font-semibold text-brand-600 hover:underline">
+                  All events from {ministry.name} →
+                </Link>
+              </section>
             )}
 
             {!youth && activities.length > 0 && (
@@ -190,42 +235,30 @@ export default async function MinistryPage({ params }: Args) {
                 <h2 className="mt-2 font-serif text-lg font-semibold text-brand-700">{ministry.leaderName}</h2>
               </div>
             )}
-            {youth && !ministry.contactEmail && !ministry.contactPhone && (
+            {askOffice && (
               <div className="rounded-2xl border border-border bg-surface p-5">
                 <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-gold-600">
                   <Mail className="h-4 w-4" aria-hidden="true" />
                   Questions?
                 </p>
                 <p className="mt-3 text-sm text-ink-muted">
-                  Ask the youth team anything, from meeting times to how to get involved.
-                </p>
-                <Link href="/connect/contact" className="mt-3 inline-block text-sm font-semibold text-brand-600 hover:underline">
-                  Send us a message →
-                </Link>
-              </div>
-            )}
-            {kidsFallback && (
-              <div className="rounded-2xl border border-border bg-surface p-5">
-                <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-gold-600">
-                  <Mail className="h-4 w-4" aria-hidden="true" />
-                  Questions?
-                </p>
-                <p className="mt-3 text-sm text-ink-muted">
-                  Ask the church office about the children&apos;s team, and they will pass your question on.
+                  {schedule.length === 0
+                    ? `We are still adding when and where ${ministry.name} meets. Ask the church office and they will pass your question on.`
+                    : `Ask the church office about ${who}, and they will pass your question on.`}
                 </p>
                 <ul className="mt-3 space-y-2 text-sm">
-                  {kidsFallback.email && (
+                  {settings?.contactEmail && (
                     <li>
-                      <a href={`mailto:${kidsFallback.email}`} className="font-medium text-brand-600 hover:underline">
-                        {kidsFallback.email}
+                      <a href={`mailto:${settings.contactEmail}`} className="font-medium text-brand-600 hover:underline">
+                        {settings.contactEmail}
                       </a>
                     </li>
                   )}
-                  {kidsFallback.phone && (
+                  {settings?.contactPhone && (
                     <li className="flex items-center gap-1.5">
                       <Phone className="h-3.5 w-3.5 text-ink-muted" aria-hidden="true" />
-                      <a href={`tel:${kidsFallback.phone.replace(/\s+/g, '')}`} className="font-medium text-brand-600 hover:underline">
-                        {kidsFallback.phone}
+                      <a href={`tel:${settings.contactPhone.replace(/\s+/g, '')}`} className="font-medium text-brand-600 hover:underline">
+                        {settings.contactPhone}
                       </a>
                     </li>
                   )}
