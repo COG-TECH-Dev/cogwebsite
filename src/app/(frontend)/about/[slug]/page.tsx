@@ -5,6 +5,7 @@ import { getPageBySlug } from '@/lib/getPageBySlug'
 import { BlockRenderer } from '@/components/blocks/BlockRenderer'
 import { AboutSubNav } from '@/components/site/AboutSubNav'
 import { DutyPastorCard } from '@/components/site/DutyPastorCard'
+import { PlanYourVisitCta } from '@/components/site/PlanYourVisitCta'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 
@@ -36,6 +37,7 @@ export default async function AboutSubPage({ params }: Args) {
         </Container>
       )}
       <BlockRenderer layout={page.layout} />
+      <PlanYourVisitCta />
     </div>
   )
 }

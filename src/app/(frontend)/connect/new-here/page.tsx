@@ -1,4 +1,5 @@
 import { Baby, Car, Clock, Coffee, MapPin, Shirt } from 'lucide-react'
+import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
 import { Button } from '@/components/ui/Button'
@@ -74,45 +75,76 @@ export default async function NewHerePage() {
   return (
     <div>
       <PageHeader
+        compact
         eyebrow="Connect"
         title="I'm New Here"
         description="Whether it's your first time or you're looking for a church home, we're glad you're here. Join us this Sunday and experience real community."
       />
-      <Container className="py-16">
-        <Reveal className="mx-auto mb-12 max-w-2xl text-center">
-          <p className="text-lg leading-relaxed text-ink-muted">
-            Our worship is heartfelt, our teaching is Bible-based, and our people are friendly. Whatever brought you
-            here, there&apos;s a place for you.
+      <Container className="py-3 sm:py-16">
+        <Reveal className="mx-auto mb-2 max-w-2xl text-center sm:mb-12">
+          <p className="text-[0.75rem] leading-snug text-ink-muted sm:text-lg sm:leading-relaxed">
+            Our worship is heartfelt, our teaching is Bible-based, and our people are friendly.
+            <span className="max-sm:hidden"> Whatever brought you here, there&apos;s a place for you.</span>
           </p>
         </Reveal>
 
-        <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        {/* On a phone the five key facts (times, address and map, parking, dress, kids) read as one slim list so they all
+            sit on the first screen; from sm up they are the original cards. */}
+        <StaggerGroup className="max-sm:divide-y max-sm:divide-border max-sm:overflow-hidden max-sm:rounded-2xl max-sm:border max-sm:border-border max-sm:bg-surface sm:grid sm:grid-cols-2 sm:gap-6 lg:grid-cols-3">
           {cards.map((card) => {
             const Icon = card.icon
             return (
               <StaggerItem key={card.title} className="h-full">
-                <div className="h-full rounded-2xl border border-border bg-surface p-6 shadow-sm">
-                  <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold-100 text-gold-600">
-                    <Icon className="h-6 w-6" aria-hidden="true" />
+                <div className="flex items-start gap-3 px-3.5 py-1.5 sm:block sm:h-full sm:rounded-2xl sm:border sm:border-border sm:bg-surface sm:p-6 sm:shadow-sm">
+                  <span className="flex shrink-0 items-center justify-center rounded-lg bg-gold-100 text-gold-600 max-sm:hidden sm:h-12 sm:w-12 sm:rounded-xl">
+                    <Icon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden="true" />
                   </span>
-                  <h2 className="mt-5 font-serif text-lg font-semibold text-brand-700">{card.title}</h2>
-                  <p className="mt-2 text-sm leading-relaxed text-ink-muted">{card.body}</p>
-                  {card.link && (
-                    <a
-                      href={card.link.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-3 inline-block text-sm font-semibold text-brand-600 hover:underline"
-                    >
-                      {card.link.label} <span aria-hidden="true">→</span>
-                      <span className="sr-only"> (opens in a new tab)</span>
-                    </a>
-                  )}
+                  <div className="min-w-0 text-[0.8rem] leading-snug sm:text-sm">
+                    <h2 className="inline font-serif text-[0.85rem] font-semibold text-brand-700 sm:mt-5 sm:block sm:text-lg">
+                      {card.title}
+                    </h2>{' '}
+                    <p className="inline text-ink-muted sm:mt-2 sm:block sm:leading-relaxed">{card.body}</p>
+                    {card.link && (
+                      <a
+                        href={card.link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="mt-0.5 block font-semibold text-brand-600 hover:underline sm:mt-3 sm:text-sm"
+                      >
+                        {card.link.label} <span aria-hidden="true">→</span>
+                        <span className="sr-only"> (opens in a new tab)</span>
+                      </a>
+                    )}
+                  </div>
                 </div>
               </StaggerItem>
             )
           })}
         </StaggerGroup>
+
+        <Reveal className="mt-10 rounded-2xl border border-border bg-brand-50 p-6 text-center sm:mt-14 sm:p-8">
+          <h2 className="font-serif text-xl font-semibold text-brand-700 sm:text-2xl">Get to know us</h2>
+          <p className="mx-auto mt-2 max-w-xl text-sm text-ink-muted sm:text-base">
+            Curious what we believe and where we come from? Read about us at your own pace; there is nothing to sign up
+            for.
+          </p>
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            {[
+              { href: '/about/tenets', label: 'What we believe' },
+              { href: '/about/vision-mission', label: 'Our vision and mission' },
+              { href: '/about/history', label: 'Our story' },
+              { href: '/about/leadership', label: 'Meet our leaders' },
+            ].map((l) => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className="rounded-full border border-brand-600 px-5 py-2.5 text-sm font-semibold text-brand-600 transition-colors hover:bg-brand-600 hover:text-white"
+              >
+                {l.label}
+              </Link>
+            ))}
+          </div>
+        </Reveal>
 
         <div id="visited" className="mx-auto mt-16 max-w-xl scroll-mt-28">
           <Reveal>

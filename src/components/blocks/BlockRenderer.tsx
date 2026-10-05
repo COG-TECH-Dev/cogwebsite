@@ -338,7 +338,7 @@ function Block({ block }: { block: LayoutBlock }) {
             <StaggerGroup className={`grid grid-cols-2 gap-y-12 text-center ${lgCols}`}>
               {block.items?.map((item, i) => (
                 <StaggerItem key={i} className="px-4 lg:border-l lg:border-white/15 lg:first:border-l-0">
-                  <p className="font-serif text-5xl font-semibold text-gold-300 sm:text-6xl">{item.value}</p>
+                  <div className="font-serif text-5xl font-semibold text-gold-300 sm:text-6xl">{item.value}</div>
                   <p className="mt-2 text-sm font-medium uppercase tracking-[0.15em] text-white/75">{item.label}</p>
                 </StaggerItem>
               ))}

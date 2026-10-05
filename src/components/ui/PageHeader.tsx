@@ -7,11 +7,14 @@ export function PageHeader({
   title,
   description,
   children,
+  compact = false,
 }: {
   eyebrow?: string
   title: string
   description?: string
   children?: ReactNode
+  /** On phones, show just a slim banner with the title so the page's key content is on the first screen. */
+  compact?: boolean
 }) {
   return (
     <section className="relative isolate overflow-hidden bg-linear-to-br from-brand-900 via-brand-700 to-brand-600 text-white">
@@ -31,18 +34,26 @@ export function PageHeader({
         />
       </div>
 
-      <Container className="py-16 sm:py-20">
+      <Container className={compact ? 'py-4 sm:py-20' : 'py-16 sm:py-20'}>
         {eyebrow && (
-          <p className="inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-gold-300">
+          <p
+            className={`inline-flex items-center gap-3 text-sm font-semibold uppercase tracking-[0.2em] text-gold-300 ${compact ? 'max-sm:hidden' : ''}`}
+          >
             <span className="h-px w-8 bg-gold-300" aria-hidden="true" />
             {eyebrow}
           </p>
         )}
-        <h1 className="mt-4 max-w-4xl text-balance font-serif text-4xl font-semibold leading-tight sm:text-5xl lg:text-6xl">
+        <h1
+          className={`max-w-4xl text-balance font-serif font-semibold leading-tight sm:mt-4 sm:text-5xl lg:text-6xl ${compact ? 'text-3xl' : 'mt-4 text-4xl'}`}
+        >
           {title}
         </h1>
         {description && (
-          <p className="mt-5 max-w-2xl text-pretty text-lg leading-relaxed text-white/80">{description}</p>
+          <p
+            className={`mt-5 max-w-2xl text-pretty text-lg leading-relaxed text-white/80 ${compact ? 'max-sm:hidden' : ''}`}
+          >
+            {description}
+          </p>
         )}
         {children && <div className="mt-10">{children}</div>}
       </Container>

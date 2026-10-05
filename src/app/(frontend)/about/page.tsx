@@ -3,6 +3,7 @@ import type { Metadata } from 'next'
 import { getPageBySlug } from '@/lib/getPageBySlug'
 import { BlockRenderer } from '@/components/blocks/BlockRenderer'
 import { AboutSubNav } from '@/components/site/AboutSubNav'
+import { PlanYourVisitCta } from '@/components/site/PlanYourVisitCta'
 import { PageHeader } from '@/components/ui/PageHeader'
 
 export const revalidate = 60
@@ -26,6 +27,7 @@ export default async function AboutPage() {
         <AboutSubNav />
       </PageHeader>
       <BlockRenderer layout={page?.layout} />
+      <PlanYourVisitCta />
     </div>
   )
 }
