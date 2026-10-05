@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
+import { Button } from '@/components/ui/Button'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -29,20 +30,19 @@ type Args = { searchParams: Promise<{ type?: string }> }
 export default async function ResourcesPage({ searchParams }: Args) {
   const { type } = await searchParams
   const payload = await getPayloadClient()
-  const resources = await payload.find({
-    collection: 'resources',
-    where: type ? { type: { equals: type } } : {},
-    limit: 100,
-    sort: 'title',
-  })
+  // Small enough to fetch once and filter here, which also lets us leave out filters that would lead to an empty list.
+  const all = await payload.find({ collection: 'resources', limit: 100, sort: 'title' })
+  const resources = { docs: type ? all.docs.filter((r) => r.type === type) : all.docs }
+  const startHere = all.docs.filter((r) => r.type === 'start-here')
+  const present = new Set(all.docs.map((r) => r.type))
 
   const filters = [
-    { label: 'All', value: undefined },
+    { label: 'All', value: undefined as string | undefined },
     { label: 'Start Here', value: 'start-here' },
     { label: 'Devotionals', value: 'devotional' },
     { label: 'Reading Plans', value: 'reading-plan' },
     { label: 'Topical Guides', value: 'topical-guide' },
-  ]
+  ].filter((f) => !f.value || present.has(f.value as (typeof all.docs)[number]['type']))
 
   return (
     <div>
@@ -52,6 +52,38 @@ export default async function ResourcesPage({ searchParams }: Args) {
         description="Devotionals, Bible reading plans, and topical guides to help you grow in your walk with God."
       />
       <Container className="py-16">
+        {/* The newcomer section: labelled for people with no church background, with the way to respond. */}
+        <section
+          id="start-here"
+          aria-labelledby="start-here-heading"
+          className="mb-12 scroll-mt-28 rounded-3xl border border-border bg-brand-50 p-6 sm:p-10"
+        >
+          <h2 id="start-here-heading" className="font-serif text-2xl font-semibold text-brand-700 sm:text-3xl">
+            New to faith? Start here
+          </h2>
+          <p className="mt-3 max-w-2xl text-ink-muted">
+            You don&apos;t need any church background. Read at your own pace; there is nothing to sign up for and no
+            question is too basic. When you&apos;re ready, we&apos;d love to help you take a step.
+          </p>
+          {startHere.length > 0 && (
+            <ul className="mt-5 space-y-2">
+              {startHere.slice(0, 4).map((r) => (
+                <li key={r.id}>
+                  <Link href={`/resources/${r.slug}`} className="font-semibold text-brand-600 hover:underline">
+                    {r.title} <span aria-hidden="true">→</span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Button href="/connect/next-steps">Take a Step of Faith</Button>
+            <Button href="/connect/new-here" variant="secondary">
+              Plan Your Visit
+            </Button>
+          </div>
+        </section>
+
         <div className="mb-10 flex flex-wrap gap-2">
           {filters.map((f) => (
             <Link

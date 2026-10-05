@@ -122,7 +122,29 @@ export default async function NewHerePage() {
           })}
         </StaggerGroup>
 
-        <Reveal className="mt-10 rounded-2xl border border-border bg-brand-50 p-6 text-center sm:mt-14 sm:p-8">
+        <Reveal className="mt-10 rounded-2xl border border-border bg-surface p-6 text-center sm:mt-14 sm:p-8">
+          <h2 className="font-serif text-xl font-semibold text-brand-700 sm:text-2xl">New to faith? Start here</h2>
+          <p className="mx-auto mt-2 max-w-xl text-sm text-ink-muted sm:text-base">
+            Plain-language reading for people with no church background, at your own pace. There is nothing to sign up
+            for.
+          </p>
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
+            <Link
+              href="/resources#start-here"
+              className="rounded-full bg-gold-500 px-5 py-2.5 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-300"
+            >
+              Beginner resources
+            </Link>
+            <Link
+              href="/connect/next-steps"
+              className="rounded-full border border-brand-600 px-5 py-2.5 text-sm font-semibold text-brand-600 transition-colors hover:bg-brand-600 hover:text-white"
+            >
+              Take a step of faith
+            </Link>
+          </div>
+        </Reveal>
+
+        <Reveal className="mt-6 rounded-2xl border border-border bg-brand-50 p-6 text-center sm:mt-8 sm:p-8">
           <h2 className="font-serif text-xl font-semibold text-brand-700 sm:text-2xl">Get to know us</h2>
           <p className="mx-auto mt-2 max-w-xl text-sm text-ink-muted sm:text-base">
             Curious what we believe and where we come from? Read about us at your own pace; there is nothing to sign up

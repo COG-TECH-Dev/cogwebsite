@@ -25,7 +25,7 @@ export function StepOfFaithForm() {
         <p className="mt-2 text-ink-muted">Wherever you are in your journey, here are a few ways to keep going:</p>
         <ul className="mt-5 space-y-3">
           <li>
-            <Link href="/resources" className="font-semibold text-brand-600 hover:underline">
+            <Link href="/resources#start-here" className="font-semibold text-brand-600 hover:underline">
               Browse Resources for New Believers →
             </Link>
           </li>
