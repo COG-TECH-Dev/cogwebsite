@@ -54,6 +54,12 @@ export const Events: CollectionConfig = {
     },
     { name: 'startDate', type: 'date', required: true },
     { name: 'endDate', type: 'date' },
+    {
+      name: 'timeLabel',
+      type: 'text',
+      label: 'Time',
+      admin: { description: 'Typed as you want it shown, e.g. "10:00am – 4:00pm" or "Fridays, 7pm". Shown on the events list and the event page.' },
+    },
     { name: 'location', type: 'text' },
     { name: 'description', type: 'richText' },
     { name: 'featuredImage', type: 'upload', relationTo: 'media' },

@@ -752,6 +752,10 @@ export interface Event {
   type: 'programme' | 'conference' | 'mission' | 'regular';
   startDate: string;
   endDate?: string | null;
+  /**
+   * Typed as you want it shown, e.g. "10:00am – 4:00pm" or "Fridays, 7pm". Shown on the events list and the event page.
+   */
+  timeLabel?: string | null;
   location?: string | null;
   description?: {
     root: {
@@ -1607,6 +1611,7 @@ export interface EventsSelect<T extends boolean = true> {
   type?: T;
   startDate?: T;
   endDate?: T;
+  timeLabel?: T;
   location?: T;
   description?: T;
   featuredImage?: T;

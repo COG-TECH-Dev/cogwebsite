@@ -16,6 +16,7 @@ import * as migration_20261003_072828_add_homegroup_join from './20261003_072828
 import * as migration_20261003_081222_add_news_missions_prayer_routing_firsttimer from './20261003_081222_add_news_missions_prayer_routing_firsttimer';
 import * as migration_20261003_190037_media_item_multiple_pages from './20261003_190037_media_item_multiple_pages';
 import * as migration_20261004_070759_safeguarding_page_and_concerns from './20261004_070759_safeguarding_page_and_concerns';
+import * as migration_20261005_060443_event_time_label from './20261005_060443_event_time_label';
 
 export const migrations = [
   {
@@ -106,6 +107,11 @@ export const migrations = [
   {
     up: migration_20261004_070759_safeguarding_page_and_concerns.up,
     down: migration_20261004_070759_safeguarding_page_and_concerns.down,
-    name: '20261004_070759_safeguarding_page_and_concerns'
+    name: '20261004_070759_safeguarding_page_and_concerns',
+  },
+  {
+    up: migration_20261005_060443_event_time_label.up,
+    down: migration_20261005_060443_event_time_label.down,
+    name: '20261005_060443_event_time_label'
   },
 ];

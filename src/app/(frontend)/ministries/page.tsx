@@ -20,9 +20,20 @@ function mediaUrl(image: unknown): string | null {
   return null
 }
 
-export default async function MinistriesPage() {
+type Args = { searchParams: Promise<{ q?: string }> }
+
+export default async function MinistriesPage({ searchParams }: Args) {
+  const { q } = await searchParams
+  const query = (q ?? '').trim().slice(0, 80)
   const payload = await getPayloadClient()
-  const ministries = await payload.find({ collection: 'ministries', limit: 100, sort: 'name' })
+  const all = await payload.find({ collection: 'ministries', limit: 100, sort: 'name' })
+  // A short list, so match in memory on the name, the summary and the leader.
+  const needle = query.toLowerCase()
+  const ministries = {
+    docs: needle
+      ? all.docs.filter((m) => [m.name, m.summary, m.leaderName].some((v) => v?.toLowerCase().includes(needle)))
+      : all.docs,
+  }
 
   return (
     <div>
@@ -32,6 +43,42 @@ export default async function MinistriesPage() {
         description="Every ministry is a place to belong, grow, and use your gifts to serve God and others. Find where you fit in."
       />
       <Container className="py-20">
+        {all.docs.length > 0 && (
+          <form
+            action="/ministries"
+            role="search"
+            aria-label="Search ministries"
+            className="mb-10 flex flex-wrap items-end gap-4 rounded-2xl border border-border bg-surface p-5"
+          >
+            <div className="min-w-[200px] flex-1">
+              <label htmlFor="q" className="mb-1 block text-sm font-medium text-ink">
+                Search ministries
+              </label>
+              <input
+                id="q"
+                name="q"
+                type="search"
+                defaultValue={query}
+                placeholder="e.g. youth, prayer, music"
+                className="input"
+              />
+            </div>
+            <div className="flex gap-2">
+              <button type="submit" className="btn-primary">
+                Search
+              </button>
+              {query && (
+                <Link
+                  href="/ministries"
+                  className="inline-flex items-center rounded-full border border-border px-5 py-2.5 text-sm font-medium text-ink hover:bg-brand-50"
+                >
+                  Clear
+                </Link>
+              )}
+            </div>
+          </form>
+        )}
+
         {ministries.docs.length > 0 ? (
           <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {ministries.docs.map((ministry, i) => {
@@ -81,6 +128,14 @@ export default async function MinistriesPage() {
               )
             })}
           </StaggerGroup>
+        ) : query ? (
+          <p className="text-ink-muted">
+            No ministries match &ldquo;{query}&rdquo;. Try a different word, or{' '}
+            <Link href="/ministries" className="font-medium text-brand-600 underline hover:text-brand-700">
+              see them all
+            </Link>
+            .
+          </p>
         ) : (
           <p className="text-ink-muted">Ministries will appear here once added in the admin panel.</p>
         )}

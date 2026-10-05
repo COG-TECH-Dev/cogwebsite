@@ -124,6 +124,7 @@ export default async function EventPage({ params }: Args) {
                   Date
                 </p>
                 <p className="mt-2 font-semibold text-brand-700">{formatEventDateRange(event.startDate, event.endDate)}</p>
+                {event.timeLabel && <p className="mt-1 text-sm text-ink-muted">{event.timeLabel}</p>}
               </div>
               {event.location && (
                 <div className="rounded-2xl border border-border bg-surface p-5">
@@ -147,7 +148,10 @@ export default async function EventPage({ params }: Args) {
                 </Link>
               )}
               {event.registrationEnabled ? (
-                <div className="relative isolate overflow-hidden rounded-2xl bg-linear-to-br from-brand-900 via-brand-700 to-brand-600 p-6 text-center text-white">
+                <div
+                  id="rsvp"
+                  className="relative isolate scroll-mt-28 overflow-hidden rounded-2xl bg-linear-to-br from-brand-900 via-brand-700 to-brand-600 p-6 text-center text-white"
+                >
                   <p className="font-serif text-lg font-semibold">Reserve Your Spot</p>
                   {spotsRemaining !== null && (
                     <p className="mt-1 text-sm text-white/80">

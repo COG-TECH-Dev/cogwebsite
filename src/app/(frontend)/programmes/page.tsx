@@ -1,10 +1,13 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import type { Where } from 'payload'
 
 import { getPayloadClient } from '@/lib/payload'
 import { formatEventDateRange, TYPE_ICONS, TYPE_LABELS } from '@/lib/eventDisplay'
+import { MONTH_PARAM, monthLabel, monthOverlapWhere, monthsCovered } from '@/lib/eventMonths'
 import { pastEventsWhere, upcomingEventsWhere } from '@/lib/eventWindow'
 import { publishedOnly } from '@/lib/published'
+import { richTextToPlain } from '@/lib/richTextPlain'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
@@ -22,38 +25,68 @@ function mediaUrl(image: unknown): string | null {
   return null
 }
 
-type Args = { searchParams: Promise<{ type?: string }> }
+type Args = { searchParams: Promise<{ type?: string; ministry?: string; month?: string }> }
+
+// Keeps the other filters when one changes.
+function listHref(params: { type?: string; ministry?: string; month?: string }) {
+  const qs = new URLSearchParams()
+  if (params.type) qs.set('type', params.type)
+  if (params.ministry) qs.set('ministry', params.ministry)
+  if (params.month) qs.set('month', params.month)
+  const s = qs.toString()
+  return s ? `/programmes?${s}` : '/programmes'
+}
 
 export default async function ProgrammesPage({ searchParams }: Args) {
-  const { type } = await searchParams
+  const sp = await searchParams
+  const type = sp.type || undefined
+  const ministryId = sp.ministry && /^\d+$/.test(sp.ministry) ? Number(sp.ministry) : undefined
+  const month = sp.month && MONTH_PARAM.test(sp.month) ? sp.month : undefined
   const payload = await getPayloadClient()
 
-  const typeConditions = type ? [{ type: { equals: type } }] : []
+  const filterConditions: Where[] = []
+  if (type) filterConditions.push({ type: { equals: type } })
+  if (ministryId) filterConditions.push({ relatedMinistry: { equals: ministryId } })
+  if (month) filterConditions.push(monthOverlapWhere(month))
 
-  const [upcoming, past] = await Promise.all([
+  const [upcoming, past, everything] = await Promise.all([
     payload.find({
       collection: 'events',
-      where: { and: [...typeConditions, upcomingEventsWhere(), publishedOnly] },
+      where: { and: [...filterConditions, upcomingEventsWhere(), publishedOnly] },
       sort: 'startDate',
       limit: 50,
       draft: false,
     }),
     payload.find({
       collection: 'events',
-      where: { and: [...typeConditions, pastEventsWhere(), publishedOnly] },
+      where: { and: [...filterConditions, pastEventsWhere(), publishedOnly] },
       sort: '-startDate',
       limit: 12,
       draft: false,
     }),
+    // Every published event, only to work out which ministries and months are worth offering as filters.
+    payload.find({ collection: 'events', where: publishedOnly, limit: 500, depth: 1, draft: false }),
   ])
 
+  const ministries = new Map<number, string>()
+  const months = new Set<string>()
+  for (const e of everything.docs) {
+    if (e.relatedMinistry && typeof e.relatedMinistry === 'object') ministries.set(e.relatedMinistry.id, e.relatedMinistry.name)
+    for (const m of monthsCovered(e.startDate, e.endDate)) months.add(m)
+  }
+  const ministryOptions = [...ministries.entries()].sort((a, b) => a[1].localeCompare(b[1]))
+  const monthOptions = [...months].sort()
+
   const filters = [
-    { label: 'All', value: undefined },
+    { label: 'All', value: undefined as string | undefined },
     { label: 'Programmes', value: 'programme' },
     { label: 'Conferences & Events', value: 'conference' },
     { label: 'Missions', value: 'mission' },
     { label: 'Regular', value: 'regular' },
   ]
+  const hasExtraFilters = Boolean(ministryId || month)
+  const anyFilter = Boolean(type || hasExtraFilters)
+  const keep = { ministry: ministryId ? String(ministryId) : undefined, month }
 
   return (
     <div>
@@ -63,11 +96,11 @@ export default async function ProgrammesPage({ searchParams }: Args) {
         description="Missions, conferences, and regular gatherings throughout the year."
       />
       <Container className="py-16">
-        <div className="mb-10 flex flex-wrap gap-2">
+        <div className="mb-6 flex flex-wrap gap-2">
           {filters.map((f) => (
             <Link
               key={f.label}
-              href={f.value ? `/programmes?type=${f.value}` : '/programmes'}
+              href={listHref({ type: f.value, ...keep })}
               className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                 type === f.value
                   ? 'bg-gold-500 text-brand-700'
@@ -79,23 +112,79 @@ export default async function ProgrammesPage({ searchParams }: Args) {
           ))}
         </div>
 
+        {(ministryOptions.length > 0 || monthOptions.length > 0) && (
+          <form
+            action="/programmes"
+            className="mb-10 flex flex-wrap items-end gap-4 rounded-2xl border border-border bg-surface p-5"
+          >
+            {type && <input type="hidden" name="type" value={type} />}
+            {monthOptions.length > 0 && (
+              <div className="min-w-[160px]">
+                <label htmlFor="month" className="mb-1 block text-sm font-medium text-ink">
+                  Month
+                </label>
+                <select id="month" name="month" defaultValue={month ?? ''} className="input">
+                  <option value="">All dates</option>
+                  {monthOptions.map((m) => (
+                    <option key={m} value={m}>
+                      {monthLabel(m)}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            {ministryOptions.length > 0 && (
+              <div className="min-w-[180px]">
+                <label htmlFor="ministry" className="mb-1 block text-sm font-medium text-ink">
+                  Ministry
+                </label>
+                <select id="ministry" name="ministry" defaultValue={ministryId ? String(ministryId) : ''} className="input">
+                  <option value="">All ministries</option>
+                  {ministryOptions.map(([id, name]) => (
+                    <option key={id} value={id}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+            <div className="flex gap-2">
+              <button type="submit" className="btn-primary">
+                Filter
+              </button>
+              {anyFilter && (
+                <Link
+                  href="/programmes"
+                  className="inline-flex items-center rounded-full border border-border px-5 py-2.5 text-sm font-medium text-ink hover:bg-brand-50"
+                >
+                  Clear
+                </Link>
+              )}
+            </div>
+          </form>
+        )}
+
         {upcoming.docs.length > 0 ? (
           <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {upcoming.docs.map((event, i) => {
               const img = mediaUrl(event.featuredImage)
               const accent = ACCENTS[i % ACCENTS.length]
               const icon = TYPE_ICONS[event.type] ?? 'compass'
+              const summary = richTextToPlain(event.description, 120)
+              const ministryName =
+                event.relatedMinistry && typeof event.relatedMinistry === 'object' ? event.relatedMinistry.name : null
               return (
                 <StaggerItem key={event.id} className="h-full">
                   <Link
-                    href={`/programmes/${event.slug}`}
+                    // With RSVP on, go straight to the sign-up on the event page.
+                    href={`/programmes/${event.slug}${event.registrationEnabled ? '#rsvp' : ''}`}
                     className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                   >
                     <div className="relative aspect-video overflow-hidden">
                       {img ? (
                         <Image
                           src={img}
-                          alt={event.title}
+                          alt=""
                           fill
                           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
                           className="object-cover transition-transform duration-500 group-hover:scale-105"
@@ -117,10 +206,13 @@ export default async function ProgrammesPage({ searchParams }: Args) {
                       <h2 className="mt-1 font-serif text-lg font-semibold text-brand-700 group-hover:text-brand-600">
                         {event.title}
                       </h2>
-                      {event.location && <p className="mt-1 text-sm text-ink-muted">{event.location}</p>}
+                      {event.timeLabel && <p className="mt-1 text-sm font-medium text-ink">{event.timeLabel}</p>}
+                      {event.location && <p className="mt-0.5 text-sm text-ink-muted">{event.location}</p>}
+                      {summary && <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-ink-muted">{summary}</p>}
+                      {ministryName && <p className="mt-2 text-xs text-ink-muted">Hosted by {ministryName}</p>}
                       {event.registrationEnabled && (
                         <span className="mt-3 inline-flex w-fit items-center rounded-full bg-gold-100 px-3 py-1 text-xs font-semibold text-gold-700">
-                          RSVP required
+                          RSVP now <span aria-hidden="true">&nbsp;→</span>
                         </span>
                       )}
                     </div>
@@ -130,7 +222,11 @@ export default async function ProgrammesPage({ searchParams }: Args) {
             })}
           </StaggerGroup>
         ) : (
-          <p className="text-ink-muted">No upcoming programmes right now — check back soon.</p>
+          <p className="text-ink-muted">
+            {anyFilter
+              ? 'No upcoming programmes match these filters. Try clearing one.'
+              : 'No upcoming programmes right now — check back soon.'}
+          </p>
         )}
 
         {past.docs.length > 0 && (
