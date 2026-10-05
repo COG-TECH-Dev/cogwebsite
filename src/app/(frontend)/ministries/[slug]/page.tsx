@@ -94,10 +94,15 @@ export default async function MinistryPage({ params }: Args) {
   const communityHref = safeWebUrl(ministry.communityLink)
   const community = communityHref ? { href: communityHref, label: ministry.communityLabel || 'Join our online community' } : null
   const joinHref = `/connect/membership?ministry=${ministry.id}`
-  const safeguardingOn = Boolean(
-    ministry.isChildrensMinistry &&
-      (await (await getPayloadClient()).findGlobal({ slug: 'settings' }).catch(() => null))?.safeguarding?.enabled,
-  )
+  const kidsSettings = ministry.isChildrensMinistry
+    ? await (await getPayloadClient()).findGlobal({ slug: 'settings' }).catch(() => null)
+    : null
+  const safeguardingOn = Boolean(kidsSettings?.safeguarding?.enabled)
+  // Until the children's team has its own contact, parents are pointed to the church office.
+  const kidsFallback =
+    ministry.isChildrensMinistry && !ministry.contactEmail && !ministry.contactPhone
+      ? { email: kidsSettings?.contactEmail, phone: kidsSettings?.contactPhone }
+      : null
 
   return (
     <div>
@@ -197,6 +202,39 @@ export default async function MinistryPage({ params }: Args) {
                 <Link href="/connect/contact" className="mt-3 inline-block text-sm font-semibold text-brand-600 hover:underline">
                   Send us a message →
                 </Link>
+              </div>
+            )}
+            {kidsFallback && (
+              <div className="rounded-2xl border border-border bg-surface p-5">
+                <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-gold-600">
+                  <Mail className="h-4 w-4" aria-hidden="true" />
+                  Questions?
+                </p>
+                <p className="mt-3 text-sm text-ink-muted">
+                  Ask the church office about the children&apos;s team, and they will pass your question on.
+                </p>
+                <ul className="mt-3 space-y-2 text-sm">
+                  {kidsFallback.email && (
+                    <li>
+                      <a href={`mailto:${kidsFallback.email}`} className="font-medium text-brand-600 hover:underline">
+                        {kidsFallback.email}
+                      </a>
+                    </li>
+                  )}
+                  {kidsFallback.phone && (
+                    <li className="flex items-center gap-1.5">
+                      <Phone className="h-3.5 w-3.5 text-ink-muted" aria-hidden="true" />
+                      <a href={`tel:${kidsFallback.phone.replace(/\s+/g, '')}`} className="font-medium text-brand-600 hover:underline">
+                        {kidsFallback.phone}
+                      </a>
+                    </li>
+                  )}
+                  <li>
+                    <Link href="/connect/contact" className="font-semibold text-brand-600 hover:underline">
+                      Send us a message →
+                    </Link>
+                  </li>
+                </ul>
               </div>
             )}
             {(ministry.contactEmail || ministry.contactPhone) && (

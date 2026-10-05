@@ -79,14 +79,16 @@ export async function ContentToDoPanel({ payload, user }: { payload?: Payload; u
     add("Children's Ministry", 'No ministry is marked as the Children’s Ministry, so the consent, volunteer and registration forms are not shown anywhere.', '/admin/collections/ministries', 'Open Ministries')
   } else {
     const link = `/admin/collections/ministries/${kids.id}`
-    if (!kids.ageGroups?.length || kids.ageGroups.some((g) => !g.description)) {
-      add("Children's Ministry", 'Write a sentence on what each class does (Pearls, Rubies, Diamond, Gold). The page shows the class names and ages until you do.', link, 'Open')
+    if (!kids.ageGroups?.length) {
+      add("Children's Ministry", 'The page is showing standard wording for Pearls, Rubies, Diamond and Gold (UK Early Years and Key Stage groups). Check it matches what each class really does, or enter your own under Age Groups.', link, 'Open')
+    } else if (kids.ageGroups.some((g) => !g.description)) {
+      add("Children's Ministry", 'Some classes have no description. Write a sentence on what each one does.', link, 'Open')
     }
     if (!kids.meetingTimes?.length) {
       add("Children's Ministry", 'Meeting times: the page is using the Sunday school and children’s service times from the website. Enter them to confirm or change them.', link, 'Open')
     }
     if (!kids.contactEmail && !kids.contactPhone) {
-      add("Children's Ministry", 'Add a contact email or phone number for the children’s team, so parents can reach them.', link, 'Open')
+      add("Children's Ministry", 'The page is sending parents to the church office. Add a contact email or phone number for the children’s team itself.', link, 'Open')
     }
   }
   const youth = ministries.find((m) => isYouthMinistry(m))
