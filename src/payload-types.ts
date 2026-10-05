@@ -875,7 +875,7 @@ export interface Resource {
    * Auto-generated from the title if left blank. Used in the page URL.
    */
   slug: string;
-  type: 'start-here' | 'devotional' | 'reading-plan' | 'topical-guide';
+  type: 'start-here' | 'devotional' | 'reading-plan' | 'topical-guide' | 'ebook' | 'ministry-form';
   body?: {
     root: {
       type: string;

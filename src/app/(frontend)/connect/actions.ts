@@ -168,7 +168,9 @@ export async function submitEnquiry(
 }
 
 export async function submitHomegroupJoin(_prev: FormState, formData: FormData): Promise<FormState> {
-  const successMessage = 'Thank you — our team will connect you with a homegroup leader soon.'
+  const successMessage = formData.get('interestedHomegroup')
+    ? "Thank you — we'll pass your details to that group's leader, and someone will be in touch soon."
+    : 'Thank you — our team will connect you with a homegroup leader soon.'
 
   if (isSpam(formData)) {
     return { status: 'success', message: successMessage }

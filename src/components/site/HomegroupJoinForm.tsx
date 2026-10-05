@@ -8,7 +8,14 @@ import { Honeypot } from './Honeypot'
 
 const initialState: FormState = { status: 'idle' }
 
-export function HomegroupJoinForm({ homegroups }: { homegroups: { id: number; name: string; area: string }[] }) {
+export function HomegroupJoinForm({
+  homegroups,
+  defaultGroupId,
+}: {
+  homegroups: { id: number; name: string; area: string }[]
+  /** Pre-selects a group, e.g. when someone clicked "Contact the group leader" on its card. */
+  defaultGroupId?: number
+}) {
   const [state, formAction, pending] = useActionState(submitHomegroupJoin, initialState)
 
   if (state.status === 'success') {
@@ -22,7 +29,12 @@ export function HomegroupJoinForm({ homegroups }: { homegroups: { id: number; na
         <label htmlFor="interestedHomegroup" className="mb-1 block text-sm font-medium text-ink">
           Which homegroup would you like to join?
         </label>
-        <select id="interestedHomegroup" name="interestedHomegroup" className="input" defaultValue="">
+        <select
+          id="interestedHomegroup"
+          name="interestedHomegroup"
+          className="input"
+          defaultValue={defaultGroupId ? String(defaultGroupId) : ''}
+        >
           <option value="">Not sure — help me find one near me</option>
           {homegroups.map((group) => (
             <option key={group.id} value={group.id}>

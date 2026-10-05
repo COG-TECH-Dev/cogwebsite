@@ -43,6 +43,8 @@ export const Resources: CollectionConfig = {
         { label: 'Devotional', value: 'devotional' },
         { label: 'Bible Reading Plan', value: 'reading-plan' },
         { label: 'Topical Guide', value: 'topical-guide' },
+        { label: 'E-book', value: 'ebook' },
+        { label: 'Ministry Form', value: 'ministry-form' },
       ],
     },
     { name: 'body', type: 'richText' },

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { getPayloadClient } from '@/lib/payload'
+import { TYPE_ICONS, TYPE_LABELS } from '@/lib/resourceDisplay'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { BrandPanel } from '@/components/ui/BrandVisuals'
 import { Button } from '@/components/ui/Button'
@@ -15,19 +16,6 @@ export const revalidate = 60
 
 type Args = { params: Promise<{ slug: string }> }
 
-const TYPE_LABELS: Record<string, string> = {
-  'start-here': 'Start Here',
-  devotional: 'Devotional',
-  'reading-plan': 'Bible Reading Plan',
-  'topical-guide': 'Topical Guide',
-}
-
-const TYPE_ICONS: Record<string, string> = {
-  'start-here': 'compass',
-  devotional: 'sun',
-  'reading-plan': 'book',
-  'topical-guide': 'lightbulb',
-}
 
 function fileUrl(file: unknown): string | null {
   if (file && typeof file === 'object' && 'url' in file && typeof file.url === 'string') {
