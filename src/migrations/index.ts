@@ -18,6 +18,7 @@ import * as migration_20261003_190037_media_item_multiple_pages from './20261003
 import * as migration_20261004_070759_safeguarding_page_and_concerns from './20261004_070759_safeguarding_page_and_concerns';
 import * as migration_20261005_060443_event_time_label from './20261005_060443_event_time_label';
 import * as migration_20261005_061445_resource_ebook_and_form_types from './20261005_061445_resource_ebook_and_form_types';
+import * as migration_20261005_062541_ministry_classes_and_contact from './20261005_062541_ministry_classes_and_contact';
 
 export const migrations = [
   {
@@ -118,6 +119,11 @@ export const migrations = [
   {
     up: migration_20261005_061445_resource_ebook_and_form_types.up,
     down: migration_20261005_061445_resource_ebook_and_form_types.down,
-    name: '20261005_061445_resource_ebook_and_form_types'
+    name: '20261005_061445_resource_ebook_and_form_types',
+  },
+  {
+    up: migration_20261005_062541_ministry_classes_and_contact.up,
+    down: migration_20261005_062541_ministry_classes_and_contact.down,
+    name: '20261005_062541_ministry_classes_and_contact'
   },
 ];

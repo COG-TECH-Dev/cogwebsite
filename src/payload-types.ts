@@ -256,6 +256,31 @@ export interface Ministry {
       )
     | null;
   leaderName?: string | null;
+  /**
+   * Shown on the ministry page so people can reach the leadership. Optional.
+   */
+  contactEmail?: string | null;
+  /**
+   * Optional. Shown on the ministry page.
+   */
+  contactPhone?: string | null;
+  /**
+   * One entry per class, e.g. Pearls, Under 3 years, and a sentence on what the children do. Shown on the ministry page. Leave empty on the Children's Ministry to show Pearls, Rubies, Diamond and Gold without descriptions.
+   */
+  ageGroups?:
+    | {
+        name: string;
+        /**
+         * e.g. "4–5 years"
+         */
+        ageRange?: string | null;
+        /**
+         * What the class does, in a sentence or two.
+         */
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   meetingTimes?:
     | {
         label: string;
@@ -1519,6 +1544,16 @@ export interface MinistriesSelect<T extends boolean = true> {
   image?: T;
   icon?: T;
   leaderName?: T;
+  contactEmail?: T;
+  contactPhone?: T;
+  ageGroups?:
+    | T
+    | {
+        name?: T;
+        ageRange?: T;
+        description?: T;
+        id?: T;
+      };
   meetingTimes?:
     | T
     | {

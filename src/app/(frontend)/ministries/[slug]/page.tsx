@@ -1,11 +1,12 @@
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { Metadata } from 'next'
-import { Clock, UserRound } from 'lucide-react'
+import { Clock, Mail, Phone, UserRound } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { getPayloadClient } from '@/lib/payload'
+import { DEFAULT_CLASSES, DEFAULT_SCHEDULE, classColours } from '@/lib/childrensMinistry'
 import { guessMinistryIcon } from '@/lib/guessMinistryIcon'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { ChildrenMinistryForms } from '@/components/site/ChildrenMinistryForms'
@@ -67,6 +68,19 @@ export default async function MinistryPage({ params }: Args) {
   const img = mediaUrl(ministry.image)
   const icon = ministry.icon || guessMinistryIcon(ministry.name)
   const others = await getOtherMinistries(ministry.id)
+  // The Children's Ministry shows the church's four classes and its Sunday times until its own are entered in the admin.
+  const classes =
+    ministry.ageGroups && ministry.ageGroups.length > 0
+      ? ministry.ageGroups.map((g) => ({ name: g.name, ageRange: g.ageRange ?? '', description: g.description ?? '' }))
+      : ministry.isChildrensMinistry
+        ? DEFAULT_CLASSES
+        : []
+  const schedule =
+    ministry.meetingTimes && ministry.meetingTimes.length > 0
+      ? ministry.meetingTimes
+      : ministry.isChildrensMinistry
+        ? DEFAULT_SCHEDULE
+        : []
   const safeguardingOn = Boolean(
     ministry.isChildrensMinistry &&
       (await (await getPayloadClient()).findGlobal({ slug: 'settings' }).catch(() => null))?.safeguarding?.enabled,
@@ -96,6 +110,30 @@ export default async function MinistryPage({ params }: Args) {
             ) : (
               ministry.summary && <p className="text-lg leading-relaxed text-ink-muted">{ministry.summary}</p>
             )}
+
+            {classes.length > 0 && (
+              <section aria-labelledby="classes-heading" className="mt-12">
+                <h2 id="classes-heading" className="font-serif text-2xl font-semibold text-brand-700">
+                  Our classes
+                </h2>
+                <p className="mt-2 text-ink-muted">Children are grouped by age, so everyone learns and plays with friends their own age.</p>
+                <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+                  {classes.map((c) => {
+                    const colour = classColours(c.name)
+                    return (
+                      <li key={c.name} className="relative overflow-hidden rounded-2xl border border-border bg-surface p-5 pt-6 shadow-sm">
+                        <span aria-hidden="true" className={`absolute inset-x-0 top-0 h-1.5 ${colour.bar}`} />
+                        <h3 className="font-serif text-lg font-semibold text-brand-700">{c.name}</h3>
+                        {c.ageRange && (
+                          <p className={`mt-1 inline-block rounded-full px-3 py-0.5 text-xs font-semibold ${colour.badge}`}>{c.ageRange}</p>
+                        )}
+                        {c.description && <p className="mt-3 text-sm leading-relaxed text-ink-muted">{c.description}</p>}
+                      </li>
+                    )
+                  })}
+                </ul>
+              </section>
+            )}
           </Reveal>
         </div>
 
@@ -110,14 +148,39 @@ export default async function MinistryPage({ params }: Args) {
                 <h2 className="mt-2 font-serif text-lg font-semibold text-brand-700">{ministry.leaderName}</h2>
               </div>
             )}
-            {ministry.meetingTimes && ministry.meetingTimes.length > 0 && (
+            {(ministry.contactEmail || ministry.contactPhone) && (
+              <div className="rounded-2xl border border-border bg-surface p-5">
+                <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-gold-600">
+                  <Mail className="h-4 w-4" aria-hidden="true" />
+                  Contact
+                </p>
+                <ul className="mt-3 space-y-2 text-sm">
+                  {ministry.contactEmail && (
+                    <li>
+                      <a href={`mailto:${ministry.contactEmail}`} className="font-medium text-brand-600 hover:underline">
+                        {ministry.contactEmail}
+                      </a>
+                    </li>
+                  )}
+                  {ministry.contactPhone && (
+                    <li className="flex items-center gap-1.5">
+                      <Phone className="h-3.5 w-3.5 text-ink-muted" aria-hidden="true" />
+                      <a href={`tel:${ministry.contactPhone.replace(/\s+/g, '')}`} className="font-medium text-brand-600 hover:underline">
+                        {ministry.contactPhone}
+                      </a>
+                    </li>
+                  )}
+                </ul>
+              </div>
+            )}
+            {schedule.length > 0 && (
               <div className="rounded-2xl border border-border bg-surface p-5">
                 <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-gold-600">
                   <Clock className="h-4 w-4" aria-hidden="true" />
                   Meeting Times
                 </p>
                 <ul className="mt-3 space-y-2 text-sm">
-                  {ministry.meetingTimes.map((mt, i) => (
+                  {schedule.map((mt, i) => (
                     <li key={i} className="flex justify-between gap-4">
                       <span className="font-medium text-ink">{mt.label}</span>
                       <span className="text-ink-muted">{mt.time}</span>

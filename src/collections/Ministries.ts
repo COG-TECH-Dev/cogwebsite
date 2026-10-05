@@ -55,6 +55,26 @@ export const Ministries: CollectionConfig = {
     },
     { name: 'leaderName', type: 'text' },
     {
+      name: 'contactEmail',
+      type: 'text',
+      admin: { description: 'Shown on the ministry page so people can reach the leadership. Optional.' },
+    },
+    { name: 'contactPhone', type: 'text', admin: { description: 'Optional. Shown on the ministry page.' } },
+    {
+      name: 'ageGroups',
+      type: 'array',
+      label: 'Classes / age groups',
+      admin: {
+        description:
+          "One entry per class, e.g. Pearls, Under 3 years, and a sentence on what the children do. Shown on the ministry page. Leave empty on the Children's Ministry to show Pearls, Rubies, Diamond and Gold without descriptions.",
+      },
+      fields: [
+        { name: 'name', type: 'text', required: true },
+        { name: 'ageRange', type: 'text', admin: { description: 'e.g. "4–5 years"' } },
+        { name: 'description', type: 'textarea', admin: { description: 'What the class does, in a sentence or two.' } },
+      ],
+    },
+    {
       name: 'meetingTimes',
       type: 'array',
       fields: [
