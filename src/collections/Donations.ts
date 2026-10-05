@@ -41,8 +41,17 @@ export const Donations: CollectionConfig = {
       defaultValue: 'one-time',
       options: [
         { label: 'One-Time', value: 'one-time' },
+        { label: 'Weekly', value: 'weekly' },
         { label: 'Monthly', value: 'monthly' },
       ],
+    },
+    {
+      name: 'startDate',
+      type: 'date',
+      admin: {
+        date: { pickerAppearance: 'dayOnly' },
+        description: 'For a recurring gift: the day the donor chose for the first gift. Empty means it started straight away.',
+      },
     },
     {
       name: 'giftAid',
@@ -61,6 +70,7 @@ export const Donations: CollectionConfig = {
       defaultValue: 'pending',
       options: [
         { label: 'Pending', value: 'pending' },
+        { label: 'Scheduled (recurring gift, starts later)', value: 'scheduled' },
         { label: 'Completed', value: 'completed' },
         { label: 'Failed', value: 'failed' },
       ],

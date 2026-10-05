@@ -81,10 +81,17 @@ export default async function EventPage({ params }: Args) {
       where: { event: { equals: event.id } },
       limit: 0,
     })
-    const taken = registrations.docs.reduce((sum, r) => sum + (typeof r.guests === 'number' ? r.guests : 1), 0)
+    // Volunteers do not take up attendee places.
+    const taken = registrations.docs
+      .filter((r) => r.role !== 'volunteer')
+      .reduce((sum, r) => sum + (typeof r.guests === 'number' ? r.guests : 1), 0)
     spotsRemaining = Math.max(event.capacity - taken, 0)
     isFull = spotsRemaining <= 0
   }
+
+  const canAttend = Boolean(event.registrationEnabled) && !isFull
+  const canVolunteer = Boolean(event.volunteerEnabled)
+  const heading = event.registrationEnabled && canVolunteer ? 'Join In' : canVolunteer ? 'Volunteer With Us' : 'Reserve Your Spot'
 
   return (
     <div>
@@ -147,23 +154,29 @@ export default async function EventPage({ params }: Args) {
                   <p className="mt-2 font-semibold text-brand-700 group-hover:text-brand-600">{ministry.name} →</p>
                 </Link>
               )}
-              {event.registrationEnabled ? (
+              {event.registrationEnabled || canVolunteer ? (
                 <div
                   id="rsvp"
                   className="relative isolate scroll-mt-28 overflow-hidden rounded-2xl bg-linear-to-br from-brand-900 via-brand-700 to-brand-600 p-6 text-center text-white"
                 >
-                  <p className="font-serif text-lg font-semibold">Reserve Your Spot</p>
-                  {spotsRemaining !== null && (
+                  <p className="font-serif text-lg font-semibold">{heading}</p>
+                  {canVolunteer && (
+                    <p className="mt-1 text-sm text-white/80">
+                      {event.registrationEnabled ? 'Come along, or give a hand.' : 'We need helpers for this event.'}
+                    </p>
+                  )}
+                  {event.registrationEnabled && spotsRemaining !== null && (
                     <p className="mt-1 text-sm text-white/80">
                       {isFull ? 'Fully booked' : `${spotsRemaining} spot${spotsRemaining === 1 ? '' : 's'} left`}
                     </p>
                   )}
-                  {isFull ? (
+                  {isFull && (
                     <p className="mt-4 text-sm text-white/90">
-                      This event is fully booked. Contact us if a spot opens up.
+                      This event is fully booked.{canVolunteer ? ' You can still offer to volunteer below.' : ' Contact us if a spot opens up.'}
                     </p>
-                  ) : (
-                    <EventRegistrationForm eventId={event.id} />
+                  )}
+                  {(canAttend || canVolunteer) && (
+                    <EventRegistrationForm eventId={event.id} canAttend={canAttend} canVolunteer={canVolunteer} />
                   )}
                   {event.externalRegistrationLink && (
                     <Button href={event.externalRegistrationLink} variant="outline" className="mt-4 w-full">

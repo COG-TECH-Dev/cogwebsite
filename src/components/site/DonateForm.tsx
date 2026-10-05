@@ -1,6 +1,6 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState, useState, startTransition, type FormEvent } from 'react'
 
 import { createDonationCheckout, type DonateState } from '@/app/(frontend)/give/donate/actions'
 import { ConsentNotice } from './ConsentNotice'
@@ -22,9 +22,23 @@ export function DonateForm({
   const [amount, setAmount] = useState<number | null>(25)
   const [customAmount, setCustomAmount] = useState('')
   const [giftAid, setGiftAid] = useState(false)
+  const [frequency, setFrequency] = useState<'one-time' | 'weekly' | 'monthly'>('one-time')
+  // Set when "On a date I choose" is picked: the earliest and latest start dates (the server checks them again).
+  const [startRange, setStartRange] = useState<{ min: string; max: string } | null>(null)
+  const startLater = startRange !== null
+
+  // Sending the data ourselves keeps what was typed if the server sends back a message
+  // (for example about the start date), instead of clearing the form.
+  function onSubmit(e: FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    const data = new FormData(e.currentTarget)
+    startTransition(() => formAction(data))
+  }
+
+  const dayFromNow = (days: number) => new Date(Date.now() + days * 86400000).toISOString().slice(0, 10)
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form onSubmit={onSubmit} className="space-y-6">
       <Honeypot />
 
       {branches.length > 0 && (
@@ -87,26 +101,83 @@ export function DonateForm({
         <input type="hidden" name="amount" value={customAmount || amount || ''} />
       </div>
 
-      <div>
-        <p className="mb-2 block text-sm font-medium text-ink">Frequency</p>
-        <div className="grid grid-cols-2 gap-2">
-          {(['one-time', 'monthly'] as const).map((freq) => (
+      <fieldset>
+        <legend className="mb-2 block text-sm font-medium text-ink">Frequency</legend>
+        <div className="grid grid-cols-3 gap-2">
+          {(
+            [
+              ['one-time', 'One-Time'],
+              ['weekly', 'Weekly'],
+              ['monthly', 'Monthly'],
+            ] as const
+          ).map(([freq, text]) => (
             <label
               key={freq}
-              className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-border px-3 py-3 text-sm font-medium text-ink has-checked:border-gold-500 has-checked:bg-gold-100 has-checked:text-brand-700"
+              className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-border px-3 py-3 text-sm font-medium text-ink has-checked:border-gold-500 has-checked:bg-gold-100 has-checked:text-brand-700 has-focus-visible:ring-2 has-focus-visible:ring-gold-500"
             >
               <input
                 type="radio"
                 name="frequency"
                 value={freq}
-                defaultChecked={freq === 'one-time'}
+                checked={frequency === freq}
+                onChange={() => setFrequency(freq)}
                 className="sr-only"
               />
-              {freq === 'one-time' ? 'One-Time' : 'Monthly'}
+              {text}
             </label>
           ))}
         </div>
-      </div>
+
+        {frequency !== 'one-time' && (
+          <div className="mt-4 rounded-xl border border-border bg-brand-50 p-4">
+            <p className="text-sm font-medium text-ink">When should your {frequency} gift start?</p>
+            <div className="mt-2 space-y-2">
+              <label className="flex items-center gap-2 text-sm text-ink">
+                <input
+                  type="radio"
+                  name="startChoice"
+                  value="now"
+                  checked={!startLater}
+                  onChange={() => setStartRange(null)}
+                  className="h-4 w-4 accent-brand-600"
+                />
+                Today
+              </label>
+              <label className="flex items-center gap-2 text-sm text-ink">
+                <input
+                  type="radio"
+                  name="startChoice"
+                  value="later"
+                  checked={startLater}
+                  onChange={() => setStartRange({ min: dayFromNow(3), max: dayFromNow(365) })}
+                  className="h-4 w-4 accent-brand-600"
+                />
+                On a date I choose
+              </label>
+            </div>
+            {startRange && (
+              <div className="mt-3">
+                <label htmlFor="startDate" className="mb-1 block text-sm font-medium text-ink">
+                  First gift on
+                </label>
+                <input
+                  id="startDate"
+                  name="startDate"
+                  type="date"
+                  required
+                  min={startRange.min}
+                  max={startRange.max}
+                  className="input sm:max-w-56"
+                />
+                <p className="mt-1 text-xs text-ink-muted">
+                  Your card is not charged until this day. It then repeats every {frequency === 'weekly' ? 'week' : 'month'} on the same
+                  {frequency === 'weekly' ? ' day' : ' date'}. Choose a date at least 3 days away.
+                </p>
+              </div>
+            )}
+          </div>
+        )}
+      </fieldset>
 
       {funds.length > 0 && (
         <div>

@@ -21,7 +21,7 @@ export const EventRegistrations: CollectionConfig = {
   admin: {
     group: 'People & Enquiries',
     useAsTitle: 'name',
-    defaultColumns: ['name', 'event', 'guests', 'createdAt'],
+    defaultColumns: ['name', 'event', 'role', 'guests', 'createdAt'],
   },
   hooks: {
     beforeChange: [enforceEventCapacity],
@@ -30,8 +30,15 @@ export const EventRegistrations: CollectionConfig = {
       // instead of waiting out the 60s ISR window.
       revalidateCollection(paths),
       notifyOnSubmission(
-        'New Event RSVP',
-        (doc) => `${doc.name} (${doc.email}) registered for an upcoming event — ${doc.guests} attending.`,
+        (doc) => (doc.role === 'volunteer' ? 'New Event Volunteer' : 'New Event RSVP'),
+        (doc) => {
+          const event = doc.event && typeof doc.event === 'object' && 'title' in doc.event ? ` "${String((doc.event as { title: unknown }).title)}"` : ''
+          const contact = [doc.email, doc.phone].filter(Boolean).join(', ')
+          if (doc.role === 'volunteer') {
+            return `${doc.name} (${contact}) offered to volunteer at the event${event}.\n\nHow they would like to help: ${doc.notes || '(not said)'}`
+          }
+          return `${doc.name} (${contact}) registered for the event${event} — ${doc.guests} attending.`
+        },
       ),
     ],
   },
@@ -48,6 +55,17 @@ export const EventRegistrations: CollectionConfig = {
     { name: 'name', type: 'text', required: true },
     { name: 'email', type: 'text', required: true },
     { name: 'phone', type: 'text' },
+    {
+      name: 'role',
+      type: 'select',
+      defaultValue: 'attendee',
+      options: [
+        { label: 'Attending', value: 'attendee' },
+        { label: 'Volunteering', value: 'volunteer' },
+      ],
+      admin: { description: 'Volunteers do not count towards the event\'s attendee capacity.' },
+    },
+    { name: 'notes', type: 'textarea', admin: { description: 'For volunteers: how they would like to help.' } },
     {
       name: 'guests',
       type: 'number',

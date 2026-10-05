@@ -19,6 +19,7 @@ import * as migration_20261004_070759_safeguarding_page_and_concerns from './202
 import * as migration_20261005_060443_event_time_label from './20261005_060443_event_time_label';
 import * as migration_20261005_061445_resource_ebook_and_form_types from './20261005_061445_resource_ebook_and_form_types';
 import * as migration_20261005_062541_ministry_classes_and_contact from './20261005_062541_ministry_classes_and_contact';
+import * as migration_20261005_065146_first_timer_youth_volunteer_weekly from './20261005_065146_first_timer_youth_volunteer_weekly';
 
 export const migrations = [
   {
@@ -124,6 +125,11 @@ export const migrations = [
   {
     up: migration_20261005_062541_ministry_classes_and_contact.up,
     down: migration_20261005_062541_ministry_classes_and_contact.down,
-    name: '20261005_062541_ministry_classes_and_contact'
+    name: '20261005_062541_ministry_classes_and_contact',
+  },
+  {
+    up: migration_20261005_065146_first_timer_youth_volunteer_weekly.up,
+    down: migration_20261005_065146_first_timer_youth_volunteer_weekly.down,
+    name: '20261005_065146_first_timer_youth_volunteer_weekly'
   },
 ];

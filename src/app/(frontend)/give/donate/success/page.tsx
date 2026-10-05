@@ -11,7 +11,9 @@ export const metadata: Metadata = { title: 'Thank You' }
 // Completed and sends the email confirmation — this page just reassures the
 // donor immediately after the redirect back from Checkout, since the
 // webhook can take a moment (or, rarely, retry) to land.
-export default function DonateSuccessPage() {
+export default async function DonateSuccessPage({ searchParams }: { searchParams: Promise<{ start?: string }> }) {
+  const { start } = await searchParams
+  const startsLater = start === 'later'
   return (
     <div>
       <PageHeader eyebrow="Give" title="Thank You" />
@@ -19,10 +21,14 @@ export default function DonateSuccessPage() {
         <span className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-brand-50 text-brand-600">
           <CheckCircle2 className="h-9 w-9" aria-hidden="true" />
         </span>
-        <h2 className="mt-6 font-serif text-2xl font-semibold text-brand-700">Your gift is on its way</h2>
+        <h2 className="mt-6 font-serif text-2xl font-semibold text-brand-700">
+          {startsLater ? 'Your recurring gift is set up' : 'Your gift is on its way'}
+        </h2>
         <p className="mt-3 text-ink-muted">
-          Thank you for your generosity — you&apos;ll receive an email confirmation shortly. If you set up a Gift
-          Aid declaration, we&apos;ll take care of claiming it on your behalf.
+          {startsLater
+            ? "Thank you for your generosity. Your card won't be charged until the start date you chose, and we'll email you to confirm. "
+            : "Thank you for your generosity — you'll receive an email confirmation shortly. "}
+          If you set up a Gift Aid declaration, we&apos;ll take care of claiming it on your behalf.
         </p>
         <Link href="/" className="mt-8 inline-block text-sm font-semibold text-brand-600 hover:underline">
           ← Back to Home

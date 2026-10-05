@@ -82,6 +82,35 @@ export const Ministries: CollectionConfig = {
         { name: 'time', type: 'text', required: true },
       ],
     },
+    {
+      name: 'activities',
+      type: 'array',
+      label: 'What we do',
+      admin: {
+        description:
+          'The ministry\'s programmes and activities, one entry each (e.g. "Acoustic Nights"). Shown on the ministry page. For Ablaze Youth, leave empty to show the activities from the church\'s Ablaze page.',
+      },
+      fields: [
+        { name: 'title', type: 'text', required: true },
+        { name: 'description', type: 'textarea' },
+      ],
+    },
+    {
+      name: 'communityLink',
+      type: 'text',
+      admin: {
+        description: 'A link to the ministry\'s online community, e.g. a WhatsApp group or Instagram page. Shown as a button on the ministry page.',
+      },
+    },
+    { name: 'communityLabel', type: 'text', admin: { description: 'Button text, e.g. "Join our WhatsApp group".' } },
+    {
+      name: 'isYouthMinistry',
+      type: 'checkbox',
+      defaultValue: false,
+      admin: {
+        description: 'Gives this ministry\'s page the bold youth look. Ablaze Youth gets it automatically.',
+      },
+    },
     { name: 'featured', type: 'checkbox', defaultValue: false },
     {
       name: 'isChildrensMinistry',

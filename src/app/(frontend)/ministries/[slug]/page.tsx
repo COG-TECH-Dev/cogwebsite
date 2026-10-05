@@ -1,6 +1,6 @@
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { Metadata } from 'next'
-import { Clock, Mail, Phone, UserRound } from 'lucide-react'
+import { Clock, ExternalLink, Mail, MessageCircle, Phone, UserRound } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -8,8 +8,10 @@ import { notFound } from 'next/navigation'
 import { getPayloadClient } from '@/lib/payload'
 import { DEFAULT_CLASSES, DEFAULT_SCHEDULE, classColours } from '@/lib/childrensMinistry'
 import { guessMinistryIcon } from '@/lib/guessMinistryIcon'
+import { YOUTH_ACTIVITIES, YOUTH_INTRO, isYouthMinistry } from '@/lib/youthMinistry'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { ChildrenMinistryForms } from '@/components/site/ChildrenMinistryForms'
+import { YouthActivities, YouthHeader, safeWebUrl } from '@/components/site/YouthMinistry'
 import { BrandPanel } from '@/components/ui/BrandVisuals'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
@@ -81,6 +83,17 @@ export default async function MinistryPage({ params }: Args) {
       : ministry.isChildrensMinistry
         ? DEFAULT_SCHEDULE
         : []
+  // Ablaze Youth gets its own bold look and, until the youth team enters theirs, the church's own list of activities.
+  const youth = isYouthMinistry(ministry)
+  const activities =
+    ministry.activities && ministry.activities.length > 0
+      ? ministry.activities.map((a) => ({ title: a.title, description: a.description ?? '' }))
+      : youth
+        ? YOUTH_ACTIVITIES
+        : []
+  const communityHref = safeWebUrl(ministry.communityLink)
+  const community = communityHref ? { href: communityHref, label: ministry.communityLabel || 'Join our online community' } : null
+  const joinHref = `/connect/membership?ministry=${ministry.id}`
   const safeguardingOn = Boolean(
     ministry.isChildrensMinistry &&
       (await (await getPayloadClient()).findGlobal({ slug: 'settings' }).catch(() => null))?.safeguarding?.enabled,
@@ -88,27 +101,51 @@ export default async function MinistryPage({ params }: Args) {
 
   return (
     <div>
-      <PageHeader eyebrow="Ministry" title={ministry.name} description={ministry.summary ?? undefined} />
+      {youth ? (
+        <YouthHeader name={ministry.name} summary={ministry.summary} joinHref={joinHref} community={community} />
+      ) : (
+        <PageHeader eyebrow="Ministry" title={ministry.name} description={ministry.summary ?? undefined} />
+      )}
       <Container className="grid gap-10 py-16 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <Reveal>
-            <div className="relative mb-8 aspect-video overflow-hidden rounded-2xl shadow-lg">
-              {img ? (
-                <Image src={img} alt={ministry.name} fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-cover" />
-              ) : (
-                <BrandPanel className="absolute inset-0 flex items-center justify-center">
-                  <span className="flex h-24 w-24 items-center justify-center rounded-3xl bg-white/10 backdrop-blur">
-                    <BlockIcon name={icon} className="h-12 w-12 text-gold-300" />
-                  </span>
-                </BrandPanel>
-              )}
-            </div>
+            {(img || !youth) && (
+              <div className="relative mb-8 aspect-video overflow-hidden rounded-2xl shadow-lg">
+                {img ? (
+                  <Image src={img} alt={ministry.name} fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-cover" />
+                ) : (
+                  <BrandPanel className="absolute inset-0 flex items-center justify-center">
+                    <span className="flex h-24 w-24 items-center justify-center rounded-3xl bg-white/10 backdrop-blur">
+                      <BlockIcon name={icon} className="h-12 w-12 text-gold-300" />
+                    </span>
+                  </BrandPanel>
+                )}
+              </div>
+            )}
             {ministry.description ? (
               <div className="prose prose-neutral max-w-none">
                 <RichText data={ministry.description} />
               </div>
+            ) : youth ? (
+              <p className="text-lg leading-relaxed text-ink-muted">{YOUTH_INTRO}</p>
             ) : (
               ministry.summary && <p className="text-lg leading-relaxed text-ink-muted">{ministry.summary}</p>
+            )}
+
+            {!youth && activities.length > 0 && (
+              <section aria-labelledby="activities-heading" className="mt-12">
+                <h2 id="activities-heading" className="font-serif text-2xl font-semibold text-brand-700">
+                  What we do
+                </h2>
+                <ul className="mt-6 grid gap-4 sm:grid-cols-2">
+                  {activities.map((a, i) => (
+                    <li key={`${a.title}-${i}`} className="rounded-2xl border border-border bg-surface p-5 shadow-sm">
+                      <h3 className="font-serif text-lg font-semibold text-brand-700">{a.title}</h3>
+                      {a.description && <p className="mt-2 text-sm leading-relaxed text-ink-muted">{a.description}</p>}
+                    </li>
+                  ))}
+                </ul>
+              </section>
             )}
 
             {classes.length > 0 && (
@@ -146,6 +183,20 @@ export default async function MinistryPage({ params }: Args) {
                   Led By
                 </p>
                 <h2 className="mt-2 font-serif text-lg font-semibold text-brand-700">{ministry.leaderName}</h2>
+              </div>
+            )}
+            {youth && !ministry.contactEmail && !ministry.contactPhone && (
+              <div className="rounded-2xl border border-border bg-surface p-5">
+                <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-gold-600">
+                  <Mail className="h-4 w-4" aria-hidden="true" />
+                  Questions?
+                </p>
+                <p className="mt-3 text-sm text-ink-muted">
+                  Ask the youth team anything, from meeting times to how to get involved.
+                </p>
+                <Link href="/connect/contact" className="mt-3 inline-block text-sm font-semibold text-brand-600 hover:underline">
+                  Send us a message →
+                </Link>
               </div>
             )}
             {(ministry.contactEmail || ministry.contactPhone) && (
@@ -189,16 +240,40 @@ export default async function MinistryPage({ params }: Args) {
                 </ul>
               </div>
             )}
-            <div className="relative isolate overflow-hidden rounded-2xl bg-linear-to-br from-brand-900 via-brand-700 to-brand-600 p-6 text-center text-white">
+            {community && !youth && (
+              <div className="rounded-2xl border border-border bg-surface p-5">
+                <p className="flex items-center gap-2 text-sm font-semibold uppercase tracking-wide text-gold-600">
+                  <MessageCircle className="h-4 w-4" aria-hidden="true" />
+                  Community
+                </p>
+                <a
+                  href={community.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:underline"
+                >
+                  {community.label}
+                  <ExternalLink className="h-3.5 w-3.5" aria-hidden="true" />
+                  <span className="sr-only"> (opens in a new tab)</span>
+                </a>
+              </div>
+            )}
+            <div
+              className={`relative isolate overflow-hidden rounded-2xl p-6 text-center text-white ${
+                youth ? 'bg-[#15100e] ring-1 ring-flame-500/50' : 'bg-linear-to-br from-brand-900 via-brand-700 to-brand-600'
+              }`}
+            >
               <p className="font-serif text-lg font-semibold">Want to get involved?</p>
               <p className="mt-1 text-sm text-white/70">We&apos;d love to have you join us.</p>
-              <Button href={`/connect/membership?ministry=${ministry.id}`} className="mt-4 w-full">
+              <Button href={joinHref} className="mt-4 w-full">
                 Join This Ministry
               </Button>
             </div>
           </aside>
         </Reveal>
       </Container>
+
+      {youth && <YouthActivities activities={activities} />}
 
       {ministry.isChildrensMinistry && (
         <div className="bg-linear-to-br from-sky-400 via-sky-500 to-orange-400">

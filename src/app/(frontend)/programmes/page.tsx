@@ -176,8 +176,8 @@ export default async function ProgrammesPage({ searchParams }: Args) {
               return (
                 <StaggerItem key={event.id} className="h-full">
                   <Link
-                    // With RSVP on, go straight to the sign-up on the event page.
-                    href={`/programmes/${event.slug}${event.registrationEnabled ? '#rsvp' : ''}`}
+                    // With RSVP or volunteering on, go straight to the sign-up on the event page.
+                    href={`/programmes/${event.slug}${event.registrationEnabled || event.volunteerEnabled ? '#rsvp' : ''}`}
                     className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                   >
                     <div className="relative aspect-video overflow-hidden">
@@ -210,10 +210,19 @@ export default async function ProgrammesPage({ searchParams }: Args) {
                       {event.location && <p className="mt-0.5 text-sm text-ink-muted">{event.location}</p>}
                       {summary && <p className="mt-2 line-clamp-2 text-sm leading-relaxed text-ink-muted">{summary}</p>}
                       {ministryName && <p className="mt-2 text-xs text-ink-muted">Hosted by {ministryName}</p>}
-                      {event.registrationEnabled && (
-                        <span className="mt-3 inline-flex w-fit items-center rounded-full bg-gold-100 px-3 py-1 text-xs font-semibold text-gold-700">
-                          RSVP now <span aria-hidden="true">&nbsp;→</span>
-                        </span>
+                      {(event.registrationEnabled || event.volunteerEnabled) && (
+                        <div className="mt-3 flex flex-wrap gap-2">
+                          {event.registrationEnabled && (
+                            <span className="inline-flex w-fit items-center rounded-full bg-gold-100 px-3 py-1 text-xs font-semibold text-gold-700">
+                              RSVP now <span aria-hidden="true">&nbsp;→</span>
+                            </span>
+                          )}
+                          {event.volunteerEnabled && (
+                            <span className="inline-flex w-fit items-center rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-600">
+                              Volunteers welcome
+                            </span>
+                          )}
+                        </div>
                       )}
                     </div>
                   </Link>

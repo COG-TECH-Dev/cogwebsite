@@ -1,5 +1,7 @@
 import type { Payload } from 'payload'
 
+import { isYouthMinistry } from '@/lib/youthMinistry'
+
 type Item = { area: string; text: string; href: string; cta: string }
 
 const names = (list: string[], max = 6) =>
@@ -52,6 +54,14 @@ export async function ContentToDoPanel({ payload, user }: { payload?: Payload; u
   } else if (!process.env.STRIPE_SECRET_KEY) {
     add('Giving', 'Stripe is not connected, so the Donate page cannot take payments.', '', 'In Vercel')
   }
+  if (process.env.STRIPE_SECRET_KEY && !process.env.STRIPE_WEBHOOK_SECRET) {
+    add(
+      'Giving',
+      'No Stripe webhook secret (STRIPE_WEBHOOK_SECRET) in Vercel. Until the webhook is added in Stripe and its secret saved here, gifts stay "pending" and no thank-you or confirmation emails are sent.',
+      '',
+      'In Vercel',
+    )
+  }
   if (!process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID) {
     add('Analytics', 'Google Analytics is not connected (no NEXT_PUBLIC_GA_MEASUREMENT_ID in Vercel).', '', 'In Vercel')
   }
@@ -79,7 +89,20 @@ export async function ContentToDoPanel({ payload, user }: { payload?: Payload; u
       add("Children's Ministry", 'Add a contact email or phone number for the children’s team, so parents can reach them.', link, 'Open')
     }
   }
-  const others = ministries.filter((m) => !m.isChildrensMinistry)
+  const youth = ministries.find((m) => isYouthMinistry(m))
+  if (youth) {
+    const link = `/admin/collections/ministries/${youth.id}`
+    if (!youth.contactEmail && !youth.contactPhone) {
+      add('Youth (Ablaze)', 'Add a youth coordinator’s email or phone number. The page shows a link to the contact form until you do.', link, 'Open')
+    }
+    if (!youth.meetingTimes?.length || !youth.ageGroups?.length) {
+      add('Youth (Ablaze)', 'Add the meeting times and age range. The church’s Ablaze page does not list them, so none are shown yet.', link, 'Open')
+    }
+    if (!youth.activities?.length) {
+      add('Youth (Ablaze)', 'The page is showing the church’s Ablaze activities (Choir, Heart to Heart, Acoustic Nights). Enter your own under "What we do" to confirm or add to them.', link, 'Open')
+    }
+  }
+  const others = ministries.filter((m) => !m.isChildrensMinistry && m !== youth)
   const noLeader = others.filter((m) => !m.leaderName).map((m) => m.name)
   if (noLeader.length) add('Ministries', `${noLeader.length} ministries have no leader named: ${names(noLeader)}.`, '/admin/collections/ministries', 'Open Ministries')
   const noTimes = others.filter((m) => !m.meetingTimes?.length).map((m) => m.name)

@@ -29,7 +29,7 @@ export async function openBillingPortal(_prev: ManageGivingState, formData: Form
     where: {
       and: [
         { donorEmail: { equals: email } },
-        { frequency: { equals: 'monthly' } },
+        { frequency: { in: ['weekly', 'monthly'] } },
         { stripeCustomerId: { exists: true } },
       ],
     },

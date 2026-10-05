@@ -1,6 +1,7 @@
 'use server'
 
 import { getPayloadClient } from '@/lib/payload'
+import { CONTACT_PREFERENCES, VISITOR_INTENTS, VISITOR_TYPES } from '@/lib/firstTimer'
 import type { FormSubmission, PrayerRequest } from '@/payload-types'
 
 export type FormState = { status: 'idle' | 'success' | 'error'; message?: string }
@@ -67,11 +68,31 @@ export async function submitFirstTimer(_prev: FormState, formData: FormData): Pr
     return { status: 'success', message: successMessage }
   }
 
-  const name = String(formData.get('name') || '').trim()
-  const email = String(formData.get('email') || '').trim()
-  const phone = String(formData.get('phone') || '').trim()
-  const problem = missingContact(name, email, phone, 'either')
-  if (problem) return { status: 'error', message: problem }
+  const text = (key: string) => {
+    const value = String(formData.get(key) || '').trim()
+    return value || undefined
+  }
+  const oneOf = <T extends string>(key: string, allowed: readonly { value: T }[]): T | undefined => {
+    const value = String(formData.get(key) || '')
+    return allowed.find((o) => o.value === value)?.value
+  }
+
+  const firstName = text('firstName')
+  const lastName = text('lastName')
+  const email = text('email')
+  const phone = text('phone')
+  if (!firstName || !lastName) return { status: 'error', message: 'Please enter your first and last name.' }
+  if (!email && !phone) return { status: 'error', message: 'Please give an email or a phone number so we can reach you.' }
+
+  // The date of the visit defaults to today when it is left blank.
+  const rawVisit = text('visitDate')
+  const visitDate = rawVisit && !Number.isNaN(Date.parse(rawVisit)) ? rawVisit : new Date().toISOString().slice(0, 10)
+
+  const homegroup = Number(formData.get('interestedHomegroup'))
+  const intents = formData
+    .getAll('intents')
+    .map(String)
+    .filter((v): v is (typeof VISITOR_INTENTS)[number]['value'] => VISITOR_INTENTS.some((o) => o.value === v))
 
   const payload = await getPayloadClient()
 
@@ -80,12 +101,23 @@ export async function submitFirstTimer(_prev: FormState, formData: FormData): Pr
       collection: 'form-submissions',
       data: {
         formType: 'first-timer',
-        name,
-        email: email || undefined,
-        phone: phone || undefined,
-        campus: formData.get('campus') ? String(formData.get('campus')) : undefined,
-        serviceAttended: formData.get('serviceAttended') ? String(formData.get('serviceAttended')) : undefined,
-        message: formData.get('message') ? String(formData.get('message')) : undefined,
+        name: `${firstName} ${lastName}`,
+        email,
+        phone,
+        visitDate,
+        campus: text('campus'),
+        serviceAttended: text('serviceAttended'),
+        address: text('address'),
+        postcode: text('postcode'),
+        city: text('city'),
+        country: text('country'),
+        interestedHomegroup: Number.isInteger(homegroup) && homegroup > 0 ? homegroup : undefined,
+        contactPreference: oneOf('contactPreference', CONTACT_PREFERENCES) ?? 'yes',
+        howHeard: text('howHeard'),
+        visitorType: oneOf('visitorType', VISITOR_TYPES),
+        intents,
+        newsletterOptIn: formData.get('newsletterOptIn') === 'on',
+        message: text('message'),
       },
     })
     return { status: 'success', message: successMessage }

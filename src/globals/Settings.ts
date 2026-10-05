@@ -67,6 +67,20 @@ export const Settings: GlobalConfig = {
       ],
     },
     {
+      name: 'formEmails',
+      type: 'group',
+      access: { update: isAdminOrUpField },
+      admin: { description: 'Who receives the email when someone submits a form that has its own team.' },
+      fields: [
+        {
+          name: 'firstTimer',
+          type: 'text',
+          label: 'First-time visitor forms go to',
+          admin: { description: 'Leave empty to use vip@cityofgodchristiancentre.org.' },
+        },
+      ],
+    },
+    {
       name: 'safeguarding',
       type: 'group',
       access: { update: isAdminOrUpField },

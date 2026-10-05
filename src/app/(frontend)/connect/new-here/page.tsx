@@ -21,6 +21,7 @@ const PARKING_MAP_URL = 'https://maps.app.goo.gl/PWsPPVr7gPtfA8NG8'
 export default async function NewHerePage() {
   const payload = await getPayloadClient()
   const settings = await payload.findGlobal({ slug: 'settings' }).catch(() => null)
+  const homegroups = (await payload.find({ collection: 'homegroups', limit: 100, sort: 'area', depth: 0 }).catch(() => null))?.docs ?? []
   const sundayServices = (settings?.serviceTimes ?? []).filter((s) => s.label.toLowerCase().includes('sunday'))
   const address = settings?.address
   const addressLine = [address?.line1, address?.city, address?.postcode].filter(Boolean).join(', ')
@@ -176,6 +177,7 @@ export default async function NewHerePage() {
             </p>
             <FirstTimerForm
               campuses={(navLinks.find((l) => l.label === 'Branches')?.children ?? []).map((b) => b.label)}
+              homegroups={homegroups.map((g) => ({ id: g.id, area: g.area }))}
             />
           </Reveal>
         </div>

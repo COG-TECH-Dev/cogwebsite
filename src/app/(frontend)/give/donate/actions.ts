@@ -34,7 +34,26 @@ export async function createDonationCheckout(_prev: DonateState, formData: FormD
   }
   const amountPence = Math.round(amountPounds * 100)
 
-  const frequency = formData.get('frequency') === 'monthly' ? 'monthly' : 'one-time'
+  const chosen = formData.get('frequency')
+  const frequency: 'one-time' | 'weekly' | 'monthly' = chosen === 'monthly' || chosen === 'weekly' ? chosen : 'one-time'
+  const recurring = frequency !== 'one-time'
+
+  // A recurring gift can start today or on a later date the donor picks. Stripe needs a
+  // later start to be at least 48 hours away, so we ask for three days to be safe, and
+  // never more than a year ahead.
+  let startDate: string | undefined
+  let trialEnd: number | undefined
+  if (recurring && formData.get('startChoice') === 'later') {
+    const raw = String(formData.get('startDate') || '')
+    const parts = /^(\d{4})-(\d{2})-(\d{2})$/.exec(raw)
+    const startsAt = parts ? Date.UTC(Number(parts[1]), Number(parts[2]) - 1, Number(parts[3]), 9) / 1000 : NaN
+    const secondsAway = startsAt - Date.now() / 1000
+    if (!Number.isFinite(startsAt) || secondsAway < 49 * 3600 || secondsAway > 365 * 86400) {
+      return { status: 'error', message: 'Please choose a start date at least 3 days from today, and within the next year.' }
+    }
+    startDate = raw
+    trialEnd = Math.floor(startsAt)
+  }
   const branch = String(formData.get('branch') || 'Newcastle')
   const fund = String(formData.get('fund') || 'General Fund')
   const donorName = String(formData.get('name') || '').trim()
@@ -70,6 +89,7 @@ export async function createDonationCheckout(_prev: DonateState, formData: FormD
       branch,
       fund,
       frequency,
+      startDate,
       giftAid,
       status: 'pending',
     },
@@ -80,7 +100,7 @@ export async function createDonationCheckout(_prev: DonateState, formData: FormD
   let session
   try {
     session = await stripe.checkout.sessions.create({
-      mode: frequency === 'monthly' ? 'subscription' : 'payment',
+      mode: recurring ? 'subscription' : 'payment',
       payment_method_types: ['card'],
       customer_email: donorEmail,
       client_reference_id: String(donation.id),
@@ -92,11 +112,15 @@ export async function createDonationCheckout(_prev: DonateState, formData: FormD
             currency: 'gbp',
             unit_amount: amountPence,
             product_data: { name: `Donation — ${branch} — ${fund}` },
-            ...(frequency === 'monthly' ? { recurring: { interval: 'month' as const } } : {}),
+            ...(recurring ? { recurring: { interval: frequency === 'weekly' ? ('week' as const) : ('month' as const) } } : {}),
           },
         },
       ],
-      success_url: `${baseUrl}/give/donate/success?session_id={CHECKOUT_SESSION_ID}`,
+      // The donation id travels with the subscription too, so each renewal can be matched back to it.
+      ...(recurring
+        ? { subscription_data: { metadata: { donationId: String(donation.id), branch, fund }, ...(trialEnd ? { trial_end: trialEnd } : {}) } }
+        : {}),
+      success_url: `${baseUrl}/give/donate/success?session_id={CHECKOUT_SESSION_ID}${startDate ? '&start=later' : ''}`,
       cancel_url: `${baseUrl}/give/donate/cancelled`,
     })
   } catch (err) {

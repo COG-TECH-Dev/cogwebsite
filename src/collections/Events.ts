@@ -72,6 +72,15 @@ export const Events: CollectionConfig = {
       admin: { description: 'Let people RSVP for this event directly on the site.' },
     },
     {
+      name: 'volunteerEnabled',
+      type: 'checkbox',
+      defaultValue: false,
+      label: 'Let people offer to volunteer',
+      admin: {
+        description: 'Adds a "volunteer" option to the sign-up box, for outreaches and other events that need helpers. Volunteers do not use up attendee places.',
+      },
+    },
+    {
       name: 'capacity',
       type: 'number',
       min: 1,

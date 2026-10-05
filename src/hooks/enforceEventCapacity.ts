@@ -5,9 +5,11 @@ import type { CollectionBeforeChangeHook } from 'payload'
  * Only applies to events with registrationEnabled + a numeric capacity —
  * uncapped or registration-closed events skip this entirely. Runs on create
  * only; editing an existing registration's guest count isn't re-checked.
+ * Volunteers never use up (or are blocked by) attendee places.
  */
 export const enforceEventCapacity: CollectionBeforeChangeHook = async ({ data, operation, req }) => {
   if (operation !== 'create') return data
+  if (data.role === 'volunteer') return data
 
   const eventId = data.event
   if (!eventId) return data
@@ -21,10 +23,9 @@ export const enforceEventCapacity: CollectionBeforeChangeHook = async ({ data, o
     limit: 0,
   })
 
-  const alreadyRegistered = existing.docs.reduce(
-    (sum, r) => sum + (typeof r.guests === 'number' ? r.guests : 1),
-    0,
-  )
+  const alreadyRegistered = existing.docs
+    .filter((r) => r.role !== 'volunteer')
+    .reduce((sum, r) => sum + (typeof r.guests === 'number' ? r.guests : 1), 0)
   const requested = typeof data.guests === 'number' ? data.guests : 1
 
   if (alreadyRegistered + requested > event.capacity) {

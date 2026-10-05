@@ -1,7 +1,53 @@
-import type { CollectionConfig } from 'payload'
+import type { CollectionConfig, PayloadRequest } from 'payload'
 
 import { pastoralReadOnly, publicCreateOnly } from '../access'
 import { notifyOnSubmission } from '../hooks/notifyOnSubmission'
+import { CONTACT_PREFERENCES, DEFAULT_FIRST_TIMER_EMAIL, VISITOR_INTENTS, VISITOR_TYPES, labelFor } from '../lib/firstTimer'
+
+const dateOnly = (value: unknown) => (value ? new Date(String(value)).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : undefined)
+
+/** The plain-text body of the email sent when someone submits a form. */
+async function describeSubmission(doc: Record<string, unknown>, req: PayloadRequest): Promise<string> {
+  const group = doc.interestedHomegroup
+  let groupName: string | null = null
+  if (group && typeof group === 'object' && 'area' in group) {
+    groupName = String((group as { area: unknown }).area)
+  } else if (group) {
+    const found = await req.payload
+      .findByID({ collection: 'homegroups', id: group as number, depth: 0, req })
+      .catch(() => null)
+    groupName = found?.area ?? `homegroup #${String(group)}`
+  }
+
+  if (doc.formType === 'first-timer') {
+    const intents = Array.isArray(doc.intents) ? doc.intents.map((i) => labelFor(VISITOR_INTENTS, i) ?? String(i)) : []
+    const address = [doc.address, doc.city, doc.postcode, doc.country].filter(Boolean).join(', ')
+    const lines: [string, string | undefined][] = [
+      ['Name', doc.name as string],
+      ['Email', doc.email as string],
+      ['Phone', doc.phone as string],
+      ['Date of first visit', dateOnly(doc.visitDate)],
+      ['Church / campus', doc.campus as string],
+      ['Service attended', doc.serviceAttended as string],
+      ['Address', address || undefined],
+      ['Home group', groupName ?? undefined],
+      ['Can we contact them?', labelFor(CONTACT_PREFERENCES, doc.contactPreference)],
+      ['How they heard about us', doc.howHeard as string],
+      ['They are a', labelFor(VISITOR_TYPES, doc.visitorType)],
+      ['Would like to', intents.length ? intents.join('; ') : undefined],
+      ['Wants the newsletter', doc.newsletterOptIn ? 'Yes' : undefined],
+      ['Prayer request / message', doc.message as string],
+    ]
+    const details = lines
+      .filter(([, value]) => value)
+      .map(([label, value]) => `${label}: ${value}`)
+      .join('\n')
+    return `A first-time visitor filled in the website form:\n\n${details}`
+  }
+
+  const contact = [doc.email, doc.phone].filter(Boolean).join(', ')
+  return `${doc.name || 'Someone (anonymous)'}${contact ? ` (${contact})` : ''} submitted a ${doc.formType} form${groupName ? ` for ${groupName}` : ''}:\n\n${doc.message || '(no message)'}`
+}
 
 export const FormSubmissions: CollectionConfig = {
   slug: 'form-submissions',
@@ -13,17 +59,13 @@ export const FormSubmissions: CollectionConfig = {
   hooks: {
     afterChange: [
       notifyOnSubmission(
-        'New Website Enquiry',
-        (doc) => {
-          const group = doc.interestedHomegroup
-          const groupName =
-            group && typeof group === 'object' && 'name' in group
-              ? String((group as { name: unknown }).name)
-              : group
-                ? `homegroup #${String(group)}`
-                : null
-          const contact = [doc.email, doc.phone].filter(Boolean).join(', ')
-          return `${doc.name || 'Someone (anonymous)'}${contact ? ` (${contact})` : ''} submitted a ${doc.formType} form${groupName ? ` for ${groupName}` : ''}:\n\n${doc.message || '(no message)'}`
+        (doc) => (doc.formType === 'first-timer' ? 'New first-time visitor' : 'New Website Enquiry'),
+        describeSubmission,
+        // First-time visitors go to the church's welcome team; everything else to NOTIFY_EMAIL.
+        async (doc, req) => {
+          if (doc.formType !== 'first-timer') return process.env.NOTIFY_EMAIL
+          const settings = await req.payload.findGlobal({ slug: 'settings', depth: 0, req }).catch(() => null)
+          return settings?.formEmails?.firstTimer?.trim() || DEFAULT_FIRST_TIMER_EMAIL
         },
       ),
     ],
@@ -102,10 +144,53 @@ export const FormSubmissions: CollectionConfig = {
       type: 'relationship',
       relationTo: 'homegroups',
       admin: {
-        description: 'The homegroup they asked to join. Empty means "not sure — help me find one near me".',
-        condition: (data) => data.formType === 'homegroup-join',
+        description: 'The homegroup they asked to join (or, for a first-time visitor, their home group). Empty means "not sure".',
+        condition: (data) => data.formType === 'homegroup-join' || data.formType === 'first-timer',
       },
     },
+    // ---- First-time visitor: the same questions as the church's New Member form ----
+    { name: 'visitDate', type: 'date', label: 'Date of first visit', admin: { date: { pickerAppearance: 'dayOnly' }, condition: (data) => data.formType === 'first-timer' } },
+    { name: 'address', type: 'text', admin: { condition: (data) => data.formType === 'first-timer' } },
+    { name: 'postcode', type: 'text', label: 'Post code', admin: { condition: (data) => data.formType === 'first-timer' } },
+    { name: 'city', type: 'text', admin: { condition: (data) => data.formType === 'first-timer' } },
+    { name: 'country', type: 'text', admin: { condition: (data) => data.formType === 'first-timer' } },
+    { name: 'howHeard', type: 'text', label: 'How did they hear about us?', admin: { condition: (data) => data.formType === 'first-timer' } },
+    {
+      name: 'visitorType',
+      type: 'select',
+      label: 'They are a…',
+      options: [
+        { label: 'Student', value: 'student' },
+        { label: 'Working professional', value: 'working-professional' },
+        { label: 'Visitor', value: 'visitor' },
+        { label: 'Other', value: 'other' },
+      ],
+      admin: { condition: (data) => data.formType === 'first-timer' },
+    },
+    {
+      name: 'intents',
+      type: 'select',
+      hasMany: true,
+      label: 'They would like to…',
+      options: [
+        { label: 'Accept Jesus as their Lord and Saviour', value: 'accept-jesus' },
+        { label: 'Become a member', value: 'membership' },
+        { label: 'Join a department in church', value: 'join-department' },
+      ],
+      admin: { condition: (data) => data.formType === 'first-timer' },
+    },
+    {
+      name: 'contactPreference',
+      type: 'select',
+      label: 'Can we contact them?',
+      options: [
+        { label: 'Yes', value: 'yes' },
+        { label: 'No', value: 'no' },
+        { label: 'Other', value: 'other' },
+      ],
+      admin: { condition: (data) => data.formType === 'first-timer' },
+    },
+    { name: 'newsletterOptIn', type: 'checkbox', label: 'Wants the church newsletter', admin: { condition: (data) => data.formType === 'first-timer' } },
     {
       name: 'interestedProject',
       type: 'relationship',

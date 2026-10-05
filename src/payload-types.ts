@@ -288,6 +288,28 @@ export interface Ministry {
         id?: string | null;
       }[]
     | null;
+  /**
+   * The ministry's programmes and activities, one entry each (e.g. "Acoustic Nights"). Shown on the ministry page. For Ablaze Youth, leave empty to show the activities from the church's Ablaze page.
+   */
+  activities?:
+    | {
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * A link to the ministry's online community, e.g. a WhatsApp group or Instagram page. Shown as a button on the ministry page.
+   */
+  communityLink?: string | null;
+  /**
+   * Button text, e.g. "Join our WhatsApp group".
+   */
+  communityLabel?: string | null;
+  /**
+   * Gives this ministry's page the bold youth look. Ablaze Youth gets it automatically.
+   */
+  isYouthMinistry?: boolean | null;
   featured?: boolean | null;
   /**
    * Shows a distinct, kid-friendly visual style and the photo consent / volunteer / pre-registration safeguarding forms on this ministry's page.
@@ -805,6 +827,10 @@ export interface Event {
    */
   registrationEnabled?: boolean | null;
   /**
+   * Adds a "volunteer" option to the sign-up box, for outreaches and other events that need helpers. Volunteers do not use up attendee places.
+   */
+  volunteerEnabled?: boolean | null;
+  /**
    * Maximum total attendees. Leave blank for unlimited.
    */
   capacity?: number | null;
@@ -823,6 +849,14 @@ export interface EventRegistration {
   name: string;
   email: string;
   phone?: string | null;
+  /**
+   * Volunteers do not count towards the event's attendee capacity.
+   */
+  role?: ('attendee' | 'volunteer') | null;
+  /**
+   * For volunteers: how they would like to help.
+   */
+  notes?: string | null;
   /**
    * Total number of people this registration covers, including the registrant.
    */
@@ -1051,7 +1085,11 @@ export interface Donation {
   amount: number;
   branch: string;
   fund: string;
-  frequency: 'one-time' | 'monthly';
+  frequency: 'one-time' | 'weekly' | 'monthly';
+  /**
+   * For a recurring gift: the day the donor chose for the first gift. Empty means it started straight away.
+   */
+  startDate?: string | null;
   /**
    * HMRC requires a home address + postcode for a valid Gift Aid declaration.
    */
@@ -1061,7 +1099,7 @@ export interface Donation {
     address?: string | null;
     postcode?: string | null;
   };
-  status?: ('pending' | 'completed' | 'failed') | null;
+  status?: ('pending' | 'scheduled' | 'completed' | 'failed') | null;
   /**
    * When Stripe confirmed payment — distinct from createdAt (when the donor started checkout).
    */
@@ -1125,9 +1163,19 @@ export interface FormSubmission {
    */
   interestedMinistry?: (number | null) | Ministry;
   /**
-   * The homegroup they asked to join. Empty means "not sure — help me find one near me".
+   * The homegroup they asked to join (or, for a first-time visitor, their home group). Empty means "not sure".
    */
   interestedHomegroup?: (number | null) | Homegroup;
+  visitDate?: string | null;
+  address?: string | null;
+  postcode?: string | null;
+  city?: string | null;
+  country?: string | null;
+  howHeard?: string | null;
+  visitorType?: ('student' | 'working-professional' | 'visitor' | 'other') | null;
+  intents?: ('accept-jesus' | 'membership' | 'join-department')[] | null;
+  contactPreference?: ('yes' | 'no' | 'other') | null;
+  newsletterOptIn?: boolean | null;
   /**
    * The mission project they are interested in (if they chose one).
    */
@@ -1561,6 +1609,16 @@ export interface MinistriesSelect<T extends boolean = true> {
         time?: T;
         id?: T;
       };
+  activities?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  communityLink?: T;
+  communityLabel?: T;
+  isYouthMinistry?: T;
   featured?: T;
   isChildrensMinistry?: T;
   updatedAt?: T;
@@ -1653,6 +1711,7 @@ export interface EventsSelect<T extends boolean = true> {
   relatedMinistry?: T;
   externalRegistrationLink?: T;
   registrationEnabled?: T;
+  volunteerEnabled?: T;
   capacity?: T;
   featured?: T;
   updatedAt?: T;
@@ -1668,6 +1727,8 @@ export interface EventRegistrationsSelect<T extends boolean = true> {
   name?: T;
   email?: T;
   phone?: T;
+  role?: T;
+  notes?: T;
   guests?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -1821,6 +1882,7 @@ export interface DonationsSelect<T extends boolean = true> {
   branch?: T;
   fund?: T;
   frequency?: T;
+  startDate?: T;
   giftAid?:
     | T
     | {
@@ -1866,6 +1928,16 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
   preferredDate?: T;
   interestedMinistry?: T;
   interestedHomegroup?: T;
+  visitDate?: T;
+  address?: T;
+  postcode?: T;
+  city?: T;
+  country?: T;
+  howHeard?: T;
+  visitorType?: T;
+  intents?: T;
+  contactPreference?: T;
+  newsletterOptIn?: T;
   interestedProject?: T;
   campus?: T;
   serviceAttended?: T;
@@ -1956,6 +2028,15 @@ export interface Setting {
      * e.g. "On call 24/7 this week for urgent pastoral needs."
      */
     note?: string | null;
+  };
+  /**
+   * Who receives the email when someone submits a form that has its own team.
+   */
+  formEmails?: {
+    /**
+     * Leave empty to use vip@cityofgodchristiancentre.org.
+     */
+    firstTimer?: string | null;
   };
   /**
    * Switches on the Safeguarding page and its "raise a concern" form. It stays hidden until you tick the box, so fill in the Safeguarding Lead details and have the page reviewed first. Someone must be reading the alerts before this goes on.
@@ -2100,6 +2181,11 @@ export interface SettingsSelect<T extends boolean = true> {
         name?: T;
         phone?: T;
         note?: T;
+      };
+  formEmails?:
+    | T
+    | {
+        firstTimer?: T;
       };
   safeguarding?:
     | T
