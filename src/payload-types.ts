@@ -265,6 +265,10 @@ export interface Ministry {
    */
   contactPhone?: string | null;
   /**
+   * Where messages from the page's "Message the team" form are sent. Never shown on the website, so a coordinator can be reached without publishing their address. Only the Ablaze Youth page has this form for now. If empty, the contact email above is used, then the general notification address.
+   */
+  messageEmail?: string | null;
+  /**
    * One entry per class, e.g. Pearls, Under 3 years, and a sentence on what the children do. Shown on the ministry page. Leave empty on the Children's Ministry to show Pearls, Rubies, Diamond and Gold without descriptions.
    */
   ageGroups?:
@@ -1159,13 +1163,14 @@ export interface FormSubmission {
     | 'homegroup-join'
     | 'first-timer'
     | 'mission-trip'
-    | 'campus-connect';
+    | 'campus-connect'
+    | 'ministry-message';
   name?: string | null;
   email?: string | null;
   phone?: string | null;
   preferredDate?: string | null;
   /**
-   * Which ministry they want to join.
+   * Which ministry they want to join, or sent a message to.
    */
   interestedMinistry?: (number | null) | Ministry;
   /**
@@ -1600,6 +1605,7 @@ export interface MinistriesSelect<T extends boolean = true> {
   leaderName?: T;
   contactEmail?: T;
   contactPhone?: T;
+  messageEmail?: T;
   ageGroups?:
     | T
     | {

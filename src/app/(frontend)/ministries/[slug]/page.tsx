@@ -14,7 +14,7 @@ import { guessMinistryIcon } from '@/lib/guessMinistryIcon'
 import { YOUTH_ACTIVITIES, YOUTH_INTRO, isYouthMinistry } from '@/lib/youthMinistry'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { ChildrenMinistryForms } from '@/components/site/ChildrenMinistryForms'
-import { YouthActivities, YouthHeader, safeWebUrl } from '@/components/site/YouthMinistry'
+import { YouthActivities, YouthHeader, YouthMessage, safeWebUrl } from '@/components/site/YouthMinistry'
 import { BrandPanel } from '@/components/ui/BrandVisuals'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
@@ -345,6 +345,7 @@ export default async function MinistryPage({ params }: Args) {
       </Container>
 
       {youth && <YouthActivities activities={activities} />}
+      {youth && <YouthMessage ministryId={ministry.id} />}
 
       {ministry.isChildrensMinistry && (
         <div className="bg-linear-to-br from-sky-400 via-sky-500 to-orange-400">

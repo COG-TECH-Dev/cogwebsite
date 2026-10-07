@@ -126,6 +126,45 @@ export async function submitFirstTimer(_prev: FormState, formData: FormData): Pr
   }
 }
 
+export async function submitMinistryMessage(ministryId: number, _prev: FormState, formData: FormData): Promise<FormState> {
+  const successMessage = 'Thank you! Your message is on its way to the team, and someone will get back to you soon.'
+
+  if (isSpam(formData)) {
+    return { status: 'success', message: successMessage }
+  }
+
+  const name = String(formData.get('name') || '').trim()
+  const email = String(formData.get('email') || '').trim()
+  const phone = String(formData.get('phone') || '').trim()
+  const message = String(formData.get('message') || '').trim()
+  const problem = missingContact(name, email, phone, 'email')
+  if (problem) return { status: 'error', message: problem }
+  if (!message) return { status: 'error', message: 'Please write a short message.' }
+
+  const payload = await getPayloadClient()
+  const ministry = Number.isInteger(ministryId)
+    ? await payload.findByID({ collection: 'ministries', id: ministryId, depth: 0 }).catch(() => null)
+    : null
+  if (!ministry) return { status: 'error', message: 'Something went wrong. Please try again.' }
+
+  try {
+    await payload.create({
+      collection: 'form-submissions',
+      data: {
+        formType: 'ministry-message',
+        name,
+        email,
+        phone: phone || undefined,
+        interestedMinistry: ministry.id,
+        message: message.slice(0, 4000),
+      },
+    })
+    return { status: 'success', message: successMessage }
+  } catch {
+    return { status: 'error', message: 'Something went wrong. Please try again.' }
+  }
+}
+
 export async function submitCampusConnect(_prev: FormState, formData: FormData): Promise<FormState> {
   const successMessage =
     "Thank you — we'll put you in touch with the church closest to where you're moving."

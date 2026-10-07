@@ -61,6 +61,15 @@ export const Ministries: CollectionConfig = {
     },
     { name: 'contactPhone', type: 'text', admin: { description: 'Optional. Shown on the ministry page.' } },
     {
+      name: 'messageEmail',
+      type: 'text',
+      label: 'Email for messages',
+      admin: {
+        description:
+          'Where messages from the page\'s "Message the team" form are sent. Never shown on the website, so a coordinator can be reached without publishing their address. Only the Ablaze Youth page has this form for now. If empty, the contact email above is used, then the general notification address.',
+      },
+    },
+    {
       name: 'ageGroups',
       type: 'array',
       label: 'Classes / age groups',

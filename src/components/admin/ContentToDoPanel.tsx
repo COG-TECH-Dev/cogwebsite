@@ -94,8 +94,8 @@ export async function ContentToDoPanel({ payload, user }: { payload?: Payload; u
   const youth = ministries.find((m) => isYouthMinistry(m))
   if (youth) {
     const link = `/admin/collections/ministries/${youth.id}`
-    if (!youth.contactEmail && !youth.contactPhone) {
-      add('Youth (Ablaze)', 'Add a youth coordinator’s email or phone number. The page shows a link to the contact form until you do.', link, 'Open')
+    if (!youth.messageEmail && !youth.contactEmail) {
+      add('Youth (Ablaze)', 'Add the youth coordinator’s email under "Email for messages". It is never shown on the site; it is where the "Message the youth team" form on the Ablaze page sends messages. Until then they are only saved here (and emailed to NOTIFY_EMAIL if that is set).', link, 'Open')
     }
     if (!youth.meetingTimes?.length || !youth.ageGroups?.length) {
       add('Youth (Ablaze)', 'Add the meeting times and age range. The church’s Ablaze page does not list them, so none are shown yet.', link, 'Open')

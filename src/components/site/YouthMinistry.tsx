@@ -2,6 +2,7 @@ import { ExternalLink, Flame, GraduationCap } from 'lucide-react'
 import Link from 'next/link'
 
 import { YOUTH_CAMPUS, YOUTH_TAGLINE } from '@/lib/youthMinistry'
+import { MinistryMessageForm } from './MinistryMessageForm'
 import { Container } from '@/components/ui/Container'
 
 // The Ablaze Youth page has its own look: dark, warm and bold, in the flame and
@@ -115,6 +116,26 @@ export function YouthActivities({ activities }: { activities: { title: string; d
             Moving to a new city?
           </Link>
         </div>
+      </Container>
+    </section>
+  )
+}
+
+/** A private way to message the youth team, without anyone's contact details being published. */
+export function YouthMessage({ ministryId }: { ministryId: number }) {
+  return (
+    <section aria-labelledby="youth-message-heading" className={`${DARK} border-t border-white/10 text-white`}>
+      <Container className="grid gap-10 py-16 lg:grid-cols-2 lg:items-start">
+        <div>
+          <h2 id="youth-message-heading" className="font-sans text-3xl font-black uppercase tracking-tight sm:text-4xl">
+            Message the youth team
+          </h2>
+          <p className="mt-4 max-w-md text-white/80">
+            A question about meetings, the choir, Acoustic Nights or joining in? Send the team a message and they will reply.
+            It goes to them privately, so nothing you write appears on the site.
+          </p>
+        </div>
+        <MinistryMessageForm ministryId={ministryId} />
       </Container>
     </section>
   )

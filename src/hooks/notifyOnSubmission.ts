@@ -15,7 +15,7 @@ type Doc = Record<string, unknown>
  * and a sending problem (an unverified domain, a bad key) is only logged.
  */
 export const notifyOnSubmission = (
-  subject: string | ((doc: Doc) => string),
+  subject: string | ((doc: Doc, req: PayloadRequest) => string | Promise<string>),
   describe: (doc: Doc, req: PayloadRequest) => string | Promise<string>,
   resolveTo?: (doc: Doc, req: PayloadRequest) => string | string[] | null | undefined | Promise<string | string[] | null | undefined>,
 ) => {
@@ -28,7 +28,7 @@ export const notifyOnSubmission = (
     try {
       await req.payload.sendEmail({
         to,
-        subject: typeof subject === 'function' ? subject(doc) : subject,
+        subject: typeof subject === 'function' ? await subject(doc, req) : subject,
         text: await describe(doc, req),
       })
     } catch (err) {

@@ -6,6 +6,16 @@ import { CONTACT_PREFERENCES, DEFAULT_FIRST_TIMER_EMAIL, VISITOR_INTENTS, VISITO
 
 const dateOnly = (value: unknown) => (value ? new Date(String(value)).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : undefined)
 
+type MinistryRef = { name?: string | null; messageEmail?: string | null; contactEmail?: string | null }
+
+// The ministry a message was sent to: already loaded, or looked up by its id.
+async function ministryOf(doc: Record<string, unknown>, req: PayloadRequest): Promise<MinistryRef | null> {
+  const m = doc.interestedMinistry
+  if (m && typeof m === 'object') return m as MinistryRef
+  if (!m) return null
+  return req.payload.findByID({ collection: 'ministries', id: m as number, depth: 0, req }).catch(() => null)
+}
+
 /** The plain-text body of the email sent when someone submits a form. */
 async function describeSubmission(doc: Record<string, unknown>, req: PayloadRequest): Promise<string> {
   const group = doc.interestedHomegroup
@@ -17,6 +27,12 @@ async function describeSubmission(doc: Record<string, unknown>, req: PayloadRequ
       .findByID({ collection: 'homegroups', id: group as number, depth: 0, req })
       .catch(() => null)
     groupName = found?.area ?? `homegroup #${String(group)}`
+  }
+
+  if (doc.formType === 'ministry-message') {
+    const ministry = await ministryOf(doc, req)
+    const contact = [doc.email, doc.phone].filter(Boolean).join(', ')
+    return `${doc.name} (${contact}) sent a message to the ${ministry?.name ?? 'ministry'} team through the website:\n\n${doc.message || '(no message)'}\n\nReply to them directly using the details above.`
   }
 
   if (doc.formType === 'first-timer') {
@@ -59,10 +75,19 @@ export const FormSubmissions: CollectionConfig = {
   hooks: {
     afterChange: [
       notifyOnSubmission(
-        (doc) => (doc.formType === 'first-timer' ? 'New first-time visitor' : 'New Website Enquiry'),
-        describeSubmission,
-        // First-time visitors go to the church's welcome team; everything else to NOTIFY_EMAIL.
         async (doc, req) => {
+          if (doc.formType === 'first-timer') return 'New first-time visitor'
+          if (doc.formType === 'ministry-message') return `New message for ${(await ministryOf(doc, req))?.name ?? 'a ministry team'}`
+          return 'New Website Enquiry'
+        },
+        describeSubmission,
+        // First-time visitors go to the church's welcome team, a message to the ministry's own
+        // contact (its private message address first), and everything else to NOTIFY_EMAIL.
+        async (doc, req) => {
+          if (doc.formType === 'ministry-message') {
+            const ministry = await ministryOf(doc, req)
+            return ministry?.messageEmail?.trim() || ministry?.contactEmail?.trim() || process.env.NOTIFY_EMAIL
+          }
           if (doc.formType !== 'first-timer') return process.env.NOTIFY_EMAIL
           const settings = await req.payload.findGlobal({ slug: 'settings', depth: 0, req }).catch(() => null)
           return settings?.formEmails?.firstTimer?.trim() || DEFAULT_FIRST_TIMER_EMAIL
@@ -96,6 +121,7 @@ export const FormSubmissions: CollectionConfig = {
         { label: 'First-Time Visitor', value: 'first-timer' },
         { label: 'Mission Trip / Volunteer Sign-Up', value: 'mission-trip' },
         { label: 'Campus Connection (relocating student)', value: 'campus-connect' },
+        { label: 'Message to a Ministry Team', value: 'ministry-message' },
       ],
     },
     {
@@ -135,8 +161,8 @@ export const FormSubmissions: CollectionConfig = {
       type: 'relationship',
       relationTo: 'ministries',
       admin: {
-        description: 'Which ministry they want to join.',
-        condition: (data) => data.formType === 'membership',
+        description: 'Which ministry they want to join, or sent a message to.',
+        condition: (data) => data.formType === 'membership' || data.formType === 'ministry-message',
       },
     },
     {
