@@ -16,7 +16,7 @@ export const RANGES = [
 export type RangeKey = (typeof RANGES)[number]['value']
 export const isRange = (v: unknown): v is RangeKey => RANGES.some((r) => r.value === v)
 
-type Granularity = 'day' | 'week' | 'month'
+export type Granularity = 'day' | 'week' | 'month'
 type Cell = string | number
 export type TableFormat = 'text' | 'int' | 'money' | 'percent'
 
@@ -95,7 +95,7 @@ const shortDay = (key: string) => new Date(`${key}T12:00:00Z`).toLocaleDateStrin
 const shortMonth = (key: string) =>
   new Date(`${key}-01T12:00:00Z`).toLocaleDateString('en-GB', { month: 'short', year: '2-digit', timeZone: 'UTC' })
 
-function bucketOf(day: string, g: Granularity): string {
+export function bucketOf(day: string, g: Granularity): string {
   return g === 'day' ? day : g === 'week' ? mondayOf(day) : day.slice(0, 7)
 }
 
@@ -138,9 +138,9 @@ const count = <T>(items: T[], keyOf: (item: T) => string | null | undefined) => 
   return out
 }
 
-const share = (n: number, total: number) => (total > 0 ? Math.round((n / total) * 1000) / 10 : 0)
+export const share = (n: number, total: number) => (total > 0 ? Math.round((n / total) * 1000) / 10 : 0)
 const pounds = (pence: number) => Math.round(pence) / 100
-const sortedDesc = (m: Map<string, number>) => [...m.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
+export const sortedDesc = (m: Map<string, number>) => [...m.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]))
 
 export function formatCell(value: Cell, format: TableFormat): string {
   if (typeof value === 'string') return value

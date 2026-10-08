@@ -1,5 +1,6 @@
 import { getAnalytics, isRange } from '@/lib/analytics'
 import { csvResponse } from '@/lib/csv'
+import { getTraffic } from '@/lib/googleAnalytics'
 import { getPayloadClient } from '@/lib/payload'
 
 // Never cache: this is the church's own figures.
@@ -22,9 +23,15 @@ export async function GET(request: Request) {
   const analytics = await getAnalytics(payload, range)
 
   const id = url.searchParams.get('table') ?? ''
-  const table = analytics.tables[id]
+  // The website-visitor tables come from Google Analytics, and only exist once it is connected.
+  let tables = analytics.tables
+  if (!tables[id]) {
+    const traffic = await getTraffic(analytics)
+    if (traffic.ok) tables = { ...tables, ...traffic.tables }
+  }
+  const table = tables[id]
   if (!table) {
-    return new Response(`Unknown table. Use one of: ${Object.keys(analytics.tables).join(', ')}`, { status: 400 })
+    return new Response(`Unknown table. Use one of: ${Object.keys(tables).join(', ')}`, { status: 400 })
   }
 
   // Money is in pounds and shares are percentages, so say so in the column names.

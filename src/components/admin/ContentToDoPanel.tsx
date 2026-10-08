@@ -65,6 +65,9 @@ export async function ContentToDoPanel({ payload, user }: { payload?: Payload; u
   if (!process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID) {
     add('Analytics', 'Google Analytics is not connected (no NEXT_PUBLIC_GA_MEASUREMENT_ID in Vercel).', '', 'In Vercel')
   }
+  if (process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID && !(process.env.GA4_PROPERTY_ID && process.env.GOOGLE_SERVICE_ACCOUNT_JSON)) {
+    add('Analytics', 'The admin Analytics page cannot show website visitors yet. Connect the Google Analytics reports (the steps are on the Analytics page): add GA4_PROPERTY_ID and GOOGLE_SERVICE_ACCOUNT_JSON in Vercel.', '/admin/analytics', 'How to connect')
+  }
   if (!settings?.socialLinks?.youtubeChannelId) {
     add('Settings', 'The YouTube channel ID is not set, so the live player, the Live button and the sermon feed are off.', '/admin/globals/settings', 'Open Settings')
   }

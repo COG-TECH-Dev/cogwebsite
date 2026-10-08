@@ -25,6 +25,7 @@ import { Icon as Icon_dfe4008080d895d460898c3a6155e9ba } from '../../../componen
 import { Logo as Logo_91a09b539d3c86b0aebf520e7564ce08 } from '../../../components/admin/Logo'
 import { PoweredBy as PoweredBy_61bc52212e085ced436439f36d9bbdcc } from '../../../components/admin/PoweredBy'
 import { AnalyticsNavLink as AnalyticsNavLink_29fa5c324cecba6cafb11381cbfac962 } from '../../../components/admin/AnalyticsNavLink'
+import { OverviewPanel as OverviewPanel_10fce7f6f130b9c232728fae8039a599 } from '../../../components/admin/OverviewPanel'
 import { ContentToDoPanel as ContentToDoPanel_1f4cf45faa200cfd52ba50043c6855ea } from '../../../components/admin/ContentToDoPanel'
 import { ExportPanel as ExportPanel_d1f5b3c2a5290ab2a5c584928d1b2655 } from '../../../components/admin/ExportPanel'
 import { VercelBlobClientUploadHandler as VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e } from '@payloadcms/storage-vercel-blob/client'
@@ -60,6 +61,7 @@ export const importMap = {
   "/components/admin/Logo#Logo": Logo_91a09b539d3c86b0aebf520e7564ce08,
   "/components/admin/PoweredBy#PoweredBy": PoweredBy_61bc52212e085ced436439f36d9bbdcc,
   "/components/admin/AnalyticsNavLink#AnalyticsNavLink": AnalyticsNavLink_29fa5c324cecba6cafb11381cbfac962,
+  "/components/admin/OverviewPanel#OverviewPanel": OverviewPanel_10fce7f6f130b9c232728fae8039a599,
   "/components/admin/ContentToDoPanel#ContentToDoPanel": ContentToDoPanel_1f4cf45faa200cfd52ba50043c6855ea,
   "/components/admin/ExportPanel#ExportPanel": ExportPanel_d1f5b3c2a5290ab2a5c584928d1b2655,
   "@payloadcms/storage-vercel-blob/client#VercelBlobClientUploadHandler": VercelBlobClientUploadHandler_16c82c5e25f430251a3e3ba57219ff4e,

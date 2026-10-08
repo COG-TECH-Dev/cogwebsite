@@ -4,10 +4,12 @@ import type { AdminViewServerProps } from 'payload'
 import Link from 'next/link'
 
 import { RANGES, formatCell, getAnalytics, isRange, type RangeKey, type Table } from '../../lib/analytics'
+import { getTraffic, type Traffic } from '../../lib/googleAnalytics'
 import { BarChart } from './BarChart'
 
 const money = (n: number) => n.toLocaleString('en-GB', { style: 'currency', currency: 'GBP', maximumFractionDigits: n % 1 === 0 ? 0 : 2 })
 const whole = (n: number) => n.toLocaleString('en-GB')
+const minutes = (s: number) => `${Math.floor(s / 60)}m ${String(s % 60).padStart(2, '0')}s`
 
 const card = {
   padding: 16,
@@ -17,6 +19,7 @@ const card = {
 } as const
 
 const sectionHeading = { margin: '32px 0 12px', fontSize: 20 } as const
+const statGrid = { display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))' } as const
 
 function Stat({ label, value, note }: { label: string; value: string; note?: string }) {
   return (
@@ -82,9 +85,50 @@ function DataTable({ id, table, range }: { id: string; table: Table; range: Rang
   )
 }
 
+/** How to connect Google Analytics (or what went wrong), shown instead of the visitor figures. */
+function ConnectGoogleAnalytics({ traffic, trackingOn }: { traffic: Extract<Traffic, { ok: false }>; trackingOn: boolean }) {
+  const failed = traffic.reason === 'error'
+  return (
+    <div style={{ ...card, borderColor: failed ? 'var(--theme-error-500)' : 'var(--theme-elevation-150)' }}>
+      <h2 style={{ margin: 0, fontSize: 18 }}>{failed ? 'Google Analytics could not be read' : 'See website visitors here'}</h2>
+      {failed ? (
+        <p style={{ margin: '8px 0 0', fontSize: 14 }}>
+          {traffic.message} {traffic.hint}
+        </p>
+      ) : (
+        <p style={{ margin: '8px 0 0', fontSize: 14, maxWidth: 720 }}>
+          {trackingOn
+            ? 'The website already sends visits to Google Analytics. Connect the reports to this page, and visitors, page views, the most viewed pages and where people come from appear here, with downloads. It takes about 15 minutes, once.'
+            : 'The website is not sending visits to Google Analytics yet: add the measurement ID (NEXT_PUBLIC_GA_MEASUREMENT_ID) in Vercel first, then connect the reports as below.'}
+        </p>
+      )}
+      <ol style={{ margin: '12px 0 0', paddingLeft: 20, fontSize: 14, lineHeight: 1.6, maxWidth: 760 }}>
+        <li>
+          In <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer">Google Analytics</a>, open Admin, then Property details, and copy the <strong>Property ID</strong> (a number).
+        </li>
+        <li>
+          In <a href="https://console.cloud.google.com/" target="_blank" rel="noopener noreferrer">Google Cloud Console</a>, create a project (or pick one) and, under APIs &amp; Services, Library, switch on the <strong>Google Analytics Data API</strong>.
+        </li>
+        <li>Under IAM &amp; Admin, Service Accounts, create a service account (any name, no roles needed). Open it, then Keys, Add key, JSON. A key file downloads.</li>
+        <li>
+          Back in Google Analytics, Admin, Property access management: add the service account&apos;s email address (it looks like
+          name@project.iam.gserviceaccount.com) with the role <strong>Viewer</strong>.
+        </li>
+        <li>
+          In Vercel, Settings, Environment Variables, add <code>GA4_PROPERTY_ID</code> (the number) and <code>GOOGLE_SERVICE_ACCOUNT_JSON</code> (paste the whole contents of the key file, and tick
+          Sensitive) for Production, then redeploy.
+        </li>
+      </ol>
+      <p style={{ margin: '12px 0 0', fontSize: 13, opacity: 0.75 }}>
+        Keep the key file private: do not email it or paste it into a chat. Only the church&apos;s website server uses it, and it can only read reports.
+      </p>
+    </div>
+  )
+}
+
 /**
- * The admin "Analytics" page (Admin / Super Admin only): headline numbers, charts over time and tables for
- * what people have done through the site. Counts and totals only, with a CSV download beside each table.
+ * The admin "Analytics" page (Admin / Super Admin only): website visitors from Google Analytics, headline numbers
+ * for what people have done through the site, charts over time and tables, with a CSV download beside each table.
  */
 export async function AnalyticsView({ initPageResult, params, searchParams }: AdminViewServerProps) {
   const { req } = initPageResult
@@ -93,8 +137,10 @@ export async function AnalyticsView({ initPageResult, params, searchParams }: Ad
   const raw = searchParams?.range
   const range: RangeKey = isRange(raw) ? raw : '90d'
   const a = allowed ? await getAnalytics(req.payload, range) : null
+  const traffic = a ? await getTraffic(a) : null
   const h = a?.headline
-  const gaOn = Boolean(process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID)
+  const trackingOn = Boolean(process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID)
+  const labels = a?.buckets.map((b) => b.label) ?? []
 
   return (
     <DefaultTemplate
@@ -109,13 +155,13 @@ export async function AnalyticsView({ initPageResult, params, searchParams }: Ad
     >
       <Gutter>
         <h1 style={{ margin: '16px 0 4px' }}>Analytics</h1>
-        {!a || !h ? (
+        {!a || !h || !traffic ? (
           <p>Only Admins can see the analytics.</p>
         ) : (
           <>
             <p style={{ margin: '0 0 16px', maxWidth: 720, opacity: 0.8, fontSize: 14 }}>
-              What people have done through the website: form submissions, event sign-ups and online giving. These are
-              counts and totals only. No names, messages or contact details appear on this page.
+              How the website is doing: who visits, and what people have done through it (form submissions, event sign-ups and online giving). These are counts
+              and totals only. No names, messages or contact details appear on this page.
             </p>
 
             <nav aria-label="Time period" style={{ display: 'flex', flexWrap: 'wrap', gap: 8, marginBottom: 8 }}>
@@ -142,7 +188,33 @@ export async function AnalyticsView({ initPageResult, params, searchParams }: Ad
               {a.rangeLabel}: {a.fromKey} to {a.toKey}
             </p>
 
-            <div style={{ display: 'grid', gap: 12, gridTemplateColumns: 'repeat(auto-fit, minmax(190px, 1fr))' }}>
+            {/* ---- Website visitors, from Google Analytics ---- */}
+            <h2 style={{ ...sectionHeading, marginTop: 0 }}>Website visitors</h2>
+            {traffic.ok ? (
+              <>
+                <div style={statGrid}>
+                  <Stat label="Visitors" value={whole(traffic.headline.visitors)} note={`${whole(traffic.headline.newVisitors)} new`} />
+                  <Stat label="Visits" value={whole(traffic.headline.sessions)} note="Each time someone comes to the site" />
+                  <Stat label="Page views" value={whole(traffic.headline.pageViews)} />
+                  <Stat label="Stayed and looked around" value={`${traffic.headline.engagementPercent}%`} note="Visits longer than 10 seconds, or with 2+ pages" />
+                  <Stat label="Time on the site" value={minutes(traffic.headline.avgSeconds)} note="Average per visit" />
+                </div>
+                <div style={{ ...card, marginTop: 12 }}>
+                  <h3 style={{ margin: '0 0 8px', fontSize: 16 }}>Visits over time</h3>
+                  <BarChart title="Website visits" labels={labels} values={traffic.sessionsSeries} format={whole} color="var(--theme-success-500)" />
+                </div>
+                <p style={{ margin: '8px 0 0', fontSize: 12, opacity: 0.7 }}>
+                  From Google Analytics, which only counts people who accepted cookies, so real visits are higher. Figures can lag by a few hours and are refreshed every 15
+                  minutes.
+                </p>
+              </>
+            ) : (
+              <ConnectGoogleAnalytics traffic={traffic} trackingOn={trackingOn} />
+            )}
+
+            {/* ---- What people did through the site ---- */}
+            <h2 style={sectionHeading}>What people did on the site</h2>
+            <div style={statGrid}>
               <Stat label="People reaching out" value={whole(h.reachedOut)} note="Form submissions and prayer requests" />
               <Stat label="First-time visitors" value={whole(h.firstTimers)} />
               <Stat label="Prayer requests" value={whole(h.prayerRequests)} />
@@ -165,17 +237,28 @@ export async function AnalyticsView({ initPageResult, params, searchParams }: Ad
             <div style={{ display: 'grid', gap: 16, gridTemplateColumns: 'repeat(auto-fit, minmax(340px, 1fr))' }}>
               <div style={card}>
                 <h3 style={{ margin: '0 0 8px', fontSize: 16 }}>Given</h3>
-                <BarChart title="Money given" labels={a.buckets.map((b) => b.label)} values={a.series.givingPounds} format={money} color="var(--theme-warning-500)" />
+                <BarChart title="Money given" labels={labels} values={a.series.givingPounds} format={money} color="var(--theme-warning-500)" />
               </div>
               <div style={card}>
                 <h3 style={{ margin: '0 0 8px', fontSize: 16 }}>People reaching out</h3>
-                <BarChart title="Form submissions and prayer requests" labels={a.buckets.map((b) => b.label)} values={a.series.reachedOut} format={whole} color="var(--theme-success-500)" />
+                <BarChart title="Form submissions and prayer requests" labels={labels} values={a.series.reachedOut} format={whole} color="var(--theme-success-500)" />
               </div>
               <div style={card}>
                 <h3 style={{ margin: '0 0 8px', fontSize: 16 }}>Event sign-ups</h3>
-                <BarChart title="Event sign-ups" labels={a.buckets.map((b) => b.label)} values={a.series.signups} format={whole} color="var(--theme-elevation-700)" />
+                <BarChart title="Event sign-ups" labels={labels} values={a.series.signups} format={whole} color="var(--theme-elevation-700)" />
               </div>
             </div>
+
+            {traffic.ok && (
+              <>
+                <h2 style={sectionHeading}>Website visitors in detail</h2>
+                <DataTable id="top-pages" table={traffic.tables['top-pages']} range={range} />
+                <DataTable id="traffic-sources" table={traffic.tables['traffic-sources']} range={range} />
+                <DataTable id="visitor-countries" table={traffic.tables['visitor-countries']} range={range} />
+                <DataTable id="devices" table={traffic.tables.devices} range={range} />
+                <DataTable id="traffic-by-period" table={traffic.tables['traffic-by-period']} range={range} />
+              </>
+            )}
 
             <h2 style={sectionHeading}>Giving</h2>
             <DataTable id="giving-by-fund" table={a.tables['giving-by-fund']} range={range} />
@@ -196,26 +279,9 @@ export async function AnalyticsView({ initPageResult, params, searchParams }: Ad
             <h2 style={sectionHeading}>Everything by period</h2>
             <DataTable id="by-period" table={a.tables['by-period']} range={range} />
 
-            <h2 style={sectionHeading}>Website visitors</h2>
-            <div style={{ ...card, marginBottom: 24 }}>
-              <p style={{ margin: 0, fontSize: 14 }}>
-                Page views, where visitors come from and which pages they read are in Google Analytics, not here.{' '}
-                {gaOn ? (
-                  <>
-                    Tracking is switched on for this site (it only counts people who accept cookies).{' '}
-                    <a href="https://analytics.google.com/" target="_blank" rel="noopener noreferrer">
-                      Open Google Analytics
-                    </a>
-                    .
-                  </>
-                ) : (
-                  'Tracking is not switched on yet: add the Google Analytics measurement ID in Vercel.'
-                )}
-              </p>
-            </div>
-            <p style={{ margin: '0 0 40px', fontSize: 14 }}>
-              The full lists behind these numbers, such as every form submission or donation, can be downloaded as spreadsheets
-              from <Link href="/admin">Download data on the dashboard</Link>.
+            <p style={{ margin: '24px 0 40px', fontSize: 14 }}>
+              The full lists behind these numbers, such as every form submission or donation, can be downloaded as spreadsheets from{' '}
+              <Link href="/admin">Download data on the dashboard</Link>.
             </p>
           </>
         )}
