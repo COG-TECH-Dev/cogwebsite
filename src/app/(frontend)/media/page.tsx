@@ -43,7 +43,7 @@ export default async function MediaHubPage() {
                   <span className={`flex h-12 w-12 items-center justify-center rounded-xl ${accent.badge}`}>
                     <Icon className="h-6 w-6" />
                   </span>
-                  <h3 className="mt-5 font-serif text-xl font-semibold text-brand-700">{section.label}</h3>
+                  <h2 className="mt-5 font-serif text-xl font-semibold text-brand-700">{section.label}</h2>
                   <p className="mt-2 text-sm text-ink-muted">{section.description}</p>
                 </Link>
               </StaggerItem>
@@ -77,14 +77,22 @@ export default async function MediaHubPage() {
             <p className="mx-auto mt-2 max-w-lg text-white/80">
               Tune in anytime for worship, teaching, and encouragement — streaming 24/7.
             </p>
-            <a
-              href={radioUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-6 inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-300"
-            >
-              Listen Live
-            </a>
+            <div className="mt-6 flex flex-wrap items-center justify-center gap-3">
+              <a
+                href={radioUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-brand-700 transition-colors hover:bg-gold-300"
+              >
+                Listen Live
+              </a>
+              <Link
+                href="/media/cog-grand-radio#app"
+                className="inline-flex items-center justify-center rounded-full border border-white/50 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+              >
+                Get the app
+              </Link>
+            </div>
           </BrandPanel>
         )}
       </Container>

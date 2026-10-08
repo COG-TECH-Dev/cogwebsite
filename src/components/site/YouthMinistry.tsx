@@ -9,16 +9,8 @@ import { Container } from '@/components/ui/Container'
 // gold of the church's colours, instead of the calmer teal used on other ministries.
 const DARK = 'bg-[#15100e]'
 
-/** The community link is typed in the admin, so only ever link to a real web address. */
-export function safeWebUrl(value?: string | null): string | null {
-  if (!value) return null
-  try {
-    const url = new URL(value.trim())
-    return url.protocol === 'https:' || url.protocol === 'http:' ? url.toString() : null
-  } catch {
-    return null
-  }
-}
+// The community link is typed in the admin, so it is only ever linked as a real web address.
+export { safeWebUrl } from '@/lib/safeUrl'
 
 export function YouthHeader({
   name,

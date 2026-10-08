@@ -69,7 +69,8 @@ export const Settings: GlobalConfig = {
     {
       name: 'formEmails',
       type: 'group',
-      access: { update: isAdminOrUpField },
+      // These addresses are for the website to use, so they are not handed out through the public API.
+      access: { read: isAdminOrUpField, update: isAdminOrUpField },
       admin: { description: 'Who receives the email when someone submits a form that has its own team.' },
       fields: [
         {
@@ -77,6 +78,63 @@ export const Settings: GlobalConfig = {
           type: 'text',
           label: 'First-time visitor forms go to',
           admin: { description: 'Leave empty to use vip@cityofgodchristiancentre.org.' },
+        },
+        {
+          name: 'welfare',
+          type: 'text',
+          label: 'Welfare requests go to',
+          admin: {
+            description:
+              'The welfare team\'s email. Leave empty to use the general notification address (NOTIFY_EMAIL). The email only says a request has arrived and never contains the details; the team signs in to read them.',
+          },
+        },
+      ],
+    },
+    {
+      name: 'welfareSupport',
+      type: 'group',
+      label: 'Welfare & Support page',
+      access: { update: isAdminOrUpField },
+      admin: {
+        description:
+          'What the Welfare & Support page shows. The list stays hidden until you add a service, so only add help the church really offers.',
+      },
+      fields: [
+        {
+          name: 'replyTime',
+          type: 'text',
+          label: 'How quickly we reply',
+          admin: {
+            description:
+              'Completes the confirmation message: "Someone from our welfare team will be in touch discreetly, ___." For example "within 2 working days". Leave empty to promise no time.',
+          },
+        },
+        {
+          name: 'services',
+          type: 'array',
+          label: 'Support the church offers',
+          labels: { singular: 'Service', plural: 'Services' },
+          fields: [
+            { name: 'name', type: 'text', required: true, admin: { description: 'e.g. "Benevolence fund" or "Pastoral counselling"' } },
+            {
+              name: 'type',
+              type: 'select',
+              required: true,
+              defaultValue: 'financial',
+              options: [
+                { label: 'Financial help', value: 'financial' },
+                { label: 'Counselling', value: 'counselling' },
+                { label: 'Food and practical help', value: 'food' },
+                { label: 'Other', value: 'other' },
+              ],
+            },
+            { name: 'description', type: 'textarea', admin: { description: 'What it offers, in plain words.' } },
+            { name: 'whoFor', type: 'text', label: 'Who it is for', admin: { description: 'e.g. "Anyone in the church community, or the local area"' } },
+            { name: 'howToAccess', type: 'text', label: 'How to get it', admin: { description: 'e.g. "Ask using the form below, or speak to a pastor after a service"' } },
+            { name: 'phone', type: 'text', admin: { description: 'Optional. Shown on the page.' } },
+            { name: 'email', type: 'text', admin: { description: 'Optional. Shown on the page.' } },
+            { name: 'link', type: 'text', admin: { description: 'Optional web address for more information.' } },
+          ],
         },
       ],
     },
@@ -99,6 +157,7 @@ export const Settings: GlobalConfig = {
           name: 'alertEmail',
           type: 'text',
           label: 'Send "new concern" alerts to',
+          access: { read: isAdminOrUpField },
           admin: { description: "Leave empty to use the lead's email. The alert never contains the details of the concern." },
         },
         { name: 'reviewedOn', type: 'text', label: 'Policy last reviewed', admin: { description: 'e.g. "October 2026". Shown on the page.' } },
@@ -113,6 +172,12 @@ export const Settings: GlobalConfig = {
         { name: 'youtube', type: 'text' },
         { name: 'tiktok', type: 'text' },
         { name: 'radioUrl', type: 'text', admin: { description: 'COG Grand Radio (external site)' } },
+        {
+          name: 'radioAppUrl',
+          type: 'text',
+          label: 'COG Grand Radio app',
+          admin: { description: 'Where "Get the app" opens on the COG Grand Radio page. Leave empty to use https://app.coggrandradiouk.org/.' },
+        },
         {
           name: 'youtubeChannelId',
           type: 'text',

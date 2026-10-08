@@ -29,6 +29,7 @@ export function EnquiryForm({
   defaultMinistryId,
   showReferenceLetterFields = false,
   showSupportType = false,
+  defaultSupportType,
   submitLabel = 'Send',
 }: {
   action: (prev: FormState, formData: FormData) => Promise<FormState>
@@ -37,6 +38,7 @@ export function EnquiryForm({
   defaultMinistryId?: number
   showReferenceLetterFields?: boolean
   showSupportType?: boolean
+  defaultSupportType?: string
   submitLabel?: string
 }) {
   const [state, formAction, pending] = useActionState(action, initialState)
@@ -96,7 +98,7 @@ export function EnquiryForm({
           <label htmlFor="supportType" className="mb-1 block text-sm font-medium text-ink">
             What kind of support are you looking for?
           </label>
-          <select id="supportType" name="supportType" required className="input">
+          <select id="supportType" name="supportType" required className="input" defaultValue={defaultSupportType}>
             {SUPPORT_TYPES.map((type) => (
               <option key={type.value} value={type.value}>
                 {type.label}

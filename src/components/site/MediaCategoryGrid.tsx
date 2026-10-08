@@ -4,8 +4,11 @@ import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
 import { publishedOnly } from '@/lib/published'
+import { RADIO_APP_URL } from '@/lib/radioApp'
+import { safeWebUrl } from '@/lib/safeUrl'
 import { youtubeVideoId } from '@/lib/youtube'
 import { getChannelFeed } from '@/lib/youtubeFeed'
+import { RadioAppGuide } from '@/components/site/RadioAppGuide'
 import { YouTubePlayer } from '@/components/site/YouTubePlayer'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
@@ -68,6 +71,10 @@ export async function MediaCategoryGrid({
               Listen Live
             </a>
           </BrandPanel>
+        )}
+
+        {category === 'cog-grand-radio' && (
+          <RadioAppGuide href={safeWebUrl(settings?.socialLinks?.radioAppUrl) ?? RADIO_APP_URL} />
         )}
 
         {category === 'cog-tv' && youtubeChannelId && (

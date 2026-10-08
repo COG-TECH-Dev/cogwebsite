@@ -1,10 +1,17 @@
-import type { CollectionConfig, PayloadRequest } from 'payload'
+import type { Access, CollectionConfig, PayloadRequest } from 'payload'
 
 import { pastoralReadOnly, publicCreateOnly } from '../access'
 import { notifyOnSubmission } from '../hooks/notifyOnSubmission'
 import { CONTACT_PREFERENCES, DEFAULT_FIRST_TIMER_EMAIL, VISITOR_INTENTS, VISITOR_TYPES, labelFor } from '../lib/firstTimer'
 
 const dateOnly = (value: unknown) => (value ? new Date(String(value)).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : undefined)
+
+// Admins read every submission; the Welfare Team role reads welfare requests and nothing else.
+const readSubmissions: Access = ({ req: { user } }) => {
+  if (user?.role === 'super-admin' || user?.role === 'admin') return true
+  if (user?.role === 'welfare-team') return { formType: { equals: 'welfare' } }
+  return false
+}
 
 type MinistryRef = { name?: string | null; messageEmail?: string | null; contactEmail?: string | null }
 
@@ -27,6 +34,14 @@ async function describeSubmission(doc: Record<string, unknown>, req: PayloadRequ
       .findByID({ collection: 'homegroups', id: group as number, depth: 0, req })
       .catch(() => null)
     groupName = found?.area ?? `homegroup #${String(group)}`
+  }
+
+  if (doc.formType === 'welfare') {
+    // Nothing about the person or what they wrote goes in the email; the team signs in to read it.
+    const base = (process.env.NEXT_PUBLIC_SITE_URL || process.env.NEXT_PUBLIC_SERVER_URL)?.replace(/\/$/, '')
+    return `A new welfare request has come in through the website.\n\nFor privacy, this email does not include the person's name, contact details or what they wrote. ${
+      base ? `Please sign in to read it: ${base}/admin/collections/form-submissions/${doc.id}` : 'Please sign in to the website admin and open Form submissions to read it.'
+    }`
   }
 
   if (doc.formType === 'ministry-message') {
@@ -77,6 +92,7 @@ export const FormSubmissions: CollectionConfig = {
       notifyOnSubmission(
         async (doc, req) => {
           if (doc.formType === 'first-timer') return 'New first-time visitor'
+          if (doc.formType === 'welfare') return 'New welfare request'
           if (doc.formType === 'ministry-message') return `New message for ${(await ministryOf(doc, req))?.name ?? 'a ministry team'}`
           return 'New Website Enquiry'
         },
@@ -87,6 +103,10 @@ export const FormSubmissions: CollectionConfig = {
           if (doc.formType === 'ministry-message') {
             const ministry = await ministryOf(doc, req)
             return ministry?.messageEmail?.trim() || ministry?.contactEmail?.trim() || process.env.NOTIFY_EMAIL
+          }
+          if (doc.formType === 'welfare') {
+            const settings = await req.payload.findGlobal({ slug: 'settings', depth: 0, req }).catch(() => null)
+            return settings?.formEmails?.welfare?.trim() || process.env.NOTIFY_EMAIL
           }
           if (doc.formType !== 'first-timer') return process.env.NOTIFY_EMAIL
           const settings = await req.payload.findGlobal({ slug: 'settings', depth: 0, req }).catch(() => null)
@@ -101,7 +121,7 @@ export const FormSubmissions: CollectionConfig = {
     // privacy rules, so splitting them into separate collections would
     // just add admin-sidebar clutter without changing access behavior.
     create: publicCreateOnly,
-    read: pastoralReadOnly,
+    read: readSubmissions,
     update: pastoralReadOnly,
     delete: pastoralReadOnly,
   },

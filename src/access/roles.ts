@@ -3,6 +3,7 @@ export const ROLES = [
   'admin',
   'content-editor',
   'ministry-leader',
+  'welfare-team',
   'volunteer',
 ] as const
 
@@ -13,6 +14,7 @@ export const ROLE_LABELS: Record<Role, string> = {
   admin: 'Admin / Pastor',
   'content-editor': 'Content Editor',
   'ministry-leader': 'Ministry Leader',
+  'welfare-team': 'Welfare Team',
   volunteer: 'Volunteer',
 }
 

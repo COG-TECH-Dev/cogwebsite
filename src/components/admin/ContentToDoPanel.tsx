@@ -72,6 +72,18 @@ export async function ContentToDoPanel({ payload, user }: { payload?: Payload; u
     add('Settings', 'Add the church contact email and phone number.', '/admin/globals/settings', 'Open Settings')
   }
 
+  // --- Welfare & Support -----------------------------------------------------------------------
+  const welfare = settings?.welfareSupport
+  if (!welfare?.services?.length) {
+    add('Welfare', 'No support services are listed on the Welfare & Support page. Add the help the church really offers (Settings, Welfare & Support page) and the page shows it.', '/admin/globals/settings', 'Open Settings')
+  }
+  if (!welfare?.replyTime?.trim()) {
+    add('Welfare', 'No reply time is set, so the confirmation promises none. Decide how quickly the welfare team replies, and enter it in Settings (Welfare & Support page).', '/admin/globals/settings', 'Open Settings')
+  }
+  if (!settings?.formEmails?.welfare?.trim()) {
+    add('Welfare', 'No welfare team email is set (Settings, Form emails). Until then, alerts about new welfare requests go to NOTIFY_EMAIL.', '/admin/globals/settings', 'Open Settings')
+  }
+
   // --- Ministries ------------------------------------------------------------------------------
   const ministries = (await payload.find({ collection: 'ministries', limit: 200, depth: 0, sort: 'name' }).catch(() => null))?.docs ?? []
   const kids = ministries.find((m) => m.isChildrensMinistry)

@@ -203,16 +203,24 @@ export async function submitEnquiry(
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
-  const successMessage =
+  const generalMessage =
     formType === 'welfare'
       ? "Thank you for reaching out — someone from our welfare team will be in touch discreetly."
       : "Thank you — we'll be in touch soon."
 
   if (isSpam(formData)) {
-    return { status: 'success', message: successMessage }
+    return { status: 'success', message: generalMessage }
   }
 
   const payload = await getPayloadClient()
+  // The welfare team's reply time, when the church has set one in Settings, is part of the confirmation.
+  let successMessage = generalMessage
+  if (formType === 'welfare') {
+    const replyTime = (await payload.findGlobal({ slug: 'settings', depth: 0 }).catch(() => null))?.welfareSupport?.replyTime?.trim()
+    if (replyTime) {
+      successMessage = `Thank you for reaching out — someone from our welfare team will be in touch discreetly, ${replyTime.replace(/[.\s]+$/, '')}.`
+    }
+  }
   const interestedMinistry = formData.get('interestedMinistry')
 
   try {

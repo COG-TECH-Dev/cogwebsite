@@ -169,7 +169,7 @@ export interface User {
   /**
    * Controls what this person can see and edit in the admin panel.
    */
-  role: 'super-admin' | 'admin' | 'content-editor' | 'ministry-leader' | 'volunteer';
+  role: 'super-admin' | 'admin' | 'content-editor' | 'ministry-leader' | 'welfare-team' | 'volunteer';
   /**
    * For Ministry Leaders: which ministry/ministries this person manages.
    */
@@ -2050,6 +2050,53 @@ export interface Setting {
      * Leave empty to use vip@cityofgodchristiancentre.org.
      */
     firstTimer?: string | null;
+    /**
+     * The welfare team's email. Leave empty to use the general notification address (NOTIFY_EMAIL). The email only says a request has arrived and never contains the details; the team signs in to read them.
+     */
+    welfare?: string | null;
+  };
+  /**
+   * What the Welfare & Support page shows. The list stays hidden until you add a service, so only add help the church really offers.
+   */
+  welfareSupport?: {
+    /**
+     * Completes the confirmation message: "Someone from our welfare team will be in touch discreetly, ___." For example "within 2 working days". Leave empty to promise no time.
+     */
+    replyTime?: string | null;
+    services?:
+      | {
+          /**
+           * e.g. "Benevolence fund" or "Pastoral counselling"
+           */
+          name: string;
+          type: 'financial' | 'counselling' | 'food' | 'other';
+          /**
+           * What it offers, in plain words.
+           */
+          description?: string | null;
+          /**
+           * e.g. "Anyone in the church community, or the local area"
+           */
+          whoFor?: string | null;
+          /**
+           * e.g. "Ask using the form below, or speak to a pastor after a service"
+           */
+          howToAccess?: string | null;
+          /**
+           * Optional. Shown on the page.
+           */
+          phone?: string | null;
+          /**
+           * Optional. Shown on the page.
+           */
+          email?: string | null;
+          /**
+           * Optional web address for more information.
+           */
+          link?: string | null;
+          id?: string | null;
+        }[]
+      | null;
   };
   /**
    * Switches on the Safeguarding page and its "raise a concern" form. It stays hidden until you tick the box, so fill in the Safeguarding Lead details and have the page reviewed first. Someone must be reading the alerts before this goes on.
@@ -2079,6 +2126,10 @@ export interface Setting {
      * COG Grand Radio (external site)
      */
     radioUrl?: string | null;
+    /**
+     * Where "Get the app" opens on the COG Grand Radio page. Leave empty to use https://app.coggrandradiouk.org/.
+     */
+    radioAppUrl?: string | null;
     /**
      * Powers the live stream embed on COG TV. This is the channel's ID (starts with UC…), not the @handle — find it on the channel's About page under 'Share channel'.
      */
@@ -2199,6 +2250,25 @@ export interface SettingsSelect<T extends boolean = true> {
     | T
     | {
         firstTimer?: T;
+        welfare?: T;
+      };
+  welfareSupport?:
+    | T
+    | {
+        replyTime?: T;
+        services?:
+          | T
+          | {
+              name?: T;
+              type?: T;
+              description?: T;
+              whoFor?: T;
+              howToAccess?: T;
+              phone?: T;
+              email?: T;
+              link?: T;
+              id?: T;
+            };
       };
   safeguarding?:
     | T
@@ -2220,6 +2290,7 @@ export interface SettingsSelect<T extends boolean = true> {
         youtube?: T;
         tiktok?: T;
         radioUrl?: T;
+        radioAppUrl?: T;
         youtubeChannelId?: T;
       };
   nav?:
