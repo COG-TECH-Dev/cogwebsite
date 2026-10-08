@@ -47,7 +47,8 @@ export default async function ResourcesPage({ searchParams }: Args) {
           (r.tags ?? []).some((t) => t?.tag?.toLowerCase().includes(needle))),
     ),
   }
-  const startHere = all.docs.filter((r) => r.type === 'start-here')
+  // In reading order: the order they were added, so the first piece is "Who is Jesus?" and not whatever starts with A.
+  const startHere = all.docs.filter((r) => r.type === 'start-here').sort((a, b) => a.createdAt.localeCompare(b.createdAt))
   const present = new Set(all.docs.map((r) => r.type))
 
   const filters = [{ label: 'All', value: undefined as string | undefined }, ...FILTERS].filter(
@@ -77,7 +78,7 @@ export default async function ResourcesPage({ searchParams }: Args) {
           </p>
           {startHere.length > 0 && (
             <ul className="mt-5 space-y-2">
-              {startHere.slice(0, 4).map((r) => (
+              {startHere.slice(0, 8).map((r) => (
                 <li key={r.id}>
                   <Link href={`/resources/${r.slug}`} className="font-semibold text-brand-600 hover:underline">
                     {r.title} <span aria-hidden="true">→</span>
