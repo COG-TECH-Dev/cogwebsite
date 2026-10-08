@@ -75,14 +75,14 @@ export function EventsCalendar({
           {monthLabel(month)}
         </h2>
         <nav aria-label="Change month" className="flex items-center gap-2">
-          <Link href={prevHref} className={navLink}>
+          <Link href={prevHref} scroll={false} className={navLink}>
             <ChevronLeft className="h-4 w-4" aria-hidden="true" />
             <span className="sr-only">Previous month</span>
           </Link>
-          <Link href={todayHref} className={navLink}>
+          <Link href={todayHref} scroll={false} className={navLink}>
             This month
           </Link>
-          <Link href={nextHref} className={navLink}>
+          <Link href={nextHref} scroll={false} className={navLink}>
             <ChevronRight className="h-4 w-4" aria-hidden="true" />
             <span className="sr-only">Next month</span>
           </Link>

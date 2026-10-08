@@ -3,6 +3,7 @@ import { Mail, MapPin, Phone } from 'lucide-react'
 import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
+import { FilterForm } from '@/components/site/FilterForm'
 import { HomegroupJoinForm } from '@/components/site/HomegroupJoinForm'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -20,11 +21,13 @@ export default async function HomegroupsPage({ searchParams }: Args) {
   const payload = await getPayloadClient()
   const all = await payload.find({ collection: 'homegroups', limit: 100, sort: 'area' })
   // A short list, so match in memory on the area, name, leader and meeting day.
-  const needle = query.toLowerCase()
+  // Every word typed has to match somewhere in the group's details.
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean)
   const homegroups = {
-    docs: needle
-      ? all.docs.filter((g) => [g.area, g.name, g.leaderName, g.meetingDay].some((v) => v?.toLowerCase().includes(needle)))
-      : all.docs,
+    docs: all.docs.filter((g) => {
+      const text = [g.area, g.name, g.leaderName, g.meetingDay].join(' ').toLowerCase()
+      return words.every((w) => text.includes(w))
+    }),
   }
   // "Contact the group leader" links here with ?group=<id> so the form opens with that group chosen.
   const chosen = sp.group && /^\d+$/.test(sp.group) ? Number(sp.group) : undefined
@@ -39,7 +42,7 @@ export default async function HomegroupsPage({ searchParams }: Args) {
       />
       <Container className="py-16">
         {all.docs.length > 0 && (
-          <form
+          <FilterForm
             action="/connect/homegroups"
             role="search"
             aria-label="Search homegroups"
@@ -65,14 +68,19 @@ export default async function HomegroupsPage({ searchParams }: Args) {
               {query && (
                 <Link
                   href="/connect/homegroups"
+                  scroll={false}
                   className="inline-flex items-center rounded-full border border-border px-5 py-2.5 text-sm font-medium text-ink hover:bg-brand-50"
                 >
                   Clear
                 </Link>
               )}
             </div>
-          </form>
+          </FilterForm>
         )}
+
+        <p role="status" className="mb-6 text-sm text-ink-muted">
+          {homegroups.docs.length === all.docs.length ? `${all.docs.length} homegroups` : `${homegroups.docs.length} of ${all.docs.length} homegroups`}
+        </p>
 
         {homegroups.docs.length > 0 ? (
           <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

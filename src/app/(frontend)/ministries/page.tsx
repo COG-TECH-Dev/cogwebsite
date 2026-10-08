@@ -3,8 +3,9 @@ import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
 import { guessMinistryIcon } from '@/lib/guessMinistryIcon'
-import { MINISTRY_CATEGORIES, isMinistryCategory, ministryCategory } from '@/lib/ministryCategories'
+import { MINISTRY_CATEGORIES, categorySearchText, isMinistryCategory, ministryCategory } from '@/lib/ministryCategories'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
+import { FilterForm } from '@/components/site/FilterForm'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -39,10 +40,14 @@ export default async function MinistriesPage({ searchParams }: Args) {
   const payload = await getPayloadClient()
   const all = await payload.find({ collection: 'ministries', limit: 100, sort: 'name' })
   // A short list, so match in memory on the name, the summary and the leader, then on the category.
-  const needle = query.toLowerCase()
+  // Every word typed has to match somewhere: the name, summary, leader, or the group and its everyday words.
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean)
   const ministries = {
     docs: all.docs
-      .filter((m) => !needle || [m.name, m.summary, m.leaderName].some((v) => v?.toLowerCase().includes(needle)))
+      .filter((m) => {
+        const text = [m.name, m.summary, m.leaderName, categorySearchText(m)].join(' ').toLowerCase()
+        return words.every((w) => text.includes(w))
+      })
       .filter((m) => !category || ministryCategory(m) === category),
   }
   // Only offer groups that have at least one ministry in them.
@@ -57,7 +62,7 @@ export default async function MinistriesPage({ searchParams }: Args) {
       />
       <Container className="py-20">
         {all.docs.length > 0 && (
-          <form
+          <FilterForm
             action="/ministries"
             role="search"
             aria-label="Search ministries"
@@ -84,13 +89,14 @@ export default async function MinistriesPage({ searchParams }: Args) {
               {(query || category) && (
                 <Link
                   href="/ministries"
+                  scroll={false}
                   className="inline-flex items-center rounded-full border border-border px-5 py-2.5 text-sm font-medium text-ink hover:bg-brand-50"
                 >
                   Clear
                 </Link>
               )}
             </div>
-          </form>
+          </FilterForm>
         )}
 
         {categoryOptions.length > 1 && (
@@ -98,6 +104,7 @@ export default async function MinistriesPage({ searchParams }: Args) {
             {[{ value: undefined as string | undefined, label: 'All' }, ...categoryOptions].map((c) => (
               <Link
                 key={c.label}
+                scroll={false}
                 href={listHref({ q: query || undefined, category: c.value })}
                 aria-current={category === c.value ? 'true' : undefined}
                 className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
@@ -109,6 +116,10 @@ export default async function MinistriesPage({ searchParams }: Args) {
             ))}
           </nav>
         )}
+
+        <p role="status" className="mb-6 text-sm text-ink-muted">
+          {ministries.docs.length === all.docs.length ? `${all.docs.length} ministries` : `${ministries.docs.length} of ${all.docs.length} ministries`}
+        </p>
 
         {ministries.docs.length > 0 ? (
           <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

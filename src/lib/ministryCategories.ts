@@ -3,13 +3,14 @@
 // ministry's name, the same way an icon is (see guessMinistryIcon), so the filter works
 // without anyone having to set 15 categories first.
 
+// `words` are the everyday words people search with, so a search for "music" or "kids" finds the group.
 export const MINISTRY_CATEGORIES = [
-  { value: 'children-youth', label: 'Children & youth' },
-  { value: 'worship-arts', label: 'Worship & arts' },
-  { value: 'fellowship-family', label: 'Fellowship & family' },
-  { value: 'outreach-missions', label: 'Outreach & missions' },
-  { value: 'prayer-care', label: 'Prayer & care' },
-  { value: 'service-teams', label: 'Service teams' },
+  { value: 'children-youth', label: 'Children & youth', words: 'children kids youth teens teenagers young people' },
+  { value: 'worship-arts', label: 'Worship & arts', words: 'worship music singing songs choir praise drama dance arts' },
+  { value: 'fellowship-family', label: 'Fellowship & family', words: 'fellowship family men women marriage couples' },
+  { value: 'outreach-missions', label: 'Outreach & missions', words: 'outreach missions evangelism street' },
+  { value: 'prayer-care', label: 'Prayer & care', words: 'prayer care welfare counselling support benevolence' },
+  { value: 'service-teams', label: 'Service teams', words: 'service volunteer serving ushering welcome hospitality media sound technical' },
 ] as const
 
 export type MinistryCategory = (typeof MINISTRY_CATEGORIES)[number]['value']
@@ -32,6 +33,12 @@ export function ministryCategory(m: { name: string; category?: string | null }):
     if (pattern.test(m.name)) return category
   }
   return null
+}
+
+/** The text a search can match for a ministry's group: its name and the everyday words for it. */
+export function categorySearchText(m: { name: string; category?: string | null }): string {
+  const c = MINISTRY_CATEGORIES.find((x) => x.value === ministryCategory(m))
+  return c ? `${c.label} ${c.words}` : ''
 }
 
 export const isMinistryCategory = (value: unknown): value is MinistryCategory => typeof value === 'string' && VALUES.has(value)

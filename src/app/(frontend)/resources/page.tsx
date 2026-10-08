@@ -3,7 +3,9 @@ import Link from 'next/link'
 
 import { getPayloadClient } from '@/lib/payload'
 import { FILTERS, TYPE_ICONS, TYPE_LABELS } from '@/lib/resourceDisplay'
+import { richTextToPlain } from '@/lib/richTextPlain'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
+import { FilterForm } from '@/components/site/FilterForm'
 import { Button } from '@/components/ui/Button'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
@@ -36,16 +38,16 @@ export default async function ResourcesPage({ searchParams }: Args) {
   const payload = await getPayloadClient()
   // Small enough to fetch once and filter here, which also lets us leave out filters that would lead to an empty list.
   const all = await payload.find({ collection: 'resources', limit: 100, sort: 'title' })
-  // Search the title and the tags; combined with the category when one is chosen.
-  const needle = query.toLowerCase()
+  // Every word typed has to match the title, the tags, the kind of resource or the text itself;
+  // combined with the category when one is chosen.
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean)
   const resources = {
-    docs: all.docs.filter(
-      (r) =>
-        (!type || r.type === type) &&
-        (!needle ||
-          r.title.toLowerCase().includes(needle) ||
-          (r.tags ?? []).some((t) => t?.tag?.toLowerCase().includes(needle))),
-    ),
+    docs: all.docs.filter((r) => {
+      if (type && r.type !== type) return false
+      if (words.length === 0) return true
+      const text = [r.title, ...(r.tags ?? []).map((t) => t?.tag), TYPE_LABELS[r.type], richTextToPlain(r.body, 20000)].join(' ').toLowerCase()
+      return words.every((w) => text.includes(w))
+    }),
   }
   // In reading order: the order they were added, so the first piece is "Who is Jesus?" and not whatever starts with A.
   const startHere = all.docs.filter((r) => r.type === 'start-here').sort((a, b) => a.createdAt.localeCompare(b.createdAt))
@@ -95,7 +97,7 @@ export default async function ResourcesPage({ searchParams }: Args) {
           </div>
         </section>
 
-        <form
+        <FilterForm
           action="/resources"
           role="search"
           aria-label="Search resources"
@@ -122,18 +124,20 @@ export default async function ResourcesPage({ searchParams }: Args) {
             {(query || type) && (
               <Link
                 href="/resources"
+                scroll={false}
                 className="inline-flex items-center rounded-full border border-border px-5 py-2.5 text-sm font-medium text-ink hover:bg-brand-50"
               >
                 Clear
               </Link>
             )}
           </div>
-        </form>
+        </FilterForm>
 
         <div className="mb-10 flex flex-wrap gap-2">
           {filters.map((f) => (
             <Link
               key={f.label}
+              scroll={false}
               href={listHref(f.value, query)}
               className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                 type === f.value ? 'bg-gold-500 text-brand-700' : 'border border-border text-ink hover:bg-brand-50'
@@ -143,6 +147,10 @@ export default async function ResourcesPage({ searchParams }: Args) {
             </Link>
           ))}
         </div>
+
+        <p role="status" className="mb-6 text-sm text-ink-muted">
+          {resources.docs.length === all.docs.length ? `${all.docs.length} resources` : `${resources.docs.length} of ${all.docs.length} resources`}
+        </p>
 
         {resources.docs.length > 0 ? (
           <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

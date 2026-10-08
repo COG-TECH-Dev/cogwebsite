@@ -6,6 +6,7 @@ import { getPayloadClient } from '@/lib/payload'
 import { publishedOnly } from '@/lib/published'
 import { getSermonItems, tvHref, youtubeThumb, type SermonItem } from '@/lib/sermons'
 import { youtubeVideoId } from '@/lib/youtube'
+import { FilterForm } from '@/components/site/FilterForm'
 import { YouTubePlayer } from '@/components/site/YouTubePlayer'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -96,7 +97,7 @@ export default async function CogTvPage({ searchParams }: Args) {
         {items.length > 0 || shownEmbeds.length > 0 || embeds.length > 0 ? (
           <>
             <h2 className="sr-only">Messages and videos</h2>
-            <form action="/media/cog-tv" role="search" aria-label="Search messages and videos" className="mb-10 flex flex-wrap items-end gap-4 rounded-2xl border border-border bg-surface p-5">
+            <FilterForm action="/media/cog-tv" role="search" aria-label="Search messages and videos" className="mb-10 flex flex-wrap items-end gap-4 rounded-2xl border border-border bg-surface p-5">
               <div className="min-w-[180px] flex-1">
                 <label htmlFor="q" className="mb-1 block text-sm font-medium text-ink">
                   Search by title
@@ -140,13 +141,18 @@ export default async function CogTvPage({ searchParams }: Args) {
                 {hasFilters && (
                   <Link
                     href="/media/cog-tv"
+                    scroll={false}
                     className="inline-flex items-center rounded-full border border-border px-5 py-2.5 text-sm font-medium text-ink hover:bg-brand-50"
                   >
                     Clear
                   </Link>
                 )}
               </div>
-            </form>
+            </FilterForm>
+
+            <p role="status" className="mb-6 text-sm text-ink-muted">
+              {filtered.length === items.length ? `${items.length} messages and videos` : `${filtered.length} of ${items.length} messages and videos`}
+            </p>
 
             {filtered.length > 0 && (
               <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">

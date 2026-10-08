@@ -11,6 +11,7 @@ import { publishedOnly } from '@/lib/published'
 import { richTextToPlain } from '@/lib/richTextPlain'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
 import { EventsCalendar } from '@/components/site/EventsCalendar'
+import { FilterForm } from '@/components/site/FilterForm'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -144,6 +145,7 @@ export default async function ProgrammesPage({ searchParams }: Args) {
           ).map(([value, label]) => (
             <Link
               key={value}
+              scroll={false}
               href={listHref({ type, ministry: ministryId ? String(ministryId) : undefined, month, view: value })}
               aria-current={view === value ? 'true' : undefined}
               className={`rounded-full px-5 py-2 transition-colors ${
@@ -181,6 +183,7 @@ export default async function ProgrammesPage({ searchParams }: Args) {
           {filters.map((f) => (
             <Link
               key={f.label}
+              scroll={false}
               href={listHref({ type: f.value, ...keep })}
               className={`rounded-full px-4 py-2 text-sm font-medium transition-colors ${
                 type === f.value
@@ -194,7 +197,7 @@ export default async function ProgrammesPage({ searchParams }: Args) {
         </div>
 
         {((view === 'list' && monthOptions.length > 0) || ministryOptions.length > 0) && (
-          <form
+          <FilterForm
             action="/programmes"
             className="mb-10 flex flex-wrap items-end gap-4 rounded-2xl border border-border bg-surface p-5"
           >
@@ -241,6 +244,7 @@ export default async function ProgrammesPage({ searchParams }: Args) {
               </button>
               {anyFilter && (
                 <Link
+                  scroll={false}
                   href={view === 'calendar' ? `/programmes?view=calendar&month=${calMonth}` : '/programmes'}
                   className="inline-flex items-center rounded-full border border-border px-5 py-2.5 text-sm font-medium text-ink hover:bg-brand-50"
                 >
@@ -248,7 +252,7 @@ export default async function ProgrammesPage({ searchParams }: Args) {
                 </Link>
               )}
             </div>
-          </form>
+          </FilterForm>
         )}
 
         {view === 'calendar' && (
