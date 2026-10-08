@@ -8,15 +8,16 @@
 // Where first-time visitor forms are emailed unless Settings says otherwise.
 export const DEFAULT_FIRST_TIMER_EMAIL = 'vip@cityofgodchristiancentre.org'
 
+// The wording is the New Member form's own, so the welcome team recognises every question and answer.
 export const VISITOR_TYPES = [
   { value: 'student', label: 'Student' },
-  { value: 'working-professional', label: 'Working professional' },
+  { value: 'working-professional', label: 'Working Professional' },
   { value: 'visitor', label: 'Visitor' },
-  { value: 'other', label: 'Other' },
+  { value: 'other', label: 'Others' },
 ] as const
 
 export const VISITOR_INTENTS = [
-  { value: 'accept-jesus', label: 'I want to accept Jesus as my Lord and Saviour' },
+  { value: 'accept-jesus', label: 'I want to Accept Jesus as my Lord and Saviour' },
   { value: 'membership', label: 'I want to be a member' },
   { value: 'join-department', label: 'I want to join a department in church' },
 ] as const

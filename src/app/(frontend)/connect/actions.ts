@@ -82,11 +82,22 @@ export async function submitFirstTimer(_prev: FormState, formData: FormData): Pr
   const email = text('email')
   const phone = text('phone')
   if (!firstName || !lastName) return { status: 'error', message: 'Please enter your first and last name.' }
-  if (!email && !phone) return { status: 'error', message: 'Please give an email or a phone number so we can reach you.' }
+  if (!email && !phone) return { status: 'error', message: 'Please give a phone number or an email address so we can reach you.' }
 
-  // The date of the visit defaults to today when it is left blank.
+  // Like the church's New Member form: the date of the visit and the whole address have to be filled in.
   const rawVisit = text('visitDate')
-  const visitDate = rawVisit && !Number.isNaN(Date.parse(rawVisit)) ? rawVisit : new Date().toISOString().slice(0, 10)
+  if (!rawVisit || Number.isNaN(Date.parse(rawVisit))) return { status: 'error', message: 'Please enter the date of your first visit.' }
+  const address = text('address')
+  const postcode = text('postcode')
+  const city = text('city')
+  const country = text('country')
+  if (!address || !postcode || !city || !country) {
+    return { status: 'error', message: 'Please fill in your address, post code, city and country.' }
+  }
+  const contactPreference = oneOf('contactPreference', CONTACT_PREFERENCES)
+  const contactOther = text('contactOther')
+  if (!contactPreference) return { status: 'error', message: 'Please tell us whether we can contact you.' }
+  if (contactPreference === 'other' && !contactOther) return { status: 'error', message: 'Please tell us how or when we can contact you.' }
 
   const homegroup = Number(formData.get('interestedHomegroup'))
   const intents = formData
@@ -104,15 +115,15 @@ export async function submitFirstTimer(_prev: FormState, formData: FormData): Pr
         name: `${firstName} ${lastName}`,
         email,
         phone,
-        visitDate,
+        visitDate: rawVisit,
         campus: text('campus'),
-        serviceAttended: text('serviceAttended'),
-        address: text('address'),
-        postcode: text('postcode'),
-        city: text('city'),
-        country: text('country'),
+        address,
+        postcode,
+        city,
+        country,
         interestedHomegroup: Number.isInteger(homegroup) && homegroup > 0 ? homegroup : undefined,
-        contactPreference: oneOf('contactPreference', CONTACT_PREFERENCES) ?? 'yes',
+        contactPreference,
+        contactOther: contactPreference === 'other' ? contactOther : undefined,
         howHeard: text('howHeard'),
         visitorType: oneOf('visitorType', VISITOR_TYPES),
         intents,

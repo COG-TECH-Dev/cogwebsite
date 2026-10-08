@@ -52,22 +52,25 @@ async function describeSubmission(doc: Record<string, unknown>, req: PayloadRequ
 
   if (doc.formType === 'first-timer') {
     const intents = Array.isArray(doc.intents) ? doc.intents.map((i) => labelFor(VISITOR_INTENTS, i) ?? String(i)) : []
-    const address = [doc.address, doc.city, doc.postcode, doc.country].filter(Boolean).join(', ')
+    const contact = labelFor(CONTACT_PREFERENCES, doc.contactPreference)
+    // The questions are named as on the church's "New Member" Google Form, in the same order.
     const lines: [string, string | undefined][] = [
       ['Name', doc.name as string],
-      ['Email', doc.email as string],
-      ['Phone', doc.phone as string],
-      ['Date of first visit', dateOnly(doc.visitDate)],
-      ['Church / campus', doc.campus as string],
-      ['Service attended', doc.serviceAttended as string],
-      ['Address', address || undefined],
+      ['Date of First Visit', dateOnly(doc.visitDate)],
+      ['Church visited', doc.campus as string],
+      ['Phone Number', doc.phone as string],
+      ['Email Address', doc.email as string],
+      ['Address', doc.address as string],
+      ['Post Code', doc.postcode as string],
+      ['City', doc.city as string],
+      ['Country', doc.country as string],
       ['Home group', groupName ?? undefined],
-      ['Can we contact them?', labelFor(CONTACT_PREFERENCES, doc.contactPreference)],
-      ['How they heard about us', doc.howHeard as string],
-      ['They are a', labelFor(VISITOR_TYPES, doc.visitorType)],
-      ['Would like to', intents.length ? intents.join('; ') : undefined],
-      ['Wants the newsletter', doc.newsletterOptIn ? 'Yes' : undefined],
-      ['Prayer request / message', doc.message as string],
+      ['Can we Contact You?', doc.contactOther ? `${contact}: ${doc.contactOther}` : contact],
+      ['How did you hear about us', doc.howHeard as string],
+      ['Newsletter', doc.newsletterOptIn ? 'Yes' : undefined],
+      ['Prayer request', doc.message as string],
+      ['Please select the one applicable to you', labelFor(VISITOR_TYPES, doc.visitorType)],
+      ['Please select from the following that applies to you', intents.length ? intents.join('; ') : undefined],
     ]
     const details = lines
       .filter(([, value]) => value)
@@ -195,21 +198,21 @@ export const FormSubmissions: CollectionConfig = {
       },
     },
     // ---- First-time visitor: the same questions as the church's New Member form ----
-    { name: 'visitDate', type: 'date', label: 'Date of first visit', admin: { date: { pickerAppearance: 'dayOnly' }, condition: (data) => data.formType === 'first-timer' } },
+    { name: 'visitDate', type: 'date', label: 'Date of First Visit', admin: { date: { pickerAppearance: 'dayOnly' }, condition: (data) => data.formType === 'first-timer' } },
     { name: 'address', type: 'text', admin: { condition: (data) => data.formType === 'first-timer' } },
-    { name: 'postcode', type: 'text', label: 'Post code', admin: { condition: (data) => data.formType === 'first-timer' } },
+    { name: 'postcode', type: 'text', label: 'Post Code', admin: { condition: (data) => data.formType === 'first-timer' } },
     { name: 'city', type: 'text', admin: { condition: (data) => data.formType === 'first-timer' } },
     { name: 'country', type: 'text', admin: { condition: (data) => data.formType === 'first-timer' } },
-    { name: 'howHeard', type: 'text', label: 'How did they hear about us?', admin: { condition: (data) => data.formType === 'first-timer' } },
+    { name: 'howHeard', type: 'text', label: 'How did you hear about us', admin: { condition: (data) => data.formType === 'first-timer' } },
     {
       name: 'visitorType',
       type: 'select',
-      label: 'They are a…',
+      label: 'Please select the one applicable to you',
       options: [
         { label: 'Student', value: 'student' },
-        { label: 'Working professional', value: 'working-professional' },
+        { label: 'Working Professional', value: 'working-professional' },
         { label: 'Visitor', value: 'visitor' },
-        { label: 'Other', value: 'other' },
+        { label: 'Others', value: 'other' },
       ],
       admin: { condition: (data) => data.formType === 'first-timer' },
     },
@@ -217,18 +220,18 @@ export const FormSubmissions: CollectionConfig = {
       name: 'intents',
       type: 'select',
       hasMany: true,
-      label: 'They would like to…',
+      label: 'Please select from the following that applies to you',
       options: [
-        { label: 'Accept Jesus as their Lord and Saviour', value: 'accept-jesus' },
-        { label: 'Become a member', value: 'membership' },
-        { label: 'Join a department in church', value: 'join-department' },
+        { label: 'I want to Accept Jesus as my Lord and Saviour', value: 'accept-jesus' },
+        { label: 'I want to be a member', value: 'membership' },
+        { label: 'I want to join a department in church', value: 'join-department' },
       ],
       admin: { condition: (data) => data.formType === 'first-timer' },
     },
     {
       name: 'contactPreference',
       type: 'select',
-      label: 'Can we contact them?',
+      label: 'Can we Contact You?',
       options: [
         { label: 'Yes', value: 'yes' },
         { label: 'No', value: 'no' },
@@ -236,7 +239,13 @@ export const FormSubmissions: CollectionConfig = {
       ],
       admin: { condition: (data) => data.formType === 'first-timer' },
     },
-    { name: 'newsletterOptIn', type: 'checkbox', label: 'Wants the church newsletter', admin: { condition: (data) => data.formType === 'first-timer' } },
+    {
+      name: 'contactOther',
+      type: 'text',
+      label: 'Can we Contact You? (Other)',
+      admin: { condition: (data) => data.formType === 'first-timer' && data.contactPreference === 'other' },
+    },
+    { name: 'newsletterOptIn', type: 'checkbox', label: 'Newsletter', admin: { condition: (data) => data.formType === 'first-timer' } },
     {
       name: 'interestedProject',
       type: 'relationship',

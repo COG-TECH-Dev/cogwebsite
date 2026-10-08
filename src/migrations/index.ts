@@ -23,6 +23,7 @@ import * as migration_20261005_065146_first_timer_youth_volunteer_weekly from '.
 import * as migration_20261005_094630_ministry_category from './20261005_094630_ministry_category';
 import * as migration_20261007_155603_ministry_message from './20261007_155603_ministry_message';
 import * as migration_20261008_122903_welfare_support_radio_app from './20261008_122903_welfare_support_radio_app';
+import * as migration_20261008_185244_first_timer_contact_other from './20261008_185244_first_timer_contact_other';
 
 export const migrations = [
   {
@@ -148,6 +149,11 @@ export const migrations = [
   {
     up: migration_20261008_122903_welfare_support_radio_app.up,
     down: migration_20261008_122903_welfare_support_radio_app.down,
-    name: '20261008_122903_welfare_support_radio_app'
+    name: '20261008_122903_welfare_support_radio_app',
+  },
+  {
+    up: migration_20261008_185244_first_timer_contact_other.up,
+    down: migration_20261008_185244_first_timer_contact_other.down,
+    name: '20261008_185244_first_timer_contact_other'
   },
 ];

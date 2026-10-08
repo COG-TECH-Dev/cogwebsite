@@ -173,7 +173,8 @@ export default async function NewHerePage() {
           <Reveal>
             <h2 className="font-serif text-2xl font-semibold text-brand-700 sm:text-3xl">Visited us? Say hello</h2>
             <p className="mt-2 mb-8 text-ink-muted">
-              We&apos;d love to know you came and to help you take a next step. It only takes a minute.
+              We&apos;d love to know you came and to help you take a next step. These are the same questions as our New
+              Member form, so our welcome team can follow you up.
             </p>
             <FirstTimerForm
               campuses={(navLinks.find((l) => l.label === 'Branches')?.children ?? []).map((b) => b.label)}

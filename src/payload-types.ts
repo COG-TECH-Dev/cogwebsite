@@ -1188,6 +1188,7 @@ export interface FormSubmission {
   visitorType?: ('student' | 'working-professional' | 'visitor' | 'other') | null;
   intents?: ('accept-jesus' | 'membership' | 'join-department')[] | null;
   contactPreference?: ('yes' | 'no' | 'other') | null;
+  contactOther?: string | null;
   newsletterOptIn?: boolean | null;
   /**
    * The mission project they are interested in (if they chose one).
@@ -1952,6 +1953,7 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
   visitorType?: T;
   intents?: T;
   contactPreference?: T;
+  contactOther?: T;
   newsletterOptIn?: T;
   interestedProject?: T;
   campus?: T;
