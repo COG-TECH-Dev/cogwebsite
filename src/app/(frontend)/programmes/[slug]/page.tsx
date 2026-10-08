@@ -28,6 +28,15 @@ function mediaUrl(image: unknown): string | null {
   return null
 }
 
+// The picture's own size, so it can be shown whole (in full width and height) instead of cropped to a box.
+function mediaSize(image: unknown): { width: number; height: number } | null {
+  if (image && typeof image === 'object' && 'width' in image && 'height' in image) {
+    const { width, height } = image as { width?: number | null; height?: number | null }
+    if (width && height) return { width, height }
+  }
+  return null
+}
+
 async function getEvent(slug: string) {
   const payload = await getPayloadClient()
   const result = await payload.find({
@@ -68,6 +77,7 @@ export default async function EventPage({ params }: Args) {
   if (!event) notFound()
 
   const img = mediaUrl(event.featuredImage)
+  const imgSize = mediaSize(event.featuredImage)
   const icon = TYPE_ICONS[event.type] ?? 'compass'
   const ministry = typeof event.relatedMinistry === 'object' ? event.relatedMinistry : null
   const others = await getOtherEvents(event.id)
@@ -104,17 +114,28 @@ export default async function EventPage({ params }: Args) {
         <div className="grid gap-10 lg:grid-cols-3">
           <div className="lg:col-span-2">
             <Reveal>
-              <div className="relative mb-8 aspect-video overflow-hidden rounded-2xl shadow-lg">
-                {img ? (
-                  <Image src={img} alt={event.title} fill sizes="(min-width: 1024px) 60vw, 100vw" className="object-cover" />
-                ) : (
+              {img ? (
+                // The whole picture, as wide as the column and as tall as it needs to be: nothing is cropped.
+                <div className="mb-8 overflow-hidden rounded-2xl shadow-lg">
+                  <Image
+                    src={img}
+                    alt={event.title}
+                    width={imgSize?.width ?? 1600}
+                    height={imgSize?.height ?? 900}
+                    sizes="(min-width: 1024px) 60vw, 100vw"
+                    className="h-auto w-full"
+                    priority
+                  />
+                </div>
+              ) : (
+                <div className="relative mb-8 aspect-video overflow-hidden rounded-2xl shadow-lg">
                   <BrandPanel className="absolute inset-0 flex items-center justify-center">
                     <span className="flex h-24 w-24 items-center justify-center rounded-3xl bg-white/10 backdrop-blur">
                       <BlockIcon name={icon} className="h-12 w-12 text-gold-300" />
                     </span>
                   </BrandPanel>
-                )}
-              </div>
+                </div>
+              )}
               {event.description && (
                 <div className="prose prose-neutral max-w-none">
                   <RichText data={event.description} />
@@ -215,7 +236,7 @@ export default async function EventPage({ params }: Args) {
                   >
                     <div className="relative aspect-video">
                       {otherImg ? (
-                        <Image src={otherImg} alt="" fill sizes="33vw" className="object-cover" />
+                        <Image src={otherImg} alt="" fill sizes="33vw" className="object-contain" />
                       ) : (
                         <BrandPanel className="absolute inset-0 flex items-center justify-center">
                           <BlockIcon name={otherIcon} className="h-8 w-8 text-gold-300" />

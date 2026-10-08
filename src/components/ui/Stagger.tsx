@@ -1,7 +1,7 @@
 'use client'
 
 import { motion, useReducedMotion } from 'motion/react'
-import type { ReactNode } from 'react'
+import { Children, isValidElement, type ReactNode } from 'react'
 
 const container = {
   hidden: {},
@@ -13,8 +13,16 @@ const item = {
   show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] as const } },
 }
 
+/**
+ * The group reveals once, as it scrolls into view. When the items change (a filter or search is applied) the group
+ * starts afresh, keyed by its items: otherwise it has already "finished" revealing, and the new items would sit at
+ * their hidden starting point and the results would look empty.
+ */
 export function StaggerGroup({ children, className = '' }: { children: ReactNode; className?: string }) {
   const shouldReduceMotion = useReducedMotion()
+  const itemsKey = Children.toArray(children)
+    .map((child) => (isValidElement(child) ? String(child.key) : ''))
+    .join('|')
 
   if (shouldReduceMotion) {
     return <div className={className}>{children}</div>
@@ -22,6 +30,7 @@ export function StaggerGroup({ children, className = '' }: { children: ReactNode
 
   return (
     <motion.div
+      key={itemsKey}
       variants={container}
       initial="hidden"
       whileInView="show"

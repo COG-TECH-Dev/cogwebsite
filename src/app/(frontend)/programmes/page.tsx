@@ -283,14 +283,14 @@ export default async function ProgrammesPage({ searchParams }: Args) {
                     href={`/programmes/${event.slug}${event.registrationEnabled || event.volunteerEnabled ? '#rsvp' : ''}`}
                     className="group flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-xl"
                   >
-                    <div className="relative aspect-video overflow-hidden">
+                    <div className="relative aspect-video overflow-hidden bg-brand-50">
                       {img ? (
                         <Image
                           src={img}
                           alt=""
                           fill
                           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                          className="object-cover transition-transform duration-500 group-hover:scale-105"
+                          className="object-contain transition-transform duration-500 group-hover:scale-105"
                         />
                       ) : (
                         <BrandPanel className="absolute inset-0 flex items-center justify-center">
