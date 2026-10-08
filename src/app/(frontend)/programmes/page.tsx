@@ -3,12 +3,14 @@ import Link from 'next/link'
 import type { Where } from 'payload'
 
 import { getPayloadClient } from '@/lib/payload'
+import { currentMonthKey, dayKey, shiftMonth, type CalendarEvent } from '@/lib/eventCalendar'
 import { formatEventDateRange, TYPE_ICONS, TYPE_LABELS } from '@/lib/eventDisplay'
 import { MONTH_PARAM, monthLabel, monthOverlapWhere, monthsCovered } from '@/lib/eventMonths'
 import { pastEventsWhere, upcomingEventsWhere } from '@/lib/eventWindow'
 import { publishedOnly } from '@/lib/published'
 import { richTextToPlain } from '@/lib/richTextPlain'
 import { BlockIcon } from '@/components/blocks/BlockIcon'
+import { EventsCalendar } from '@/components/site/EventsCalendar'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
@@ -25,11 +27,12 @@ function mediaUrl(image: unknown): string | null {
   return null
 }
 
-type Args = { searchParams: Promise<{ type?: string; ministry?: string; month?: string }> }
+type Args = { searchParams: Promise<{ type?: string; ministry?: string; month?: string; view?: string }> }
 
 // Keeps the other filters when one changes.
-function listHref(params: { type?: string; ministry?: string; month?: string }) {
+function listHref(params: { type?: string; ministry?: string; month?: string; view?: string }) {
   const qs = new URLSearchParams()
+  if (params.view === 'calendar') qs.set('view', 'calendar')
   if (params.type) qs.set('type', params.type)
   if (params.ministry) qs.set('ministry', params.ministry)
   if (params.month) qs.set('month', params.month)
@@ -42,6 +45,9 @@ export default async function ProgrammesPage({ searchParams }: Args) {
   const type = sp.type || undefined
   const ministryId = sp.ministry && /^\d+$/.test(sp.ministry) ? Number(sp.ministry) : undefined
   const month = sp.month && MONTH_PARAM.test(sp.month) ? sp.month : undefined
+  // The page is a list of event cards, or the same events laid out on a month calendar.
+  const view = sp.view === 'calendar' ? 'calendar' : 'list'
+  const calMonth = month ?? currentMonthKey()
   const payload = await getPayloadClient()
 
   const filterConditions: Where[] = []
@@ -68,6 +74,36 @@ export default async function ProgrammesPage({ searchParams }: Args) {
     payload.find({ collection: 'events', where: publishedOnly, limit: 500, depth: 1, draft: false }),
   ])
 
+  const calendarEvents: CalendarEvent[] =
+    view === 'calendar'
+      ? (
+          await payload.find({
+            collection: 'events',
+            where: {
+              and: [
+                ...(type ? [{ type: { equals: type } }] : []),
+                ...(ministryId ? [{ relatedMinistry: { equals: ministryId } }] : []),
+                monthOverlapWhere(calMonth),
+                publishedOnly,
+              ],
+            },
+            sort: 'startDate',
+            limit: 200,
+            depth: 0,
+            draft: false,
+          })
+        ).docs.map((e) => ({
+          id: e.id,
+          slug: e.slug,
+          title: e.title,
+          type: e.type,
+          startDate: e.startDate,
+          endDate: e.endDate,
+          timeLabel: e.timeLabel,
+          signup: Boolean(e.registrationEnabled || e.volunteerEnabled),
+        }))
+      : []
+
   const ministries = new Map<number, string>()
   const months = new Set<string>()
   for (const e of everything.docs) {
@@ -84,12 +120,12 @@ export default async function ProgrammesPage({ searchParams }: Args) {
     { label: 'Missions', value: 'mission' },
     { label: 'Regular', value: 'regular' },
   ]
-  const hasExtraFilters = Boolean(ministryId || month)
+  const hasExtraFilters = Boolean(ministryId || (view === 'list' && month))
   const anyFilter = Boolean(type || hasExtraFilters)
   // The weekly services, from Settings (the office hours are not a service), so the page lists services as well as events.
   const settings = await payload.findGlobal({ slug: 'settings', depth: 0 }).catch(() => null)
   const weeklyServices = (settings?.serviceTimes ?? []).filter((s) => s.label && s.time && !/office/i.test(s.label))
-  const keep = { ministry: ministryId ? String(ministryId) : undefined, month }
+  const keep = { ministry: ministryId ? String(ministryId) : undefined, month, view }
 
   return (
     <div>
@@ -99,7 +135,28 @@ export default async function ProgrammesPage({ searchParams }: Args) {
         description="Missions, conferences, and regular gatherings throughout the year."
       />
       <Container className="py-16">
-        {!anyFilter && weeklyServices.length > 0 && (
+        <div role="group" aria-label="How to view events" className="mb-6 inline-flex rounded-full border border-border bg-surface p-1 text-sm font-semibold">
+          {(
+            [
+              ['list', 'List'],
+              ['calendar', 'Calendar'],
+            ] as const
+          ).map(([value, label]) => (
+            <Link
+              key={value}
+              href={listHref({ type, ministry: ministryId ? String(ministryId) : undefined, month, view: value })}
+              aria-current={view === value ? 'true' : undefined}
+              className={`rounded-full px-5 py-2 transition-colors ${
+                view === value ? 'bg-brand-700 text-white' : 'text-ink hover:bg-brand-50'
+              }`}
+            >
+              {label}
+              <span className="sr-only"> view</span>
+            </Link>
+          ))}
+        </div>
+
+        {view === 'list' && !anyFilter && weeklyServices.length > 0 && (
           <section aria-labelledby="weekly-heading" className="mb-10 rounded-2xl border border-border bg-brand-50 p-5 sm:p-6">
             <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
               <h2 id="weekly-heading" className="font-serif text-lg font-semibold text-brand-700">
@@ -136,13 +193,19 @@ export default async function ProgrammesPage({ searchParams }: Args) {
           ))}
         </div>
 
-        {(ministryOptions.length > 0 || monthOptions.length > 0) && (
+        {((view === 'list' && monthOptions.length > 0) || ministryOptions.length > 0) && (
           <form
             action="/programmes"
             className="mb-10 flex flex-wrap items-end gap-4 rounded-2xl border border-border bg-surface p-5"
           >
             {type && <input type="hidden" name="type" value={type} />}
-            {monthOptions.length > 0 && (
+            {view === 'calendar' && (
+              <>
+                <input type="hidden" name="view" value="calendar" />
+                <input type="hidden" name="month" value={calMonth} />
+              </>
+            )}
+            {view === 'list' && monthOptions.length > 0 && (
               <div className="min-w-[160px]">
                 <label htmlFor="month" className="mb-1 block text-sm font-medium text-ink">
                   Month
@@ -178,7 +241,7 @@ export default async function ProgrammesPage({ searchParams }: Args) {
               </button>
               {anyFilter && (
                 <Link
-                  href="/programmes"
+                  href={view === 'calendar' ? `/programmes?view=calendar&month=${calMonth}` : '/programmes'}
                   className="inline-flex items-center rounded-full border border-border px-5 py-2.5 text-sm font-medium text-ink hover:bg-brand-50"
                 >
                   Clear
@@ -188,7 +251,19 @@ export default async function ProgrammesPage({ searchParams }: Args) {
           </form>
         )}
 
-        {upcoming.docs.length > 0 ? (
+        {view === 'calendar' && (
+          <EventsCalendar
+            month={calMonth}
+            events={calendarEvents}
+            today={dayKey(new Date())}
+            prevHref={listHref({ type, ministry: keep.ministry, month: shiftMonth(calMonth, -1), view: 'calendar' })}
+            nextHref={listHref({ type, ministry: keep.ministry, month: shiftMonth(calMonth, 1), view: 'calendar' })}
+            todayHref={listHref({ type, ministry: keep.ministry, view: 'calendar' })}
+            listHref={listHref({ type, ministry: keep.ministry, month: calMonth })}
+          />
+        )}
+
+        {view === 'list' && (upcoming.docs.length > 0 ? (
           <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {upcoming.docs.map((event, i) => {
               const img = mediaUrl(event.featuredImage)
@@ -260,9 +335,9 @@ export default async function ProgrammesPage({ searchParams }: Args) {
               ? 'No upcoming programmes match these filters. Try clearing one.'
               : 'No upcoming programmes right now — check back soon.'}
           </p>
-        )}
+        ))}
 
-        {past.docs.length > 0 && (
+        {view === 'list' && past.docs.length > 0 && (
           <Reveal className="mt-16 border-t border-border pt-10">
             <h2 className="mb-6 font-serif text-xl font-semibold text-brand-700">Past Events</h2>
             <ul className="space-y-3">

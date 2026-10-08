@@ -1,4 +1,8 @@
+import Link from 'next/link'
+
 import { DATA_EXPORTS } from '../../lib/dataExports'
+
+const GROUPS = ['Submitted through the site', 'Summaries for analysis'] as const
 
 const field = {
   display: 'block',
@@ -33,17 +37,25 @@ export function ExportPanel({ user }: { user?: { role?: string | null } | null }
     >
       <h2 style={{ margin: 0, fontSize: 18 }}>Download data</h2>
       <p style={{ margin: '4px 0 16px', opacity: 0.75, fontSize: 14 }}>
-        Export what people have submitted through the website as a spreadsheet (CSV). Leave the dates empty to get
-        everything.
+        Export what people have submitted through the website, or a summary built for analysis, as a spreadsheet (CSV).
+        Leave the dates empty to get everything. For a summary of events the dates are when the event starts; for
+        ministries and homegroups they narrow the counts. The charts and tables are on the{' '}
+        <Link href="/admin/analytics">Analytics</Link> page.
       </p>
       <form method="get" action="/api/data-export" style={{ display: 'grid', gap: 12, maxWidth: 640 }}>
         <label style={{ fontSize: 14 }}>
           What to download
           <select name="type" required defaultValue="form-submissions" style={field}>
-            {Object.entries(DATA_EXPORTS).map(([value, config]) => (
-              <option key={value} value={value}>
-                {config.label}
-              </option>
+            {GROUPS.map((group) => (
+              <optgroup key={group} label={group}>
+                {Object.entries(DATA_EXPORTS)
+                  .filter(([, config]) => (config.group ?? 'Submitted through the site') === group)
+                  .map(([value, config]) => (
+                    <option key={value} value={value}>
+                      {config.label}
+                    </option>
+                  ))}
+              </optgroup>
             ))}
           </select>
         </label>

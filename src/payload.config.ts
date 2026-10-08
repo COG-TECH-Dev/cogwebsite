@@ -47,6 +47,10 @@ export default buildConfig({
     components: {
       afterLogin: ['/components/admin/PoweredBy#PoweredBy'],
       beforeDashboard: ['/components/admin/ContentToDoPanel#ContentToDoPanel', '/components/admin/ExportPanel#ExportPanel'],
+      afterNavLinks: ['/components/admin/AnalyticsNavLink#AnalyticsNavLink'],
+      views: {
+        analytics: { Component: '/components/admin/AnalyticsView#AnalyticsView', path: '/analytics' },
+      },
       graphics: {
         Icon: '/components/admin/Icon#Icon',
         Logo: '/components/admin/Logo#Logo',
