@@ -86,6 +86,9 @@ export default async function ProgrammesPage({ searchParams }: Args) {
   ]
   const hasExtraFilters = Boolean(ministryId || month)
   const anyFilter = Boolean(type || hasExtraFilters)
+  // The weekly services, from Settings (the office hours are not a service), so the page lists services as well as events.
+  const settings = await payload.findGlobal({ slug: 'settings', depth: 0 }).catch(() => null)
+  const weeklyServices = (settings?.serviceTimes ?? []).filter((s) => s.label && s.time && !/office/i.test(s.label))
   const keep = { ministry: ministryId ? String(ministryId) : undefined, month }
 
   return (
@@ -96,6 +99,27 @@ export default async function ProgrammesPage({ searchParams }: Args) {
         description="Missions, conferences, and regular gatherings throughout the year."
       />
       <Container className="py-16">
+        {!anyFilter && weeklyServices.length > 0 && (
+          <section aria-labelledby="weekly-heading" className="mb-10 rounded-2xl border border-border bg-brand-50 p-5 sm:p-6">
+            <div className="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1">
+              <h2 id="weekly-heading" className="font-serif text-lg font-semibold text-brand-700">
+                Every week
+              </h2>
+              <Link href="/connect/new-here" className="text-sm font-semibold text-brand-600 hover:underline">
+                Plan your visit →
+              </Link>
+            </div>
+            <ul className="mt-3 grid gap-x-8 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+              {weeklyServices.map((s) => (
+                <li key={`${s.label}-${s.time}`} className="flex justify-between gap-4 text-sm">
+                  <span className="font-medium text-ink">{s.label}</span>
+                  <span className="text-right text-ink-muted">{s.time}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+
         <div className="mb-6 flex flex-wrap gap-2">
           {filters.map((f) => (
             <Link
