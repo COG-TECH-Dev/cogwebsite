@@ -47,7 +47,6 @@ export const navLinks: NavLink[] = [
     label: 'Media',
     href: '/media',
     children: [
-      { label: 'Sermons', href: '/media/sermons' },
       { label: 'Gallery', href: '/media/gallery' },
       { label: 'COG TV', href: '/media/cog-tv' },
       { label: 'COG Grand Radio', href: '/media/cog-grand-radio' },

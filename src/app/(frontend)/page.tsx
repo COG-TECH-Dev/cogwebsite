@@ -100,7 +100,7 @@ export default async function HomePage() {
               <Button href="/connect/new-here" variant="primary">
                 Plan Your Visit
               </Button>
-              <Button href="/media/sermons" variant="outline">
+              <Button href="/media/cog-tv" variant="outline">
                 Watch Latest Sermon
               </Button>
             </div>
@@ -189,7 +189,7 @@ export default async function HomePage() {
               </div>
               <p className="mt-4 text-sm text-ink-muted">
                 Nothing streaming right now?{' '}
-                <Link href="/media/sermons" className="font-semibold text-brand-600 hover:underline">
+                <Link href="/media/cog-tv" className="font-semibold text-brand-600 hover:underline">
                   Catch up on past messages →
                 </Link>
               </p>

@@ -14,8 +14,11 @@ export type SermonItem = {
   date: string
   href: string
   image: string | null
-  source: 'admin' | 'youtube'
+  source: 'admin' | 'youtube' | 'picked'
 }
+
+/** Where a message or video is watched: its own page on COG TV. */
+export const tvHref = (slug: string) => `/media/cog-tv/${slug}`
 
 export const youtubeThumb = (id: string) => `https://i.ytimg.com/vi/${id}/hqdefault.jpg`
 
@@ -26,11 +29,18 @@ function mediaUrl(image: unknown): string | null {
 
 /**
  * Every sermon, newest first: the ones added by hand in the admin plus the
- * latest messages from the YouTube channel (prayer streams left out). A video
- * that's already in the admin isn't listed twice — the admin entry wins, so
- * its speaker / series / description can be filled in properly.
+ * latest messages from the YouTube channel. A video that's already in the admin
+ * isn't listed twice — the admin entry wins, so its speaker / series /
+ * description can be filled in properly.
+ *
+ * By default the channel's prayer streams are left out (the home page wants
+ * messages only); COG TV passes `includeOtherVideos` to list everything.
  */
-export async function getSermonItems(payload: Payload, channelId: string | null | undefined): Promise<SermonItem[]> {
+export async function getSermonItems(
+  payload: Payload,
+  channelId: string | null | undefined,
+  options: { includeOtherVideos?: boolean } = {},
+): Promise<SermonItem[]> {
   const [sermons, feed] = await Promise.all([
     payload.find({ collection: 'sermons', sort: '-date', limit: 500 }),
     getChannelFeed(channelId),
@@ -43,15 +53,17 @@ export async function getSermonItems(payload: Payload, channelId: string | null 
     series: s.series ?? null,
     seriesLabel: s.series ?? null,
     date: s.date,
-    href: `/media/sermons/${s.slug}`,
+    href: tvHref(s.slug),
     image: mediaUrl(s.thumbnail),
     source: 'admin',
   }))
 
   const inAdmin = new Set(sermons.docs.map((s) => (s.videoUrl ? youtubeVideoId(s.videoUrl) : null)).filter(Boolean))
   for (const v of feed?.videos ?? []) {
-    if (!isSermonVideo(v.title) || inAdmin.has(v.id)) continue
-    const p = parseVideoTitle(v.title)
+    const isMessage = isSermonVideo(v.title)
+    if ((!isMessage && !options.includeOtherVideos) || inAdmin.has(v.id)) continue
+    // Only messages carry a speaker and series; for other videos (prayer streams) just the title part is kept, without the date after the bar.
+    const p = isMessage ? parseVideoTitle(v.title) : { title: parseVideoTitle(v.title).title, speaker: null, series: null, seriesLabel: null }
     items.push({
       key: `yt-${v.id}`,
       title: p.title,
@@ -59,7 +71,7 @@ export async function getSermonItems(payload: Payload, channelId: string | null 
       series: p.series,
       seriesLabel: p.seriesLabel,
       date: v.published,
-      href: `/media/sermons/yt-${v.id}`,
+      href: tvHref(`yt-${v.id}`),
       image: youtubeThumb(v.id),
       source: 'youtube',
     })

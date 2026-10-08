@@ -1,4 +1,4 @@
-import { Camera, Mic, Radio, Tv } from 'lucide-react'
+import { Camera, Radio, Tv } from 'lucide-react'
 import Link from 'next/link'
 import type { ComponentType } from 'react'
 
@@ -13,9 +13,8 @@ export const revalidate = 60
 export const metadata = { title: 'Media' }
 
 const sections: { label: string; href: string; description: string; icon: ComponentType<{ className?: string }> }[] = [
-  { label: 'Sermons', href: '/media/sermons', description: 'Catch up on recent messages.', icon: Mic },
   { label: 'Gallery', href: '/media/gallery', description: 'Photos from church life.', icon: Camera },
-  { label: 'COG TV', href: '/media/cog-tv', description: 'Watch our video content.', icon: Tv },
+  { label: 'COG TV', href: '/media/cog-tv', description: 'Watch live, and catch up on sermons and other videos.', icon: Tv },
   { label: 'COG Grand Radio', href: '/media/cog-grand-radio', description: 'Listen live and on demand.', icon: Radio },
 ]
 

@@ -83,14 +83,17 @@ const nextConfig: NextConfig = {
       { source: '/ministries/ablaze-ministry', destination: '/ministries/ablaze-youth', permanent: true },
       // Events/sermons moved under new URL prefixes.
       { source: '/events/:slug', destination: '/programmes/:slug', permanent: true },
-      { source: '/sermons/you-can-try', destination: '/media/sermons', permanent: true },
-      { source: '/sermons/:slug', destination: '/media/sermons/:slug', permanent: true },
+      // The Sermons page was folded into COG TV: its list, filters and message pages now live there.
+      { source: '/media/sermons', destination: '/media/cog-tv', permanent: true },
+      { source: '/media/sermons/:slug', destination: '/media/cog-tv/:slug', permanent: true },
+      { source: '/sermons/you-can-try', destination: '/media/cog-tv', permanent: true },
+      { source: '/sermons/:slug', destination: '/media/cog-tv/:slug', permanent: true },
       // ---- The church's real live WordPress site (cityofgodchristiancentre.org) ----
       // Taken from its own sitemap (wp-sitemap.xml), so links people already have
       // keep working once this site takes over the domain. Specific rules come
       // before the generic /sermons/:slug one.
-      { source: '/sermon', destination: '/media/sermons', permanent: true },
-      { source: '/categories', destination: '/media/sermons', permanent: true },
+      { source: '/sermon', destination: '/media/cog-tv', permanent: true },
+      { source: '/categories', destination: '/media/cog-tv', permanent: true },
       { source: '/give-online', destination: '/give', permanent: true },
       { source: '/giving-2', destination: '/give', permanent: true },
       { source: '/donation-confirmation', destination: '/give', permanent: true },
@@ -135,7 +138,7 @@ const nextConfig: NextConfig = {
       // Blog-style posts — real content worth porting properly later, but
       // redirected to the closest hub for now rather than 404ing.
       { source: '/hello-world', destination: '/', permanent: true },
-      { source: '/walking-by-faith-not-by-sight', destination: '/media/sermons', permanent: true },
+      { source: '/walking-by-faith-not-by-sight', destination: '/media/cog-tv', permanent: true },
       { source: '/30-day-bible-reading-plan-the-gospel-of-john', destination: '/resources', permanent: true },
       { source: '/finding-peace-in-seasons-of-anxiety', destination: '/resources', permanent: true },
       { source: '/what-is-the-gospel-in-plain-language', destination: '/resources', permanent: true },

@@ -1,9 +1,11 @@
 import { RichText } from '@payloadcms/richtext-lexical/react'
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 
 import { getPayloadClient } from '@/lib/payload'
-import { getYouTubeSermon, youtubeThumb } from '@/lib/sermons'
+import { publishedOnly } from '@/lib/published'
+import { getYouTubeSermon, youtubeThumb, type YouTubeSermon } from '@/lib/sermons'
 import { youtubeVideoId } from '@/lib/youtube'
 import { YouTubePlayer } from '@/components/site/YouTubePlayer'
 import { Container } from '@/components/ui/Container'
@@ -13,14 +15,32 @@ export const revalidate = 60
 
 type Args = { params: Promise<{ slug: string }> }
 
-// Messages that come straight from the YouTube channel (not added in the admin)
-// are linked as /media/sermons/yt-<video id>.
+// Videos that come straight from the YouTube channel (not added in the admin)
+// are linked as /media/cog-tv/yt-<video id>.
 const YT_SLUG = /^yt-([\w-]{11})$/
 
 async function getChannelId() {
   const payload = await getPayloadClient()
   const settings = await payload.findGlobal({ slug: 'settings' }).catch(() => null)
   return settings?.socialLinks?.youtubeChannelId
+}
+
+// A video picked by hand in the admin (Media Gallery Items, shown on COG TV) always opens, even when it is not from
+// the church's own channel: someone chose it on purpose. Any other video must belong to the channel.
+async function findVideo(id: string): Promise<YouTubeSermon | null> {
+  const payload = await getPayloadClient()
+  const picked = await payload
+    .find({
+      collection: 'media-gallery-items',
+      where: { and: [{ category: { in: ['cog-tv'] } }, publishedOnly, { videoEmbedUrl: { contains: id } }] },
+      limit: 1,
+      draft: false,
+      depth: 0,
+    })
+    .then((r) => r.docs[0] ?? null)
+    .catch(() => null)
+  if (picked) return { id, title: picked.title, speaker: null, seriesLabel: null, date: picked.createdAt, description: '' }
+  return getYouTubeSermon(id, await getChannelId())
 }
 
 async function getSermon(slug: string) {
@@ -33,7 +53,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { slug } = await params
   const yt = slug.match(YT_SLUG)
   if (yt) {
-    const video = await getYouTubeSermon(yt[1], await getChannelId())
+    const video = await findVideo(yt[1])
     if (!video) return {}
     return { title: video.title, openGraph: { title: video.title, images: [youtubeThumb(video.id)] } }
   }
@@ -50,7 +70,7 @@ export default async function SermonPage({ params }: Args) {
   const { slug } = await params
   const yt = slug.match(YT_SLUG)
   if (yt) {
-    const video = await getYouTubeSermon(yt[1], await getChannelId())
+    const video = await findVideo(yt[1])
     if (!video) notFound()
     const when = video.date
       ? new Date(video.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })
@@ -79,7 +99,17 @@ export default async function SermonPage({ params }: Args) {
               Watch on YouTube →
             </a>
           </p>
-        </Container>
+          <p className="mt-10 border-t border-border pt-6">
+            <Link href="/media/cog-tv" className="text-sm font-semibold text-brand-600 hover:underline">
+              ← All messages and videos on COG TV
+            </Link>
+          </p>
+          <p className="mt-10 border-t border-border pt-6">
+          <Link href="/media/cog-tv" className="text-sm font-semibold text-brand-600 hover:underline">
+            ← All messages and videos on COG TV
+          </Link>
+        </p>
+      </Container>
       </div>
     )
   }

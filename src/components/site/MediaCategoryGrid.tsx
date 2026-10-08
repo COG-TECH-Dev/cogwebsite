@@ -1,4 +1,4 @@
-import { Radio, Tv } from 'lucide-react'
+import { Radio } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -7,7 +7,6 @@ import { publishedOnly } from '@/lib/published'
 import { RADIO_APP_URL } from '@/lib/radioApp'
 import { safeWebUrl } from '@/lib/safeUrl'
 import { youtubeVideoId } from '@/lib/youtube'
-import { getChannelFeed } from '@/lib/youtubeFeed'
 import { RadioAppGuide } from '@/components/site/RadioAppGuide'
 import { YouTubePlayer } from '@/components/site/YouTubePlayer'
 import { ACCENTS, BrandPanel } from '@/components/ui/BrandVisuals'
@@ -28,7 +27,7 @@ export async function MediaCategoryGrid({
   title,
   description,
 }: {
-  category: 'gallery' | 'cog-tv' | 'cog-grand-radio'
+  category: 'gallery' | 'cog-grand-radio'
   eyebrow: string
   title: string
   description?: string
@@ -41,18 +40,9 @@ export async function MediaCategoryGrid({
       limit: 50,
       draft: false,
     }),
-    category === 'cog-grand-radio' || category === 'cog-tv'
-      ? payload.findGlobal({ slug: 'settings' }).catch(() => null)
-      : null,
+    category === 'cog-grand-radio' ? payload.findGlobal({ slug: 'settings' }).catch(() => null) : null,
   ])
   const radioUrl = settings?.socialLinks?.radioUrl
-  const youtubeChannelId = settings?.socialLinks?.youtubeChannelId
-
-  // COG TV is everything on the YouTube channel (prayer streams included), after
-  // any items picked by hand in the admin. A video that was picked by hand isn't repeated.
-  const pickedIds = new Set(items.docs.map((i) => (i.videoEmbedUrl ? youtubeVideoId(i.videoEmbedUrl) : null)).filter(Boolean))
-  const channelVideos =
-    category === 'cog-tv' ? ((await getChannelFeed(youtubeChannelId))?.videos ?? []).filter((v) => !pickedIds.has(v.id)) : []
 
   return (
     <div>
@@ -77,22 +67,7 @@ export async function MediaCategoryGrid({
           <RadioAppGuide href={safeWebUrl(settings?.socialLinks?.radioAppUrl) ?? RADIO_APP_URL} />
         )}
 
-        {category === 'cog-tv' && youtubeChannelId && (
-          <div className="mb-12">
-            <div className="mb-4 flex items-center gap-2">
-              <Tv className="h-5 w-5 text-gold-600" aria-hidden="true" />
-              <h2 className="font-serif text-xl font-semibold text-brand-700">Watch Live</h2>
-            </div>
-            <div className="relative aspect-video overflow-hidden rounded-2xl border border-border shadow-lg">
-              <YouTubePlayer channelId={youtubeChannelId} title="City of God Christian Centre live stream" />
-            </div>
-            <p className="mt-3 text-sm text-ink-muted">
-              Nothing streaming right now? Check back during a service, or browse past messages below.
-            </p>
-          </div>
-        )}
-
-        {items.docs.length > 0 || channelVideos.length > 0 ? (
+        {items.docs.length > 0 ? (
           <StaggerGroup className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {items.docs.map((item, i) => {
               const images = (item.images ?? []).filter((img): img is Exclude<typeof img, number> => typeof img === 'object')
@@ -176,37 +151,6 @@ export async function MediaCategoryGrid({
           </StaggerGroup>
         ) : (
           <p className="text-ink-muted">Content will appear here soon.</p>
-        )}
-
-        {channelVideos.length > 0 && (
-          <section className={items.docs.length > 0 ? 'mt-16' : undefined}>
-            <div className="mb-6 flex flex-wrap items-baseline justify-between gap-2">
-              <h2 className="font-serif text-xl font-semibold text-brand-700">Latest from our YouTube channel</h2>
-              <a
-                href={`https://www.youtube.com/channel/${youtubeChannelId}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-sm font-semibold text-brand-600 hover:underline"
-              >
-                See everything on YouTube →
-              </a>
-            </div>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {channelVideos.map((video) => (
-                <div key={video.id} className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
-                  <div className="relative aspect-video">
-                    <YouTubePlayer videoId={video.id} title={video.title} />
-                  </div>
-                  <div className="flex flex-1 flex-col gap-1 p-4">
-                    <h3 className="font-medium text-brand-700">{video.title}</h3>
-                    <p className="text-xs text-ink-muted">
-                      {new Date(video.published).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' })}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
         )}
       </Container>
     </div>

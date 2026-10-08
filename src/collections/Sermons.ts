@@ -4,13 +4,14 @@ import { isContentEditorOrUp } from '../access'
 import { formatSlug } from '../hooks/formatSlug'
 import { revalidateCollection, revalidateCollectionOnDelete } from '../hooks/revalidate'
 
-const paths = (doc: Record<string, unknown>) => ['/', '/media/sermons', `/media/sermons/${doc.slug}`]
+const paths = (doc: Record<string, unknown>) => ['/', '/media/cog-tv', `/media/cog-tv/${doc.slug}`]
 
 export const Sermons: CollectionConfig = {
   slug: 'sermons',
   admin: {
     group: 'Content',
     useAsTitle: 'title',
+    description: 'Messages added here are listed on the COG TV page, with the latest videos from the YouTube channel. Speaker and series feed its filters.',
     defaultColumns: ['title', 'speaker', 'date', 'featured'],
   },
   hooks: {

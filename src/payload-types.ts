@@ -875,6 +875,8 @@ export interface EventRegistration {
   createdAt: string;
 }
 /**
+ * Messages added here are listed on the COG TV page, with the latest videos from the YouTube channel. Speaker and series feed its filters.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "sermons".
  */
