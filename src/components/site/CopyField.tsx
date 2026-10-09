@@ -22,13 +22,18 @@ export function CopyField({ label, value }: { label: string; value: string }) {
     <button
       type="button"
       onClick={handleCopy}
-      className="group flex w-full items-center justify-between gap-4 rounded-xl border border-border bg-paper px-4 py-3 text-left transition-colors hover:border-gold-300"
+      // On a phone the words and the Copy button stack (a button beside a narrow box squeezes the value into one letter
+      // per line); from sm up they sit side by side.
+      className="group flex w-full flex-col items-start gap-2 rounded-xl border border-border bg-paper px-4 py-3 text-left transition-colors hover:border-gold-300 sm:flex-row sm:items-center sm:justify-between sm:gap-4"
     >
-      <span>
+      <span className="min-w-0">
         <span className="block text-xs font-semibold uppercase tracking-wide text-ink-muted">{label}</span>
-        <span className="font-mono text-base font-semibold text-brand-700">{value}</span>
+        {/* Numbers and codes stay on one line (a sort code must not break at its dashes); a name wraps between words. */}
+        <span className={`block break-words font-mono text-base font-semibold text-brand-700 ${value.includes(' ') ? '' : 'whitespace-nowrap'}`}>
+          {value}
+        </span>
       </span>
-      <span className="flex items-center gap-1.5 text-xs font-semibold text-gold-600">
+      <span className="flex shrink-0 items-center gap-1.5 text-xs font-semibold text-gold-600">
         {copied ? (
           <>
             <Check className="h-4 w-4" aria-hidden="true" />

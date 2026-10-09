@@ -17,7 +17,7 @@ export type SermonItem = {
   source: 'admin' | 'youtube' | 'picked'
 }
 
-/** COG TV lists the channel's latest videos, always this many (the most YouTube's own feed ever holds). */
+/** COG TV lists the channel's latest videos, always this many (the daily prayer streams are not counted). */
 export const CHANNEL_VIDEO_COUNT = 15
 
 /** Where a message or video is watched: its own page on COG TV. */
@@ -36,15 +36,11 @@ function mediaUrl(image: unknown): string | null {
  * isn't listed twice — the admin entry wins, so its speaker / series /
  * description can be filled in properly.
  *
- * By default the channel's prayer streams are left out (the home page wants
- * messages only); COG TV passes `includeOtherVideos` to list the latest
- * `CHANNEL_VIDEO_COUNT` videos of every kind.
+ * The channel's daily Morning and Evening Prayer streams are left out, so the
+ * latest `CHANNEL_VIDEO_COUNT` videos from the channel are always messages and
+ * services (the church's own admin entries are on top of those).
  */
-export async function getSermonItems(
-  payload: Payload,
-  channelId: string | null | undefined,
-  options: { includeOtherVideos?: boolean } = {},
-): Promise<SermonItem[]> {
+export async function getSermonItems(payload: Payload, channelId: string | null | undefined): Promise<SermonItem[]> {
   const [sermons, feed] = await Promise.all([
     payload.find({ collection: 'sermons', sort: '-date', limit: 500 }),
     getChannelFeed(channelId, payload),
@@ -63,12 +59,9 @@ export async function getSermonItems(
   }))
 
   const inAdmin = new Set(sermons.docs.map((s) => (s.videoUrl ? youtubeVideoId(s.videoUrl) : null)).filter(Boolean))
-  const channelVideos = options.includeOtherVideos ? (feed?.videos ?? []).slice(0, CHANNEL_VIDEO_COUNT) : (feed?.videos ?? [])
+  const channelVideos = (feed?.videos ?? []).filter((v) => isSermonVideo(v.title) && !inAdmin.has(v.id)).slice(0, CHANNEL_VIDEO_COUNT)
   for (const v of channelVideos) {
-    const isMessage = isSermonVideo(v.title)
-    if ((!isMessage && !options.includeOtherVideos) || inAdmin.has(v.id)) continue
-    // Only messages carry a speaker and series; for other videos (prayer streams) just the title part is kept, without the date after the bar.
-    const p = isMessage ? parseVideoTitle(v.title) : { title: parseVideoTitle(v.title).title, speaker: null, series: null, seriesLabel: null }
+    const p = parseVideoTitle(v.title)
     items.push({
       key: `yt-${v.id}`,
       title: p.title,

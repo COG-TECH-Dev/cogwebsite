@@ -67,7 +67,8 @@ export default async function GivePage() {
                 </p>
                 <div className="mt-5 space-y-2">
                   <CopyField label="Account Name" value={bank!.accountName!} />
-                  <div className="grid grid-cols-2 gap-2">
+                  {/* Side by side only where each box has room for its number; on a small phone they stack. */}
+                  <div className="grid grid-cols-1 gap-2 min-[420px]:grid-cols-2">
                     <CopyField label="Sort Code" value={bank!.sortCode!} />
                     <CopyField label="Account Number" value={bank!.accountNumber!} />
                   </div>

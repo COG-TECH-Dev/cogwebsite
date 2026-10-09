@@ -1,11 +1,12 @@
-// Reads the church's YouTube channel — no API key or account access needed. The
-// first choice is YouTube's public RSS feed, which holds the latest 15 videos
-// (with exact dates); the fetch is cached for 15 minutes, so a new upload shows
-// up on the site shortly after it is published without anyone touching the admin.
+// Reads the church's YouTube channel — no API key or account access needed. Two public
+// sources are combined: the RSS feed (the latest 15 videos, with exact dates and
+// descriptions; cached for 15 minutes) and the channel's "uploads" page (its latest
+// 100 videos, with dates as exact as "2 weeks ago"). Most of the feed's 15 are the
+// daily prayer streams, so the uploads page is what lets COG TV always have 15
+// messages to show.
 //
-// YouTube's feed sometimes just answers "404 Not Found" for a day or so. So that
-// the site never drops to a handful of videos when that happens, the channel's
-// own public Videos page is read instead, and the last good list is also kept
+// YouTube's feed sometimes just answers "404 Not Found" for a day or so. When that
+// happens the uploads page carries on alone, and the last good list is also kept
 // in the database (Payload's key-value store) as a final fallback.
 //
 // Everything here fails soft: if nothing can be reached the site shows what's in
@@ -83,6 +84,27 @@ function approxDate(text: string, now: number): string | null {
   return new Date(now - Number(m[1]) * ms).toISOString()
 }
 
+/** A "dd/mm/yyyy" in a title (the channel puts the service date there) as an ISO date, or null. */
+function dateInTitle(title: string): string | null {
+  const m = title.match(/(\d{1,2})\s*[/.-]\s*(\d{1,2})\s*[/.-]\s*(\d{4}|\d{2})(?!\d)/)
+  if (!m) return null
+  const day = Number(m[1])
+  const month = Number(m[2])
+  const year = Number(m[3]) < 100 ? 2000 + Number(m[3]) : Number(m[3])
+  const d = new Date(Date.UTC(year, month - 1, day, 12))
+  return Number.isNaN(d.getTime()) || d.getUTCMonth() !== month - 1 || d.getUTCDate() !== day ? null : d.toISOString()
+}
+
+/**
+ * When a video was published, from what the page says ("2 wk ago"). Older videos are only given to the nearest week or
+ * month, so a date written in the title is preferred when it agrees with that to within about six weeks.
+ */
+function pageDate(title: string, when: string | undefined, now: number): string {
+  const approx = (when && approxDate(when, now)) || new Date(now).toISOString()
+  const fromTitle = dateInTitle(title)
+  return fromTitle && Math.abs(Date.parse(fromTitle) - Date.parse(approx)) < 45 * DAY ? fromTitle : approx
+}
+
 type Obj = Record<string, unknown>
 const isObj = (v: unknown): v is Obj => typeof v === 'object' && v !== null
 
@@ -102,12 +124,12 @@ function videosFromPageData(data: unknown, now: number): ChannelVideo[] {
       const when = parts
         .map((p) => (isObj(p) && isObj(p.text) && typeof p.text.content === 'string' ? p.text.content : ''))
         .find((t) => /\bago\b/i.test(t))
-      out.push({ id: lockup.contentId, title, published: (when && approxDate(when, now)) || new Date(now).toISOString(), description: '' })
+      out.push({ id: lockup.contentId, title, published: pageDate(title, when, now), description: '' })
     } else if (isObj(renderer) && typeof renderer.videoId === 'string') {
       const runs = isObj(renderer.title) && Array.isArray(renderer.title.runs) ? renderer.title.runs : []
       const title = isObj(runs[0]) ? String(runs[0].text ?? '') : ''
       const when = isObj(renderer.publishedTimeText) && typeof renderer.publishedTimeText.simpleText === 'string' ? renderer.publishedTimeText.simpleText : ''
-      out.push({ id: renderer.videoId, title, published: approxDate(when, now) || new Date(now).toISOString(), description: '' })
+      out.push({ id: renderer.videoId, title, published: pageDate(title, when, now), description: '' })
     } else {
       Object.values(node).forEach(walk)
     }
@@ -116,10 +138,13 @@ function videosFromPageData(data: unknown, now: number): ChannelVideo[] {
   return out.filter((v) => VIDEO_ID.test(v.id) && v.title)
 }
 
-/** Second choice: the channel's public Videos page. Dates are only as exact as "3 days ago", and there is no description. */
-async function fetchChannelPage(id: string): Promise<ChannelFeed | null> {
+/**
+ * Second source: the channel's "uploads" playlist page, which lists its latest 100 videos (the RSS feed holds only 15, and
+ * most of those are the daily prayer streams). Dates are only as exact as "2 wk ago", and there is no description.
+ */
+async function fetchUploadsPage(id: string): Promise<ChannelFeed | null> {
   try {
-    const res = await fetch(`https://www.youtube.com/channel/${id}/videos`, {
+    const res = await fetch(`https://www.youtube.com/playlist?list=UU${id.slice(2)}`, {
       cache: 'no-store',
       signal: AbortSignal.timeout(9000),
       headers: {
@@ -140,8 +165,9 @@ async function fetchChannelPage(id: string): Promise<ChannelFeed | null> {
       seen.add(v.id)
       return true
     })
-    const meta = isObj(data) && isObj(data.metadata) && isObj(data.metadata.channelMetadataRenderer) ? data.metadata.channelMetadataRenderer : {}
-    return videos.length > 0 ? { channelName: typeof meta.title === 'string' ? meta.title : '', videos } : null
+    const meta = isObj(data) && isObj(data.metadata) && isObj(data.metadata.playlistMetadataRenderer) ? data.metadata.playlistMetadataRenderer : {}
+    const channelName = typeof meta.title === 'string' ? meta.title.replace(/^Uploads from\s+/i, '') : ''
+    return videos.length > 0 ? { channelName, videos } : null
   } catch {
     return null
   }
@@ -149,39 +175,38 @@ async function fetchChannelPage(id: string): Promise<ChannelFeed | null> {
 
 type StoredFeed = ChannelFeed & { fetchedAt: number }
 
+const KEEP = 100
+
 /**
- * The channel's latest videos, newest first. Pass `payload` so that the last good list is remembered in the database
- * and used when YouTube can't be reached at all.
+ * The channel's latest videos, newest first: up to 100 (15 from the feed with exact dates, the rest from the uploads
+ * page). Pass `payload` so the list is remembered in the database for 15 minutes between visits, and kept as the fallback
+ * for when YouTube can't be reached at all.
  */
 export async function getChannelFeed(channelId: string | null | undefined, payload?: Payload): Promise<ChannelFeed | null> {
   const id = channelId?.trim()
   if (!id || !CHANNEL_ID.test(id)) return null
   const key = `youtube-feed:${id}`
   const stored = payload ? await payload.kv.get<StoredFeed>(key).catch(() => null) : null
+  if (stored && Date.now() - stored.fetchedAt < FRESH_MS) return { channelName: stored.channelName, videos: stored.videos }
 
-  let fresh = await fetchRssFeed(id)
-  const fromRss = Boolean(fresh)
-  if (!fresh) {
-    // The feed is down: reuse what was read in the last 15 minutes rather than reading the page on every visit.
-    if (stored && Date.now() - stored.fetchedAt < FRESH_MS) return { channelName: stored.channelName, videos: stored.videos }
-    fresh = await fetchChannelPage(id)
-  }
-  if (!fresh) return stored ? { channelName: stored.channelName, videos: stored.videos } : null
+  const [rss, page] = await Promise.all([fetchRssFeed(id), fetchUploadsPage(id)])
+  if (!rss && !page) return stored ? { channelName: stored.channelName, videos: stored.videos } : null
 
-  // A video the database already knows keeps its exact date and description (the page only says "3 days ago").
+  // Exact dates and descriptions win (the feed's, or ones already in the database); the page only says "2 wk ago".
+  const exact = new Map((rss?.videos ?? []).map((v) => [v.id, v]))
   const known = new Map((stored?.videos ?? []).map((v) => [v.id, v]))
-  const videos = fresh.videos.map((v) => {
+  const merged = new Map<string, ChannelVideo>()
+  for (const v of page?.videos ?? []) {
     const old = known.get(v.id)
-    return !fromRss && old && old.description ? { ...v, published: old.published, description: old.description } : v
-  })
-  const feed: ChannelFeed = { channelName: fresh.channelName || stored?.channelName || '', videos }
-
-  if (payload) {
-    const changed = !stored || stored.videos.map((v) => v.id + v.title).join() !== videos.map((v) => v.id + v.title).join()
-    if (changed || Date.now() - (stored?.fetchedAt ?? 0) > FRESH_MS / 3) {
-      await payload.kv.set(key, { ...feed, fetchedAt: Date.now() } satisfies StoredFeed).catch(() => {})
-    }
+    merged.set(v.id, exact.get(v.id) ?? (old?.description ? { ...v, published: old.published, description: old.description } : v))
   }
+  for (const v of rss?.videos ?? []) if (!merged.has(v.id)) merged.set(v.id, v)
+  // If the page could not be read, keep the older videos already known rather than shrinking to the feed's 15.
+  if (!page) for (const v of stored?.videos ?? []) if (!merged.has(v.id)) merged.set(v.id, v)
+
+  const videos = [...merged.values()].sort((a, b) => Date.parse(b.published) - Date.parse(a.published)).slice(0, KEEP)
+  const feed: ChannelFeed = { channelName: rss?.channelName || page?.channelName || stored?.channelName || '', videos }
+  if (payload) await payload.kv.set(key, { ...feed, fetchedAt: Date.now() } satisfies StoredFeed).catch(() => {})
   return feed
 }
 

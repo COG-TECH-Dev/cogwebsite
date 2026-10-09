@@ -28,7 +28,7 @@ export default async function CogTvPage({ searchParams }: Args) {
   const channelId = settings?.socialLinks?.youtubeChannelId
 
   const [tvItems, picked] = await Promise.all([
-    getSermonItems(payload, channelId, { includeOtherVideos: true }),
+    getSermonItems(payload, channelId),
     payload.find({
       collection: 'media-gallery-items',
       where: { and: [{ category: { in: ['cog-tv'] } }, publishedOnly] },
