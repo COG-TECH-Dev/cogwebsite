@@ -124,13 +124,15 @@ export default async function HomePage() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className="group flex items-center gap-3 rounded-2xl border border-border p-4 transition-colors hover:border-gold-300 hover:bg-brand-50"
+                  // Two to a row on a phone leaves too little width for an icon beside the words, so there the icon sits above
+                  // them (all four left-aligned); from sm up it goes back beside them.
+                  className="group flex flex-col items-start gap-3 rounded-2xl border border-border p-4 transition-colors hover:border-gold-300 hover:bg-brand-50 sm:flex-row sm:items-center"
                 >
                   <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-gold-100 text-gold-600">
                     <Icon className="h-5 w-5" aria-hidden="true" />
                   </span>
-                  <span>
-                    <span className="block font-serif font-semibold text-brand-700 group-hover:text-brand-600">
+                  <span className="min-w-0">
+                    <span className="block font-serif font-semibold leading-snug text-brand-700 group-hover:text-brand-600">
                       {item.label}
                     </span>
                     <span className="block text-xs text-ink-muted">{item.hint}</span>
