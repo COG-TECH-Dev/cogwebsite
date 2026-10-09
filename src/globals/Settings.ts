@@ -58,7 +58,7 @@ export const Settings: GlobalConfig = {
       access: { update: isAdminOrUpField },
       admin: {
         description:
-          'What the Gateshead church page shows (it has no website of its own). Anything you leave empty is simply left off the page; the pastor and the Gateshead homegroups are filled in for you.',
+          'What the Gateshead church page shows (it has no website of its own). The address and meeting times the church supplied (Dunston Community Centre; Sundays 10am and Thursdays 7pm) show until you enter your own here, which then replace them. The pastor and the Gateshead homegroups are filled in for you.',
       },
       fields: [
         { name: 'about', type: 'textarea', label: 'Welcome message', admin: { description: 'A few friendly lines about the church. Leave empty for a short standard welcome.' } },

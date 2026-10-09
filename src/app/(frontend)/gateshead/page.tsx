@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Clock, Mail, MapPin, Phone, Users } from 'lucide-react'
 import Link from 'next/link'
 
+import { gatesheadDetails } from '@/lib/gateshead'
 import { getPayloadClient } from '@/lib/payload'
 import { Button } from '@/components/ui/Button'
 import { Container } from '@/components/ui/Container'
@@ -20,13 +21,13 @@ const DEFAULT_WELCOME =
 
 /**
  * Gateshead's own page: it has no website of its own, so this is its home. The pastor and the Gateshead homegroups
- * come from the rest of the site; the welcome, address, times and contact details are filled in under Settings in the admin,
- * and anything left empty is left off the page.
+ * come from the rest of the site; the address and times the church supplied are built in (see lib/gateshead.ts), and the
+ * welcome, address, times and contact details can be changed under Settings in the admin.
  */
 export default async function GatesheadPage() {
   const payload = await getPayloadClient()
   const settings = await payload.findGlobal({ slug: 'settings' }).catch(() => null)
-  const g = settings?.gatesheadChurch
+  const { about, times, addressLines, email, phone } = gatesheadDetails(settings)
   const homegroups = (
     await payload
       .find({
@@ -39,11 +40,7 @@ export default async function GatesheadPage() {
       .catch(() => null)
   )?.docs ?? []
 
-  const times = (g?.serviceTimes ?? []).filter((t) => t.label && t.time)
-  const addressLines = (g?.address ?? '').split('\n').map((l) => l.trim()).filter(Boolean)
-  const mapUrl = addressLines.length > 0 ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressLines.join(', '))}` : null
-  const email = g?.contactEmail?.trim()
-  const phone = g?.contactPhone?.trim()
+  const mapUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(addressLines.join(', '))}`
 
   const card = 'rounded-2xl border border-border bg-surface p-6 shadow-sm'
   const iconWrap = 'flex h-12 w-12 items-center justify-center rounded-xl bg-gold-100 text-gold-600'
@@ -58,7 +55,7 @@ export default async function GatesheadPage() {
       />
       <Container className="py-16">
         <Reveal className="mx-auto max-w-2xl text-center">
-          <p className="text-lg leading-relaxed text-ink-muted">{g?.about?.trim() || DEFAULT_WELCOME}</p>
+          <p className="text-lg leading-relaxed text-ink-muted">{about || DEFAULT_WELCOME}</p>
         </Reveal>
 
         <StaggerGroup className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
@@ -68,17 +65,13 @@ export default async function GatesheadPage() {
                 <Clock className="h-6 w-6" aria-hidden="true" />
               </span>
               <h2 className={heading}>When We Meet</h2>
-              {times.length > 0 ? (
-                <ul className="mt-2 space-y-1 text-sm text-ink-muted">
-                  {times.map((t, i) => (
-                    <li key={i}>
-                      <span className="font-medium text-ink">{t.label}</span> · {t.time}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="mt-2 text-sm text-ink-muted">Service times will be added here soon. Get in touch and we will tell you.</p>
-              )}
+              <ul className="mt-2 space-y-1 text-sm text-ink-muted">
+                {times.map((t, i) => (
+                  <li key={i}>
+                    <span className="font-medium text-ink">{t.label}</span> · {t.time}
+                  </li>
+                ))}
+              </ul>
             </div>
           </StaggerItem>
 
@@ -88,25 +81,17 @@ export default async function GatesheadPage() {
                 <MapPin className="h-6 w-6" aria-hidden="true" />
               </span>
               <h2 className={heading}>Where to Find Us</h2>
-              {addressLines.length > 0 ? (
-                <>
-                  <address className="mt-2 text-sm not-italic text-ink-muted">
-                    {addressLines.map((line, i) => (
-                      <span key={i} className="block">
-                        {line}
-                      </span>
-                    ))}
-                  </address>
-                  {mapUrl && (
-                    <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="mt-3 block text-sm font-semibold text-brand-600 hover:underline">
-                      Open in Google Maps <span aria-hidden="true">→</span>
-                      <span className="sr-only"> (opens in a new tab)</span>
-                    </a>
-                  )}
-                </>
-              ) : (
-                <p className="mt-2 text-sm text-ink-muted">The address will be added here soon. Get in touch and we will point you the right way.</p>
-              )}
+              <address className="mt-2 text-sm not-italic text-ink-muted">
+                {addressLines.map((line, i) => (
+                  <span key={i} className="block">
+                    {line}
+                  </span>
+                ))}
+              </address>
+              <a href={mapUrl} target="_blank" rel="noopener noreferrer" className="mt-3 block text-sm font-semibold text-brand-600 hover:underline">
+                Open in Google Maps <span aria-hidden="true">→</span>
+                <span className="sr-only"> (opens in a new tab)</span>
+              </a>
             </div>
           </StaggerItem>
 

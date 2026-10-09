@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { ExternalLink, MapPin } from 'lucide-react'
 import Link from 'next/link'
 
+import { gatesheadDetails } from '@/lib/gateshead'
 import { getPayloadClient } from '@/lib/payload'
 import { CampusConnectForm } from '@/components/site/CampusConnectForm'
 import { navLinks } from '@/components/site/navLinks'
@@ -23,6 +24,7 @@ export default async function FindACampusPage() {
   const address = [settings?.address?.line1, settings?.address?.city, settings?.address?.postcode]
     .filter(Boolean)
     .join(', ')
+  const gateshead = gatesheadDetails(settings)
 
   return (
     <div>
@@ -42,6 +44,9 @@ export default async function FindACampusPage() {
                 <h2 className="mt-4 font-serif text-xl font-semibold text-brand-700">{branch.label}</h2>
                 {branch.label.startsWith('Newcastle') && address && (
                   <p className="mt-2 flex-1 text-sm text-ink-muted">{address}</p>
+                )}
+                {branch.label.startsWith('Gateshead') && (
+                  <p className="mt-2 flex-1 text-sm text-ink-muted">{gateshead.addressLines.join(', ')}</p>
                 )}
                 {branch.external ? (
                   <a
