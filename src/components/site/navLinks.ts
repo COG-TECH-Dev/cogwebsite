@@ -37,10 +37,8 @@ export const navLinks: NavLink[] = [
       { label: 'Sunderland Church', href: 'https://cityofgodsunderland.org/', external: true },
       { label: 'London Church', href: 'https://cityofgodlondon.org/', external: true },
       { label: 'Middlesbrough Church', href: 'https://cityofgodmiddlesbrough.org/', external: true },
-      // Gateshead doesn't have its own site yet — point to the Leadership
-      // page (real content: Pastor Udu is listed as its pastor) rather than
-      // looping back to the Newcastle homepage.
-      { label: 'Gateshead Church', href: '/about/leadership' },
+      // Gateshead doesn't have a website of its own, so it has a page here.
+      { label: 'Gateshead Church', href: '/gateshead' },
     ],
   },
   {

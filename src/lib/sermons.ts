@@ -17,6 +17,9 @@ export type SermonItem = {
   source: 'admin' | 'youtube' | 'picked'
 }
 
+/** COG TV lists the channel's latest videos, always this many (the most YouTube's own feed ever holds). */
+export const CHANNEL_VIDEO_COUNT = 15
+
 /** Where a message or video is watched: its own page on COG TV. */
 export const tvHref = (slug: string) => `/media/cog-tv/${slug}`
 
@@ -34,7 +37,8 @@ function mediaUrl(image: unknown): string | null {
  * description can be filled in properly.
  *
  * By default the channel's prayer streams are left out (the home page wants
- * messages only); COG TV passes `includeOtherVideos` to list everything.
+ * messages only); COG TV passes `includeOtherVideos` to list the latest
+ * `CHANNEL_VIDEO_COUNT` videos of every kind.
  */
 export async function getSermonItems(
   payload: Payload,
@@ -43,7 +47,7 @@ export async function getSermonItems(
 ): Promise<SermonItem[]> {
   const [sermons, feed] = await Promise.all([
     payload.find({ collection: 'sermons', sort: '-date', limit: 500 }),
-    getChannelFeed(channelId),
+    getChannelFeed(channelId, payload),
   ])
 
   const items: SermonItem[] = sermons.docs.map((s) => ({
@@ -59,7 +63,8 @@ export async function getSermonItems(
   }))
 
   const inAdmin = new Set(sermons.docs.map((s) => (s.videoUrl ? youtubeVideoId(s.videoUrl) : null)).filter(Boolean))
-  for (const v of feed?.videos ?? []) {
+  const channelVideos = options.includeOtherVideos ? (feed?.videos ?? []).slice(0, CHANNEL_VIDEO_COUNT) : (feed?.videos ?? [])
+  for (const v of channelVideos) {
     const isMessage = isSermonVideo(v.title)
     if ((!isMessage && !options.includeOtherVideos) || inAdmin.has(v.id)) continue
     // Only messages carry a speaker and series; for other videos (prayer streams) just the title part is kept, without the date after the bar.
@@ -95,8 +100,8 @@ export type YouTubeSermon = {
  * only if they belong to this channel — otherwise anyone could put any video
  * on our site by editing the link.
  */
-export async function getYouTubeSermon(id: string, channelId: string | null | undefined): Promise<YouTubeSermon | null> {
-  const feed = await getChannelFeed(channelId)
+export async function getYouTubeSermon(id: string, channelId: string | null | undefined, payload?: Payload): Promise<YouTubeSermon | null> {
+  const feed = await getChannelFeed(channelId, payload)
   if (!feed) return null
   const inFeed = feed.videos.find((v) => v.id === id)
   if (inFeed) {

@@ -52,6 +52,32 @@ export const Settings: GlobalConfig = {
     { name: 'contactEmail', type: 'text', access: { update: isAdminOrUpField } },
     { name: 'contactPhone', type: 'text', access: { update: isAdminOrUpField } },
     {
+      name: 'gatesheadChurch',
+      type: 'group',
+      label: 'Gateshead church page',
+      access: { update: isAdminOrUpField },
+      admin: {
+        description:
+          'What the Gateshead church page shows (it has no website of its own). Anything you leave empty is simply left off the page; the pastor and the Gateshead homegroups are filled in for you.',
+      },
+      fields: [
+        { name: 'about', type: 'textarea', label: 'Welcome message', admin: { description: 'A few friendly lines about the church. Leave empty for a short standard welcome.' } },
+        {
+          name: 'serviceTimes',
+          type: 'array',
+          label: 'When they meet',
+          labels: { singular: 'Service', plural: 'Services' },
+          fields: [
+            { name: 'label', type: 'text', required: true, admin: { description: 'e.g. "Sunday Service"' } },
+            { name: 'time', type: 'text', required: true, admin: { description: 'e.g. "10:00am"' } },
+          ],
+        },
+        { name: 'address', type: 'textarea', label: 'Where they meet', admin: { description: 'The full address, as you would write it on an envelope. One line per row.' } },
+        { name: 'contactEmail', type: 'text', label: 'Email' },
+        { name: 'contactPhone', type: 'text', label: 'Phone' },
+      ],
+    },
+    {
       name: 'dutyPastor',
       type: 'group',
       access: { update: isAdminOrUpField },

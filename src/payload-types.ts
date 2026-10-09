@@ -2029,6 +2029,34 @@ export interface Setting {
   contactEmail?: string | null;
   contactPhone?: string | null;
   /**
+   * What the Gateshead church page shows (it has no website of its own). Anything you leave empty is simply left off the page; the pastor and the Gateshead homegroups are filled in for you.
+   */
+  gatesheadChurch?: {
+    /**
+     * A few friendly lines about the church. Leave empty for a short standard welcome.
+     */
+    about?: string | null;
+    serviceTimes?:
+      | {
+          /**
+           * e.g. "Sunday Service"
+           */
+          label: string;
+          /**
+           * e.g. "10:00am"
+           */
+          time: string;
+          id?: string | null;
+        }[]
+      | null;
+    /**
+     * The full address, as you would write it on an envelope. One line per row.
+     */
+    address?: string | null;
+    contactEmail?: string | null;
+    contactPhone?: string | null;
+  };
+  /**
    * The pastor on call this week. Shown on the Leadership page and the Connect page when ticked on. Only publish contact details you are comfortable having public.
    */
   dutyPastor?: {
@@ -2242,6 +2270,21 @@ export interface SettingsSelect<T extends boolean = true> {
       };
   contactEmail?: T;
   contactPhone?: T;
+  gatesheadChurch?:
+    | T
+    | {
+        about?: T;
+        serviceTimes?:
+          | T
+          | {
+              label?: T;
+              time?: T;
+              id?: T;
+            };
+        address?: T;
+        contactEmail?: T;
+        contactPhone?: T;
+      };
   dutyPastor?:
     | T
     | {

@@ -24,6 +24,7 @@ import * as migration_20261005_094630_ministry_category from './20261005_094630_
 import * as migration_20261007_155603_ministry_message from './20261007_155603_ministry_message';
 import * as migration_20261008_122903_welfare_support_radio_app from './20261008_122903_welfare_support_radio_app';
 import * as migration_20261008_185244_first_timer_contact_other from './20261008_185244_first_timer_contact_other';
+import * as migration_20261009_064256_gateshead_church_page from './20261009_064256_gateshead_church_page';
 
 export const migrations = [
   {
@@ -154,6 +155,11 @@ export const migrations = [
   {
     up: migration_20261008_185244_first_timer_contact_other.up,
     down: migration_20261008_185244_first_timer_contact_other.down,
-    name: '20261008_185244_first_timer_contact_other'
+    name: '20261008_185244_first_timer_contact_other',
+  },
+  {
+    up: migration_20261009_064256_gateshead_church_page.up,
+    down: migration_20261009_064256_gateshead_church_page.down,
+    name: '20261009_064256_gateshead_church_page'
   },
 ];

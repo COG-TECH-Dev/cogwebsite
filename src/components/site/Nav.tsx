@@ -100,9 +100,11 @@ export function Nav({ churchName }: { churchName: string }) {
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.25, ease: [0.22, 1, 0.36, 1] }}
-            className="overflow-hidden border-t border-border bg-paper xl:hidden"
+            // The menu is longer than a phone screen, so it scrolls inside itself (the header is pinned, so the page
+            // behind it cannot be scrolled to reach the bottom of it).
+            className="max-h-[calc(100dvh-5rem)] overflow-y-auto overscroll-contain border-t border-border bg-paper xl:hidden"
           >
-            <Container className="flex flex-col gap-1 py-4">
+            <Container className="flex flex-col gap-1 pb-24 pt-4">
               {navLinks.map((link) => (
                 <div key={link.label}>
                   <Link

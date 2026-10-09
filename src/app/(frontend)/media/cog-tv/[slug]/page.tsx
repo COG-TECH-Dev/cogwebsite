@@ -40,7 +40,7 @@ async function findVideo(id: string): Promise<YouTubeSermon | null> {
     .then((r) => r.docs[0] ?? null)
     .catch(() => null)
   if (picked) return { id, title: picked.title, speaker: null, seriesLabel: null, date: picked.createdAt, description: '' }
-  return getYouTubeSermon(id, await getChannelId())
+  return getYouTubeSermon(id, await getChannelId(), payload)
 }
 
 async function getSermon(slug: string) {
