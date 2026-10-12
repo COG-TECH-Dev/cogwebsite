@@ -52,6 +52,11 @@ export async function submitPrayerRequest(_prev: FormState, formData: FormData):
   }
 }
 
+const EMAIL_FORMAT = /^\S+@\S+\.\S+$/
+// The consent box is required in the browser too; this stops a form being sent without it.
+const consentGiven = (formData: FormData) => formData.get('consent') === 'on'
+const NO_CONSENT = 'Please tick the box to agree to your details being used to respond to you.'
+
 // Shared by the forms below that ask for at least a name plus a way to reach
 // the person. Returns a friendly message, or null when the details are fine.
 function missingContact(name: string, email: string, phone: string, need: 'email' | 'either'): string | null {
@@ -82,7 +87,9 @@ export async function submitFirstTimer(_prev: FormState, formData: FormData): Pr
   const email = text('email')
   const phone = text('phone')
   if (!firstName || !lastName) return { status: 'error', message: 'Please enter your first and last name.' }
-  if (!email && !phone) return { status: 'error', message: 'Please give a phone number or an email address so we can reach you.' }
+  // Both ways of reaching the visitor are needed, as the welcome team asked.
+  if (!phone) return { status: 'error', message: 'Please enter your phone number.' }
+  if (!email || !EMAIL_FORMAT.test(email)) return { status: 'error', message: 'Please enter a valid email address.' }
 
   // Like the church's New Member form: the date of the visit and the whole address have to be filled in.
   const rawVisit = text('visitDate')
@@ -98,6 +105,9 @@ export async function submitFirstTimer(_prev: FormState, formData: FormData): Pr
   const contactOther = text('contactOther')
   if (!contactPreference) return { status: 'error', message: 'Please tell us whether we can contact you.' }
   if (contactPreference === 'other' && !contactOther) return { status: 'error', message: 'Please tell us how or when we can contact you.' }
+  const visitorType = oneOf('visitorType', VISITOR_TYPES)
+  if (!visitorType) return { status: 'error', message: 'Please select the one that is applicable to you (Student, Working Professional, Visitor or Others).' }
+  if (!consentGiven(formData)) return { status: 'error', message: NO_CONSENT }
 
   const homegroup = Number(formData.get('interestedHomegroup'))
   const intents = formData
@@ -125,7 +135,7 @@ export async function submitFirstTimer(_prev: FormState, formData: FormData): Pr
         contactPreference,
         contactOther: contactPreference === 'other' ? contactOther : undefined,
         howHeard: text('howHeard'),
-        visitorType: oneOf('visitorType', VISITOR_TYPES),
+        visitorType,
         intents,
         newsletterOptIn: formData.get('newsletterOptIn') === 'on',
         message: text('message'),
@@ -310,22 +320,21 @@ export async function submitStepOfFaith(_prev: StepOfFaithState, formData: FormD
     return { status: 'error', message: 'Please choose the option that best describes your decision today.' }
   }
 
-  const payload = await getPayloadClient()
+  // The team follows everyone up, so name, email and phone are all needed (they used to be optional).
   const name = String(formData.get('name') || '').trim()
   const email = String(formData.get('email') || '').trim()
+  const phone = String(formData.get('phone') || '').trim()
+  if (!name) return { status: 'error', message: 'Please enter your full name.' }
+  if (!email || !EMAIL_FORMAT.test(email)) return { status: 'error', message: 'Please enter a valid email address.' }
+  if (!phone) return { status: 'error', message: 'Please enter your phone number.' }
+  if (!consentGiven(formData)) return { status: 'error', message: NO_CONSENT }
+
+  const payload = await getPayloadClient()
 
   try {
     await payload.create({
       collection: 'form-submissions',
-      data: {
-        formType: 'step-of-faith',
-        decisionType,
-        // Genuinely optional here — someone can respond fully anonymously
-        // and still see their next steps below.
-        name: name || undefined,
-        email: email || undefined,
-        phone: formData.get('phone') ? String(formData.get('phone')) : undefined,
-      },
+      data: { formType: 'step-of-faith', decisionType, name, email, phone },
     })
     return { status: 'success' }
   } catch {

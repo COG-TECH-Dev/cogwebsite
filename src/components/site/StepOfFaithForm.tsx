@@ -9,6 +9,14 @@ import { Honeypot } from './Honeypot'
 
 const initialState: StepOfFaithState = { status: 'idle' }
 
+// A red star after the name of a question that has to be answered.
+const Star = () => (
+  <span className="text-red-600" aria-hidden="true">
+    {' '}
+    *
+  </span>
+)
+
 const DECISIONS = [
   { value: 'first-time', label: "I'm trusting Jesus for the first time" },
   { value: 'recommitting', label: "I'm recommitting my life to Christ" },
@@ -55,6 +63,7 @@ export function StepOfFaithForm() {
       <div>
         <label htmlFor="decisionType" className="mb-1 block text-sm font-medium text-ink">
           Which best describes your decision today?
+          <Star />
         </label>
         <select id="decisionType" name="decisionType" required className="input">
           <option value="">Please select</option>
@@ -66,30 +75,32 @@ export function StepOfFaithForm() {
         </select>
       </div>
       <p className="text-sm text-ink-muted">
-        The details below are entirely optional. Leave them blank if you&apos;d rather stay anonymous — you&apos;ll
-        still see your next steps.
+        <Star /> Please give your name, email and phone number so that one of our team can get in touch with you.
       </p>
       <div>
         <label htmlFor="name" className="mb-1 block text-sm font-medium text-ink">
-          Full Name (optional)
+          Full Name
+          <Star />
         </label>
-        <input id="name" name="name" type="text" className="input" />
+        <input id="name" name="name" type="text" required autoComplete="name" className="input" />
       </div>
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label htmlFor="email" className="mb-1 block text-sm font-medium text-ink">
-            Email (optional)
+            Email
+            <Star />
           </label>
-          <input id="email" name="email" type="email" className="input" />
+          <input id="email" name="email" type="email" required autoComplete="email" className="input" />
         </div>
         <div>
           <label htmlFor="phone" className="mb-1 block text-sm font-medium text-ink">
-            Phone (optional)
+            Phone
+            <Star />
           </label>
-          <input id="phone" name="phone" type="tel" className="input" />
+          <input id="phone" name="phone" type="tel" required autoComplete="tel" className="input" />
         </div>
       </div>
-      <ConsentNotice />
+      <ConsentNotice marked />
       {state.status === 'error' && <p className="text-sm text-red-600">{state.message}</p>}
       <button type="submit" disabled={pending} className="btn-primary w-full">
         {pending ? 'Submitting…' : 'Submit'}

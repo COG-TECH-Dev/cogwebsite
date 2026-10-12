@@ -5,9 +5,10 @@ import Link from 'next/link'
  * submitting any public-facing form (CLR-003). Shared across every enquiry
  * form so the wording stays consistent and only needs updating in one place.
  * `dark` swaps in light-on-dark colors for forms placed on a brand-gradient
- * card (e.g. the event RSVP panel) instead of the default surface.
+ * card (e.g. the event RSVP panel) instead of the default surface. `marked`
+ * adds the red star used on forms that mark their required questions.
  */
-export function ConsentNotice({ dark = false }: { dark?: boolean }) {
+export function ConsentNotice({ dark = false, marked = false }: { dark?: boolean; marked?: boolean }) {
   return (
     <label className={`flex items-start gap-2 text-sm ${dark ? 'text-white/80' : 'text-ink-muted'}`}>
       <input
@@ -25,6 +26,12 @@ export function ConsentNotice({ dark = false }: { dark?: boolean }) {
           Privacy Policy
         </Link>
         .
+        {marked && (
+          <span className="text-red-600" aria-hidden="true">
+            {' '}
+            *
+          </span>
+        )}
       </span>
     </label>
   )

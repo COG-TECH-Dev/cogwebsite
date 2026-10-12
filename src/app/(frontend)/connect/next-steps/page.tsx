@@ -45,9 +45,9 @@ export default function NextStepsPage() {
 
         <Reveal delay={0.1} className="mt-10">
           <p className="mb-6 text-ink-muted">
-            Take a moment to respond below. Sharing your details is completely optional; if you&apos;d rather stay
-            anonymous for now, that&apos;s okay too. Either way, we&apos;ll show you a few simple next steps as
-            soon as you submit.
+            Take a moment to respond below. We ask for your name, email and phone number so that one of our team
+            can get in touch and walk this journey with you. As soon as you submit, we&apos;ll show you a few simple
+            next steps.
           </p>
           <StepOfFaithForm />
         </Reveal>

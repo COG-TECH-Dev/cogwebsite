@@ -27,7 +27,8 @@ const Star = () => (
 /**
  * The first-time visitor form. It is the church's own "New Member" Google Form, question for question and in the
  * same order and wording, so the welcome team recognises it. The only addition is "Which church did you visit?",
- * for the churches outside Newcastle. Every question is on the page; the ones marked * have to be answered.
+ * for the churches outside Newcastle. Every question is on the page; the ones marked * have to be answered
+ * (both a phone number and an email address, and which description fits the visitor, as the welcome team asked).
  */
 export function FirstTimerForm({
   campuses,
@@ -37,11 +38,6 @@ export function FirstTimerForm({
   homegroups: { id: number; area: string }[]
 }) {
   const [state, formAction, pending] = useActionState(submitFirstTimer, initialState)
-  // Either an email or a phone number is enough — but one of them is needed.
-  // Making each required only while the other is empty lets the browser catch
-  // this before submitting, so nobody loses what they typed to a server error.
-  const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
   const [contact, setContact] = useState('yes')
 
   // Submitting through a React form action clears every field when the server
@@ -135,35 +131,18 @@ export function FirstTimerForm({
         <div>
           <label htmlFor="ft-phone" className={label}>
             Phone Number
+            <Star />
           </label>
-          <input
-            id="ft-phone"
-            name="phone"
-            type="tel"
-            autoComplete="tel"
-            className="input"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            required={!email}
-          />
+          <input id="ft-phone" name="phone" type="tel" required autoComplete="tel" className="input" />
         </div>
         <div>
           <label htmlFor="ft-email" className={label}>
             Email Address
+            <Star />
           </label>
-          <input
-            id="ft-email"
-            name="email"
-            type="email"
-            autoComplete="email"
-            className="input"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required={!phone}
-          />
+          <input id="ft-email" name="email" type="email" required autoComplete="email" className="input" />
         </div>
       </div>
-      <p className="-mt-2 text-xs text-ink-muted">Please give at least a phone number or an email address.</p>
 
       <div>
         <label htmlFor="ft-address" className={label}>
@@ -277,11 +256,14 @@ export function FirstTimerForm({
       </div>
 
       <fieldset>
-        <legend className={legend}>Please select the one applicable to you</legend>
+        <legend className={legend}>
+          Please select the one applicable to you
+          <Star />
+        </legend>
         <div className="grid gap-2 sm:grid-cols-2">
           {VISITOR_TYPES.map((o) => (
             <label key={o.value} className={choice}>
-              <input type="radio" name="visitorType" value={o.value} className={control} />
+              <input type="radio" name="visitorType" value={o.value} required className={control} />
               {o.label}
             </label>
           ))}
@@ -300,7 +282,7 @@ export function FirstTimerForm({
         </div>
       </fieldset>
 
-      <ConsentNotice />
+      <ConsentNotice marked />
       {state.status === 'error' && (
         <p className="text-sm text-red-600" role="alert">
           {state.message}

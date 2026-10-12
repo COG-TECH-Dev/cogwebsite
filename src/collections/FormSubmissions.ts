@@ -150,31 +150,33 @@ export const FormSubmissions: CollectionConfig = {
     {
       name: 'name',
       type: 'text',
-      // Optional only for Step of Faith — that form explicitly lets someone
-      // respond anonymously and still see their next steps (matches the
-      // church's existing wording for this flow).
-      validate: (value: unknown, { siblingData }: { siblingData?: { formType?: string } }) => {
-        if (siblingData?.formType === 'step-of-faith') return true
+      // Step of Faith used to allow an anonymous response, so older records can have no name. A new one needs it
+      // (the form now makes name, email and phone compulsory); only an existing record may be saved without.
+      validate: (value: unknown, { siblingData, operation }: { siblingData?: { formType?: string }; operation?: string }) => {
+        if (siblingData?.formType === 'step-of-faith' && operation !== 'create') return true
         return value ? true : 'Name is required.'
       },
     },
     {
       name: 'email',
       type: 'text',
-      // Optional for Step of Faith (anonymous allowed) and Join a Homegroup
-      // (phone is the required way to reach them there instead).
-      validate: (value: unknown, { siblingData }: { siblingData?: { formType?: string; phone?: string } }) => {
-        if (siblingData?.formType === 'step-of-faith' || siblingData?.formType === 'homegroup-join') return true
-        // A first-time visitor can give either an email or a phone number.
-        if (siblingData?.formType === 'first-timer') return value || siblingData.phone ? true : 'Please give an email or phone number.'
+      // Optional for Join a Homegroup (phone is the required way to reach them there instead). A new Step of Faith or
+      // First-Time Visitor record needs both an email and a phone number; older ones (which could be anonymous, or have
+      // only one) can still be saved as they are.
+      validate: (value: unknown, { siblingData, operation }: { siblingData?: { formType?: string }; operation?: string }) => {
+        if (siblingData?.formType === 'homegroup-join') return true
+        if ((siblingData?.formType === 'step-of-faith' || siblingData?.formType === 'first-timer') && operation !== 'create') return true
         return value ? true : 'Email is required.'
       },
     },
     {
       name: 'phone',
       type: 'text',
-      validate: (value: unknown, { siblingData }: { siblingData?: { formType?: string } }) => {
+      validate: (value: unknown, { siblingData, operation }: { siblingData?: { formType?: string }; operation?: string }) => {
         if (siblingData?.formType === 'homegroup-join') return value ? true : 'Phone number is required.'
+        if ((siblingData?.formType === 'step-of-faith' || siblingData?.formType === 'first-timer') && operation === 'create') {
+          return value ? true : 'Phone number is required.'
+        }
         return true
       },
     },
