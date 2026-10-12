@@ -2029,7 +2029,7 @@ export interface Setting {
   contactEmail?: string | null;
   contactPhone?: string | null;
   /**
-   * What the Gateshead church page shows (it has no website of its own). Anything you leave empty is simply left off the page; the pastor and the Gateshead homegroups are filled in for you.
+   * What the Gateshead church page shows (it has no website of its own). The address and meeting times the church supplied (Dunston Community Centre; Sundays 10am and Thursdays 7pm) show until you enter your own here, which then replace them. The pastor and the Gateshead homegroups are filled in for you.
    */
   gatesheadChurch?: {
     /**
