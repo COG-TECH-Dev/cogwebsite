@@ -1,7 +1,8 @@
 'use server'
 
 import { getPayloadClient } from '@/lib/payload'
-import { CONTACT_PREFERENCES, VISITOR_INTENTS, VISITOR_TYPES } from '@/lib/firstTimer'
+import { navLinks } from '@/components/site/navLinks'
+import { CONTACT_PREFERENCES, HOW_HEARD, VISITOR_INTENTS, VISITOR_TYPES } from '@/lib/firstTimer'
 import type { FormSubmission, PrayerRequest } from '@/payload-types'
 
 export type FormState = { status: 'idle' | 'success' | 'error'; message?: string }
@@ -107,6 +108,14 @@ export async function submitFirstTimer(_prev: FormState, formData: FormData): Pr
   if (contactPreference === 'other' && !contactOther) return { status: 'error', message: 'Please tell us how or when we can contact you.' }
   const visitorType = oneOf('visitorType', VISITOR_TYPES)
   if (!visitorType) return { status: 'error', message: 'Please select the one that is applicable to you (Student, Working Professional, Visitor or Others).' }
+  // The church visited has to be one of the branches (the form makes the visitor choose, rather than assuming Newcastle).
+  const branches = (navLinks.find((l) => l.label === 'Branches')?.children ?? []).map((b) => b.label)
+  const campus = text('campus')
+  if (branches.length > 0 && (!campus || !branches.includes(campus))) return { status: 'error', message: 'Please choose which church you visited.' }
+  // "How did you hear about us" is optional, but when it is "Other" they say how.
+  const howHeard = HOW_HEARD.find((o) => o === text('howHeard'))
+  const howHeardOther = text('howHeardOther')
+  if (howHeard === 'Other' && !howHeardOther) return { status: 'error', message: 'Please tell us how you heard about us.' }
   if (!consentGiven(formData)) return { status: 'error', message: NO_CONSENT }
 
   const homegroup = Number(formData.get('interestedHomegroup'))
@@ -126,7 +135,7 @@ export async function submitFirstTimer(_prev: FormState, formData: FormData): Pr
         email,
         phone,
         visitDate: rawVisit,
-        campus: text('campus'),
+        campus,
         address,
         postcode,
         city,
@@ -134,7 +143,8 @@ export async function submitFirstTimer(_prev: FormState, formData: FormData): Pr
         interestedHomegroup: Number.isInteger(homegroup) && homegroup > 0 ? homegroup : undefined,
         contactPreference,
         contactOther: contactPreference === 'other' ? contactOther : undefined,
-        howHeard: text('howHeard'),
+        howHeard,
+        howHeardOther: howHeard === 'Other' ? howHeardOther : undefined,
         visitorType,
         intents,
         newsletterOptIn: formData.get('newsletterOptIn') === 'on',

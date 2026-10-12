@@ -5,7 +5,7 @@ import Link from 'next/link'
 
 import { submitFirstTimer, type FormState } from '@/app/(frontend)/connect/actions'
 import { COUNTRIES } from '@/lib/countries'
-import { CONTACT_PREFERENCES, VISITOR_INTENTS, VISITOR_TYPES } from '@/lib/firstTimer'
+import { CONTACT_PREFERENCES, HOW_HEARD, VISITOR_INTENTS, VISITOR_TYPES } from '@/lib/firstTimer'
 import { ConsentNotice } from './ConsentNotice'
 import { Honeypot } from './Honeypot'
 
@@ -27,8 +27,9 @@ const Star = () => (
 /**
  * The first-time visitor form. It is the church's own "New Member" Google Form, question for question and in the
  * same order and wording, so the welcome team recognises it. The only addition is "Which church did you visit?",
- * for the churches outside Newcastle. Every question is on the page; the ones marked * have to be answered
- * (both a phone number and an email address, and which description fits the visitor, as the welcome team asked).
+ * for the churches outside Newcastle (which has to be chosen). Every question is on the page; the ones marked * have
+ * to be answered (both a phone number and an email address, and which description fits the visitor, as the welcome
+ * team asked).
  */
 export function FirstTimerForm({
   campuses,
@@ -39,6 +40,7 @@ export function FirstTimerForm({
 }) {
   const [state, formAction, pending] = useActionState(submitFirstTimer, initialState)
   const [contact, setContact] = useState('yes')
+  const [heard, setHeard] = useState('')
 
   // Submitting through a React form action clears every field when the server
   // says no (for example a network error). Sending the data ourselves keeps what
@@ -115,8 +117,12 @@ export function FirstTimerForm({
           <div>
             <label htmlFor="ft-campus" className={label}>
               Which church did you visit?
+              <Star />
             </label>
-            <select id="ft-campus" name="campus" className="input" defaultValue={campuses[0]}>
+            <select id="ft-campus" name="campus" required className="input" defaultValue="">
+              <option value="" disabled>
+                Choose
+              </option>
               {campuses.map((campus) => (
                 <option key={campus} value={campus}>
                   {campus}
@@ -237,7 +243,23 @@ export function FirstTimerForm({
         <label htmlFor="ft-heard" className={label}>
           How did you hear about us
         </label>
-        <input id="ft-heard" name="howHeard" type="text" className="input" />
+        <select id="ft-heard" name="howHeard" className="input" value={heard} onChange={(e) => setHeard(e.target.value)}>
+          <option value="">Choose</option>
+          {HOW_HEARD.map((option) => (
+            <option key={option} value={option}>
+              {option === 'Other' ? 'Other (please specify)' : option}
+            </option>
+          ))}
+        </select>
+        {heard === 'Other' && (
+          <div className="mt-3">
+            <label htmlFor="ft-heard-other" className={label}>
+              Please specify
+              <Star />
+            </label>
+            <input id="ft-heard-other" name="howHeardOther" type="text" required className="input" />
+          </div>
+        )}
       </div>
 
       <fieldset>

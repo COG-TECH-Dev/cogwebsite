@@ -87,6 +87,7 @@ export const DATA_EXPORTS: Record<string, ExportConfig> = {
       ['Can We Contact You', (d) => d.contactPreference],
       ['Can We Contact You (Other)', (d) => d.contactOther],
       ['How Did You Hear About Us', (d) => d.howHeard],
+      ['How Did You Hear About Us (Other)', (d) => d.howHeardOther],
       ['Please Select The One Applicable To You', (d) => d.visitorType],
       ['Please Select From The Following That Applies To You', (d) => (Array.isArray(d.intents) ? d.intents.join('; ') : '')],
       ['Newsletter', (d) => (d.newsletterOptIn ? 'Yes' : '')],

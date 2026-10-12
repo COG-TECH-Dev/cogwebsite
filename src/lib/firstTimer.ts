@@ -22,6 +22,9 @@ export const VISITOR_INTENTS = [
   { value: 'join-department', label: 'I want to join a department in church' },
 ] as const
 
+// The choices for "How did you hear about us". The value saved is the same word, so the Analytics page can count them.
+export const HOW_HEARD = ['Instagram', 'Facebook', 'X (Twitter)', 'Evangelism', 'TikTok', 'Church Flyer', 'YouTube', 'Other'] as const
+
 export const CONTACT_PREFERENCES = [
   { value: 'yes', label: 'Yes' },
   { value: 'no', label: 'No' },

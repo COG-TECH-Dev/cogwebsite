@@ -66,7 +66,7 @@ async function describeSubmission(doc: Record<string, unknown>, req: PayloadRequ
       ['Country', doc.country as string],
       ['Home group', groupName ?? undefined],
       ['Can we Contact You?', doc.contactOther ? `${contact}: ${doc.contactOther}` : contact],
-      ['How did you hear about us', doc.howHeard as string],
+      ['How did you hear about us', doc.howHeardOther ? `${doc.howHeard}: ${doc.howHeardOther}` : (doc.howHeard as string)],
       ['Newsletter', doc.newsletterOptIn ? 'Yes' : undefined],
       ['Prayer request', doc.message as string],
       ['Please select the one applicable to you', labelFor(VISITOR_TYPES, doc.visitorType)],
@@ -206,6 +206,12 @@ export const FormSubmissions: CollectionConfig = {
     { name: 'city', type: 'text', admin: { condition: (data) => data.formType === 'first-timer' } },
     { name: 'country', type: 'text', admin: { condition: (data) => data.formType === 'first-timer' } },
     { name: 'howHeard', type: 'text', label: 'How did you hear about us', admin: { condition: (data) => data.formType === 'first-timer' } },
+    {
+      name: 'howHeardOther',
+      type: 'text',
+      label: 'How did you hear about us (Other)',
+      admin: { condition: (data) => data.formType === 'first-timer' && data.howHeard === 'Other' },
+    },
     {
       name: 'visitorType',
       type: 'select',

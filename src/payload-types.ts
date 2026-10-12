@@ -329,6 +329,8 @@ export interface Ministry {
   createdAt: string;
 }
 /**
+ * Pictures for the website. Use "Select a file" (or drag and drop) for one picture, or "Bulk Upload" at the top of this list for many at once. "Paste URL" only works with a direct link to a picture file: a Google Drive folder or share link opens a web page, not a picture, so download the pictures from Drive first and upload them here.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
@@ -1185,6 +1187,7 @@ export interface FormSubmission {
   city?: string | null;
   country?: string | null;
   howHeard?: string | null;
+  howHeardOther?: string | null;
   visitorType?: ('student' | 'working-professional' | 'visitor' | 'other') | null;
   intents?: ('accept-jesus' | 'membership' | 'join-department')[] | null;
   contactPreference?: ('yes' | 'no' | 'other') | null;
@@ -1950,6 +1953,7 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
   city?: T;
   country?: T;
   howHeard?: T;
+  howHeardOther?: T;
   visitorType?: T;
   intents?: T;
   contactPreference?: T;
