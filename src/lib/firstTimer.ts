@@ -8,6 +8,33 @@
 // Where first-time visitor forms are emailed unless Settings says otherwise.
 export const DEFAULT_FIRST_TIMER_EMAIL = 'vip@cityofgodchristiancentre.org'
 
+// Each church's own welcome-team inbox. A form goes to the church the visitor says they visited. London and Middlesbrough
+// have none yet, so theirs go to the general address above until one is added (here, or under Settings > Form emails).
+export const BRANCH_FIRST_TIMER_EMAILS: Record<string, string> = {
+  'Newcastle Church': 'vip@cityofgodchristiancentre.org',
+  'Sunderland Church': 'vipsunderland@cityofgodchristiancentre.org',
+  'Gateshead Church': 'gateshead@cityofgodchristiancentre.org',
+}
+
+type FirstTimerEmailSettings = {
+  formEmails?: { firstTimer?: string | null; firstTimerBranches?: { branch: string; email: string }[] | null } | null
+} | null
+
+/**
+ * Who a first-time visitor's form is emailed to: the address set for their church under Settings, else the built-in one
+ * for that church, else the general first-time-visitor address from Settings, else the default.
+ */
+export function firstTimerRecipient(campus: string | null | undefined, settings: FirstTimerEmailSettings): string {
+  const church = campus?.trim()
+  const fromSettings = church ? settings?.formEmails?.firstTimerBranches?.find((b) => b.branch === church)?.email?.trim() : undefined
+  return (
+    fromSettings ||
+    (church ? BRANCH_FIRST_TIMER_EMAILS[church] : undefined) ||
+    settings?.formEmails?.firstTimer?.trim() ||
+    DEFAULT_FIRST_TIMER_EMAIL
+  )
+}
+
 // The wording is the New Member form's own, so the welcome team recognises every question and answer.
 export const VISITOR_TYPES = [
   { value: 'student', label: 'Student' },

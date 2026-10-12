@@ -2,7 +2,7 @@ import type { Access, CollectionConfig, PayloadRequest } from 'payload'
 
 import { pastoralReadOnly, publicCreateOnly } from '../access'
 import { notifyOnSubmission } from '../hooks/notifyOnSubmission'
-import { CONTACT_PREFERENCES, DEFAULT_FIRST_TIMER_EMAIL, VISITOR_INTENTS, VISITOR_TYPES, labelFor } from '../lib/firstTimer'
+import { CONTACT_PREFERENCES, VISITOR_INTENTS, VISITOR_TYPES, firstTimerRecipient, labelFor } from '../lib/firstTimer'
 
 const dateOnly = (value: unknown) => (value ? new Date(String(value)).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : undefined)
 
@@ -94,13 +94,14 @@ export const FormSubmissions: CollectionConfig = {
     afterChange: [
       notifyOnSubmission(
         async (doc, req) => {
-          if (doc.formType === 'first-timer') return 'New first-time visitor'
+          // The church is in the subject so each branch's team can see at a glance which church it is for.
+          if (doc.formType === 'first-timer') return doc.campus ? `New first-time visitor (${doc.campus})` : 'New first-time visitor'
           if (doc.formType === 'welfare') return 'New welfare request'
           if (doc.formType === 'ministry-message') return `New message for ${(await ministryOf(doc, req))?.name ?? 'a ministry team'}`
           return 'New Website Enquiry'
         },
         describeSubmission,
-        // First-time visitors go to the church's welcome team, a message to the ministry's own
+        // First-time visitors go to the welcome team of the church they visited, a message to the ministry's own
         // contact (its private message address first), and everything else to NOTIFY_EMAIL.
         async (doc, req) => {
           if (doc.formType === 'ministry-message') {
@@ -113,7 +114,7 @@ export const FormSubmissions: CollectionConfig = {
           }
           if (doc.formType !== 'first-timer') return process.env.NOTIFY_EMAIL
           const settings = await req.payload.findGlobal({ slug: 'settings', depth: 0, req }).catch(() => null)
-          return settings?.formEmails?.firstTimer?.trim() || DEFAULT_FIRST_TIMER_EMAIL
+          return firstTimerRecipient(doc.campus as string | undefined, settings)
         },
       ),
     ],

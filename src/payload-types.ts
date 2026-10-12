@@ -2083,9 +2083,20 @@ export interface Setting {
    */
   formEmails?: {
     /**
-     * Leave empty to use vip@cityofgodchristiancentre.org.
+     * The general address, used for a church that has none of its own below (today London and Middlesbrough). Leave empty to use vip@cityofgodchristiancentre.org.
      */
     firstTimer?: string | null;
+    /**
+     * Each church's own welcome-team address. A visitor's form goes to the church they say they visited. Newcastle (vip@), Sunderland (vipsunderland@) and Gateshead (gateshead@cityofgodchristiancentre.org) are already set up; add a row here to change one of them or to add London or Middlesbrough.
+     */
+    firstTimerBranches?:
+      | {
+          branch:
+            'Newcastle Church' | 'Sunderland Church' | 'London Church' | 'Middlesbrough Church' | 'Gateshead Church';
+          email: string;
+          id?: string | null;
+        }[]
+      | null;
     /**
      * The welfare team's email. Leave empty to use the general notification address (NOTIFY_EMAIL). The email only says a request has arrived and never contains the details; the team signs in to read them.
      */
@@ -2301,6 +2312,13 @@ export interface SettingsSelect<T extends boolean = true> {
     | T
     | {
         firstTimer?: T;
+        firstTimerBranches?:
+          | T
+          | {
+              branch?: T;
+              email?: T;
+              id?: T;
+            };
         welfare?: T;
       };
   welfareSupport?:

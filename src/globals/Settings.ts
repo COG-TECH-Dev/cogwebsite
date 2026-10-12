@@ -2,6 +2,10 @@ import type { GlobalConfig } from 'payload'
 
 import { isAdminOrUpField, isContentEditorOrUp } from '../access'
 import { revalidateGlobal } from '../hooks/revalidate'
+import { navLinks } from '../components/site/navLinks'
+
+// The churches in the Branches menu, for choosing which church an address belongs to.
+const BRANCH_OPTIONS = (navLinks.find((l) => l.label === 'Branches')?.children ?? []).map((b) => ({ label: b.label, value: b.label }))
 
 export const Settings: GlobalConfig = {
   slug: 'settings',
@@ -103,7 +107,24 @@ export const Settings: GlobalConfig = {
           name: 'firstTimer',
           type: 'text',
           label: 'First-time visitor forms go to',
-          admin: { description: 'Leave empty to use vip@cityofgodchristiancentre.org.' },
+          admin: {
+            description:
+              'The general address, used for a church that has none of its own below (today London and Middlesbrough). Leave empty to use vip@cityofgodchristiancentre.org.',
+          },
+        },
+        {
+          name: 'firstTimerBranches',
+          type: 'array',
+          label: 'First-time visitor forms, by church',
+          labels: { singular: 'Church', plural: 'Churches' },
+          admin: {
+            description:
+              "Each church's own welcome-team address. A visitor's form goes to the church they say they visited. Newcastle (vip@), Sunderland (vipsunderland@) and Gateshead (gateshead@cityofgodchristiancentre.org) are already set up; add a row here to change one of them or to add London or Middlesbrough.",
+          },
+          fields: [
+            { name: 'branch', type: 'select', required: true, options: BRANCH_OPTIONS },
+            { name: 'email', type: 'text', required: true },
+          ],
         },
         {
           name: 'welfare',
