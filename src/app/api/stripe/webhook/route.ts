@@ -11,8 +11,14 @@ export const runtime = 'nodejs'
 
 export async function POST(request: Request) {
   const stripe = getStripeClient()
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET
-  if (!stripe || !webhookSecret) {
+  // Stripe gives every webhook endpoint its own signing secret. STRIPE_WEBHOOK_SECRET can therefore hold more than one,
+  // separated by commas (for example the temporary address used for testing before launch, and the real domain), so
+  // both can stay live and nothing needs changing in Vercel at launch.
+  const secrets = (process.env.STRIPE_WEBHOOK_SECRET ?? '')
+    .split(',')
+    .map((secret) => secret.trim())
+    .filter(Boolean)
+  if (!stripe || secrets.length === 0) {
     return NextResponse.json({ error: 'Stripe is not configured' }, { status: 400 })
   }
 
@@ -23,11 +29,18 @@ export async function POST(request: Request) {
 
   const rawBody = await request.text()
 
-  let event: Stripe.Event
-  try {
-    event = stripe.webhooks.constructEvent(rawBody, signature, webhookSecret)
-  } catch (err) {
-    console.error('Stripe webhook signature verification failed:', err)
+  let event: Stripe.Event | undefined
+  let lastError: unknown
+  for (const secret of secrets) {
+    try {
+      event = stripe.webhooks.constructEvent(rawBody, signature, secret)
+      break
+    } catch (err) {
+      lastError = err
+    }
+  }
+  if (!event) {
+    console.error('Stripe webhook signature verification failed:', lastError)
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 })
   }
 
