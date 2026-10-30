@@ -31,6 +31,7 @@ import * as migration_20261030_044242_lead_pastor_page from './20261030_044242_l
 import * as migration_20261030_050019_reference_letter_for_school from './20261030_050019_reference_letter_for_school';
 import * as migration_20261030_050825_bookstore_orders from './20261030_050825_bookstore_orders';
 import * as migration_20261030_100211_team_member_message from './20261030_100211_team_member_message';
+import * as migration_20261030_144902_life_event_requests from './20261030_144902_life_event_requests';
 
 export const migrations = [
   {
@@ -196,6 +197,11 @@ export const migrations = [
   {
     up: migration_20261030_100211_team_member_message.up,
     down: migration_20261030_100211_team_member_message.down,
-    name: '20261030_100211_team_member_message'
+    name: '20261030_100211_team_member_message',
+  },
+  {
+    up: migration_20261030_144902_life_event_requests.up,
+    down: migration_20261030_144902_life_event_requests.down,
+    name: '20261030_144902_life_event_requests'
   },
 ];

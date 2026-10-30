@@ -1185,7 +1185,8 @@ export interface FormSubmission {
     | 'mission-trip'
     | 'campus-connect'
     | 'ministry-message'
-    | 'book-order';
+    | 'book-order'
+    | 'life-event';
   name?: string | null;
   email?: string | null;
   phone?: string | null;

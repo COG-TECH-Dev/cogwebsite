@@ -71,6 +71,7 @@ const FORM_LABELS: Record<string, string> = {
   'campus-connect': 'Campus connection',
   'ministry-message': 'Message to a ministry team',
   'book-order': 'Book order',
+  'life-event': 'Baby dedication or naming ceremony request',
 }
 
 // ---------------------------------------------------------------- dates (all in UK time)

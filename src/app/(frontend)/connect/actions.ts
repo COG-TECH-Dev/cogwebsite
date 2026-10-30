@@ -4,6 +4,7 @@ import { getPayloadClient } from '@/lib/payload'
 import { navLinks } from '@/components/site/navLinks'
 import { CONTACT_PREFERENCES, HOW_HEARD, VISITOR_INTENTS, VISITOR_TYPES } from '@/lib/firstTimer'
 import { MAX_BOOKS_PER_ORDER } from '@/lib/books'
+import { LIFE_EVENT_TYPES, dedicationSundays, formatDate, isTodayOrLater } from '@/lib/lifeEvents'
 import { isLetterType } from '@/lib/letters'
 import type { FormSubmission, PrayerRequest } from '@/payload-types'
 
@@ -152,6 +153,70 @@ export async function submitFirstTimer(_prev: FormState, formData: FormData): Pr
         newsletterOptIn: formData.get('newsletterOptIn') === 'on',
         message: text('message'),
       },
+    })
+    return { status: 'success', message: successMessage }
+  } catch {
+    return { status: 'error', message: 'Something went wrong. Please try again.' }
+  }
+}
+
+export async function submitLifeEvent(_prev: FormState, formData: FormData): Promise<FormState> {
+  if (isSpam(formData)) {
+    return { status: 'success', message: "Thank you — we've received your request." }
+  }
+
+  const field = (key: string) => String(formData.get(key) || '').trim()
+  const type = LIFE_EVENT_TYPES.find((t) => t.value === formData.get('type'))
+  if (!type) return { status: 'error', message: 'Please choose what you would like to request.' }
+
+  const name = field('name')
+  const email = field('email')
+  const phone = field('phone')
+  const homegroup = field('homegroup')
+  if (!name) return { status: 'error', message: 'Please enter your name.' }
+  if (!phone) return { status: 'error', message: 'Please enter your phone number.' }
+  if (!email || !EMAIL_FORMAT.test(email)) return { status: 'error', message: 'Please enter a valid email address.' }
+  if (!homegroup) return { status: 'error', message: 'Please choose your home group (or "I don\'t have one yet").' }
+
+  let preferredDate: string
+  let details: string[]
+  let successMessage: string
+  if (type.value === 'baby-dedication') {
+    // Only a last Sunday with at least 10 days' notice is possible, whatever the form was sent with.
+    const sunday = dedicationSundays().find((d) => d.value === field('dedicationDate'))
+    if (!sunday) {
+      return { status: 'error', message: "Please choose one of the Sundays listed: dedications are on the last Sunday of the month, with at least 10 days' notice." }
+    }
+    preferredDate = sunday.value
+    details = [`Sunday wanted: ${sunday.label}`, field('childName') ? `Child's name: ${field('childName')}` : '']
+    successMessage = "Thank you — we've received your request for a baby dedication. Once it is approved, we will send you a form to complete."
+  } else {
+    const date = field('namingDate')
+    const time = field('namingTime')
+    const address = field('address')
+    const postcode = field('postcode')
+    if (!isTodayOrLater(date)) return { status: 'error', message: 'Please choose the date you would like (it cannot be in the past).' }
+    if (!/^\d{2}:\d{2}$/.test(time)) return { status: 'error', message: 'Please choose the time you would like the ceremony to start.' }
+    if (!address || !postcode) return { status: 'error', message: 'Please give your home address and postcode, so that a pastor can visit.' }
+    preferredDate = date
+    details = [
+      `Date wanted: ${formatDate(date)}`,
+      `Start time: ${time}`,
+      `Home address: ${address}, ${postcode}`,
+      field('childNames') ? `Names and their meanings: ${field('childNames')}` : '',
+    ]
+    successMessage = "Thank you — we've received your request for a naming ceremony. The church office will be in touch to arrange for a pastor to visit your home."
+  }
+  if (!consentGiven(formData)) return { status: 'error', message: NO_CONSENT }
+
+  const notes = field('message')
+  const message = [...details, `Home group: ${homegroup}`, notes ? `\nNotes: ${notes}` : ''].filter(Boolean).join('\n')
+
+  const payload = await getPayloadClient()
+  try {
+    await payload.create({
+      collection: 'form-submissions',
+      data: { formType: 'life-event', name, email, phone, purpose: type.purpose, preferredDate, message },
     })
     return { status: 'success', message: successMessage }
   } catch {

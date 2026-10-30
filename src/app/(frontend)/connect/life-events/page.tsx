@@ -3,7 +3,9 @@ import { Baby, Check, GraduationCap, Heart, Home, Mail } from 'lucide-react'
 import Link from 'next/link'
 import type { ComponentType, ReactNode } from 'react'
 
+import { dedicationSundays } from '@/lib/lifeEvents'
 import { getPayloadClient } from '@/lib/payload'
+import { LifeEventForm } from '@/components/site/LifeEventForm'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { StaggerGroup, StaggerItem } from '@/components/ui/Stagger'
@@ -29,9 +31,11 @@ type Card = {
  * The church's own guidance for four life events, in short form. The email address is the church's contact email from
  * Settings (so it always matches the footer); the subject lines are the ones the church office already looks for.
  */
-export default async function LifeEventsPage() {
+export default async function LifeEventsPage({ searchParams }: { searchParams: Promise<{ type?: string }> }) {
+  const { type } = await searchParams
   const payload = await getPayloadClient()
   const settings = await payload.findGlobal({ slug: 'settings' }).catch(() => null)
+  const homegroups = ((await payload.find({ collection: 'homegroups', limit: 100, sort: 'area', depth: 0 }).catch(() => null))?.docs ?? []).map((g) => g.area)
   const email = settings?.contactEmail?.trim() || DEFAULT_EMAIL
   const mail = (subject: string) => `mailto:${email}?subject=${encodeURIComponent(subject)}`
   const addr = <strong className="font-semibold text-ink">{email}</strong>
@@ -42,27 +46,23 @@ export default async function LifeEventsPage() {
       icon: Baby,
       intro: 'Present your child to God before the church family.',
       points: [
-        <>
-          Email {addr} with the subject <strong className="font-semibold text-ink">“Baby Dedication”</strong> and the month you would like. Once approved, we will send you a form to complete.
-        </>,
+        'Fill in the request form below and choose the Sunday you would like. Once it is approved, we will send you a form to complete.',
         'Dedications are on the last Sunday of the month. We need at least 10 days’ notice for that month.',
         'Prayerfully decide what you wish to offer to God, following the examples in the Bible.',
         'A reception is entirely optional. You are welcome to host a small gathering at home or elsewhere. To use our community hall, check availability and book early with Sister Victoria Membere.',
       ],
-      action: { label: 'Email us about a dedication', href: mail('Baby Dedication'), external: true },
+      action: { label: 'Request a baby dedication', href: '/connect/life-events?type=baby-dedication#request' },
     },
     {
       title: 'Naming Ceremony',
       icon: Home,
       intro: 'Your child is formally named, welcomed into the church family and blessed by a pastor, who prays for God’s protection, love and guidance over their life.',
       points: [
-        <>
-          Email {addr} with the subject <strong className="font-semibold text-ink">“NAMING CEREMONY”</strong> and tell us: the date and start time you want, your contact details, your home group, and your home address and postcode.
-        </>,
+        'Fill in the request form below with the date and start time you want, your contact details, your home group, and your home address and postcode.',
         'The church office will arrange for a pastor to visit your home.',
         'Please give the pastor the names you will call your child, and their meanings.',
       ],
-      action: { label: 'Email us about a naming ceremony', href: mail('NAMING CEREMONY'), external: true },
+      action: { label: 'Request a naming ceremony', href: '/connect/life-events?type=naming-ceremony#request' },
     },
     {
       title: 'Getting Engaged or Married',
@@ -133,6 +133,21 @@ export default async function LifeEventsPage() {
             )
           })}
         </StaggerGroup>
+
+        <section id="request" aria-labelledby="request-heading" className="mx-auto mt-16 max-w-xl scroll-mt-28">
+          <h2 id="request-heading" className="font-serif text-2xl font-semibold text-brand-700 sm:text-3xl">
+            Request a dedication or naming ceremony
+          </h2>
+          <p className="mt-2 mb-8 text-ink-muted">Fill in the form and the church office will be in touch.</p>
+          <LifeEventForm defaultType={type} dedicationDates={dedicationSundays()} homegroups={homegroups} />
+          <p className="mt-4 text-sm text-ink-muted">
+            Prefer to email? Write to {addr} with the subject “Baby Dedication” or “NAMING CEREMONY”, or{' '}
+            <a href={mail('Baby Dedication')} className="font-semibold text-brand-600 hover:underline">
+              open a new email
+            </a>
+            .
+          </p>
+        </section>
 
         <p className="mx-auto mt-12 max-w-2xl text-center text-ink-muted">
           Not sure where to start? <Link href="/connect/contact" className="font-semibold text-brand-600 hover:underline">Contact us</Link> or{' '}

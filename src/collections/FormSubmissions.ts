@@ -81,6 +81,20 @@ async function describeSubmission(doc: Record<string, unknown>, req: PayloadRequ
     return `A first-time visitor filled in the website form:\n\n${details}`
   }
 
+  if (doc.formType === 'life-event') {
+    const lines: [string, string | undefined][] = [
+      ['Request', doc.purpose as string],
+      ['Name', doc.name as string],
+      ['Email', doc.email as string],
+      ['Phone', doc.phone as string],
+    ]
+    const details = lines
+      .filter(([, value]) => value)
+      .map(([label, value]) => `${label}: ${value}`)
+      .join('\n')
+    return `A request came in through the website:\n\n${details}\n\n${doc.message ?? ''}`
+  }
+
   if (doc.formType === 'book-order') {
     const qty = Number(doc.quantity) || 1
     const item = doc.bookTitle
@@ -135,6 +149,8 @@ export const FormSubmissions: CollectionConfig = {
           if (doc.formType === 'first-timer') return doc.campus ? `New first-time visitor (${doc.campus})` : 'New first-time visitor'
           if (doc.formType === 'welfare') return 'New welfare request'
           if (doc.formType === 'ministry-message') return `New message for ${(await ministryOf(doc, req))?.name ?? 'a ministry team'}`
+          // A dedication or naming request keeps the subject lines the church office already uses for these emails.
+          if (doc.formType === 'life-event') return doc.purpose === 'Baby dedication' ? 'Baby Dedication' : 'NAMING CEREMONY'
           if (doc.formType === 'book-order') return `New book order: ${doc.bookTitle ?? 'a book'}`
           // A school letter keeps the subject the church office already uses for these, so it is easy to spot.
           if (doc.formType === 'reference-letter') return doc.letterType === 'school' ? 'LETTER FOR SCHOOL' : 'New letter request'
@@ -187,6 +203,7 @@ export const FormSubmissions: CollectionConfig = {
         { label: 'Campus Connection (relocating student)', value: 'campus-connect' },
         { label: 'Message to a Ministry Team', value: 'ministry-message' },
         { label: 'Book Order (collect at church)', value: 'book-order' },
+        { label: 'Baby Dedication / Naming Ceremony Request', value: 'life-event' },
       ],
     },
     {
@@ -222,7 +239,11 @@ export const FormSubmissions: CollectionConfig = {
         return true
       },
     },
-    { name: 'preferredDate', type: 'date', admin: { condition: (data) => data.formType === 'appointment' } },
+    {
+      name: 'preferredDate',
+      type: 'date',
+      admin: { condition: (data) => data.formType === 'appointment' || data.formType === 'life-event' },
+    },
     { name: 'bookTitle', type: 'text', label: 'Book ordered', admin: { condition: (data) => data.formType === 'book-order' } },
     { name: 'quantity', type: 'number', label: 'How many', min: 1, admin: { condition: (data) => data.formType === 'book-order' } },
     {
