@@ -30,6 +30,7 @@ import * as migration_20261012_055555_first_timer_emails_by_church from './20261
 import * as migration_20261030_044242_lead_pastor_page from './20261030_044242_lead_pastor_page';
 import * as migration_20261030_050019_reference_letter_for_school from './20261030_050019_reference_letter_for_school';
 import * as migration_20261030_050825_bookstore_orders from './20261030_050825_bookstore_orders';
+import * as migration_20261030_100211_team_member_message from './20261030_100211_team_member_message';
 
 export const migrations = [
   {
@@ -190,6 +191,11 @@ export const migrations = [
   {
     up: migration_20261030_050825_bookstore_orders.up,
     down: migration_20261030_050825_bookstore_orders.down,
-    name: '20261030_050825_bookstore_orders'
+    name: '20261030_050825_bookstore_orders',
+  },
+  {
+    up: migration_20261030_100211_team_member_message.up,
+    down: migration_20261030_100211_team_member_message.down,
+    name: '20261030_100211_team_member_message'
   },
 ];

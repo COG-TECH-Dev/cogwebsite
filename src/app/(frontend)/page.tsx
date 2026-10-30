@@ -150,7 +150,7 @@ export default async function HomePage() {
           <Reveal className="mx-auto max-w-2xl text-center">
             <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-600">A Word From Our Leadership</p>
             <p className="mt-6 text-lg leading-relaxed text-ink-muted">
-              On behalf of the entire leadership team, welcome to City of God Christian Centre. Whether you are
+              On behalf of our Lead Pastor, Apostle Bright Onoka, and the entire leadership team, welcome to City of God Christian Centre. Whether you are
               joining us for the first time or you have been part of this family for years, we are so glad you are
               here. Our prayer is that you will encounter God&apos;s love, find genuine community, and discover your
               purpose as you journey with us.

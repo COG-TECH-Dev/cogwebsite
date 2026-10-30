@@ -23,9 +23,20 @@ export const TeamGrid: Block = {
           name: 'photo',
           type: 'upload',
           relationTo: 'media',
-          admin: { description: 'A portrait photo. If empty, a coloured card with their initials is shown.' },
+          admin: {
+            description:
+              'A portrait photo. If empty, a coloured card with their initials is shown. On the large highlighted card (the first person, when that is ticked above) a full-length, full-height photo is shown whole, never cropped.',
+          },
         },
         { name: 'bio', type: 'textarea' },
+        {
+          name: 'message',
+          type: 'textarea',
+          admin: {
+            description:
+              'Optional: a personal welcome or message from this person. It is shown beside their name on the large highlighted card (the first person, when that is ticked above). Separate paragraphs with a blank line.',
+          },
+        },
       ],
     },
   ],

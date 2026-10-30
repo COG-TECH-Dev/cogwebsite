@@ -66,6 +66,15 @@ function SectionHeading({
   )
 }
 
+// The picture's own size, so a full-length photo can be shown whole instead of cropped to a box.
+function mediaSize(image: unknown): { width: number; height: number } | null {
+  if (image && typeof image === 'object' && 'width' in image && 'height' in image) {
+    const { width, height } = image as { width?: number | null; height?: number | null }
+    if (width && height) return { width, height }
+  }
+  return null
+}
+
 function MemberVisual({ photo, name, large }: { photo: unknown; name: string; large?: boolean }) {
   const img = mediaUrl(photo)
   if (img) {
@@ -359,19 +368,46 @@ function Block({ block }: { block: LayoutBlock }) {
 
           {spotlight && (
             <Reveal className="mb-10">
-              <div className="overflow-hidden rounded-3xl border border-border bg-surface shadow-lg md:grid md:grid-cols-5">
-                <div className="relative min-h-72 md:col-span-2">
-                  <MemberVisual photo={spotlight.photo} name={spotlight.name} large />
+              {/* The highlighted card stands out on a brand panel: a full-length photo shown whole (never cropped), standing on the
+                  card's bottom edge, with the name and the personal message beside it. */}
+              <div className="relative isolate overflow-hidden rounded-3xl bg-linear-to-br from-brand-900 via-brand-700 to-brand-600 text-white shadow-xl md:grid md:grid-cols-5">
+                <Glows />
+                <div className="flex items-end justify-center px-6 pt-10 md:col-span-2 md:px-8 md:pt-12">
+                  {mediaUrl(spotlight.photo) ? (
+                    <Image
+                      src={mediaUrl(spotlight.photo)!}
+                      alt={spotlight.name}
+                      width={mediaSize(spotlight.photo)?.width ?? 800}
+                      height={mediaSize(spotlight.photo)?.height ?? 1400}
+                      sizes="(min-width: 768px) 40vw, 100vw"
+                      className="h-auto max-h-[28rem] w-auto max-w-full object-contain drop-shadow-2xl md:max-h-[36rem]"
+                      priority
+                    />
+                  ) : (
+                    <span
+                      aria-hidden="true"
+                      className="mb-10 flex h-36 w-36 items-center justify-center rounded-full border border-gold-300/40 bg-white/10 font-serif text-6xl font-semibold text-gold-300 backdrop-blur"
+                    >
+                      {initials(spotlight.name)}
+                    </span>
+                  )}
                 </div>
                 <div className="flex flex-col justify-center p-8 sm:p-12 md:col-span-3">
                   {spotlight.title && (
-                    <p className="w-fit rounded-full bg-gold-100 px-4 py-1 text-sm font-semibold text-gold-600">
-                      {spotlight.title}
-                    </p>
+                    <p className="w-fit rounded-full bg-gold-500 px-4 py-1 text-sm font-semibold text-brand-700">{spotlight.title}</p>
                   )}
-                  <h3 className="mt-4 font-serif text-3xl font-semibold text-brand-700 sm:text-4xl">{spotlight.name}</h3>
-                  {spotlight.bio && (
-                    <p className="mt-4 text-lg leading-relaxed text-ink-muted">{spotlight.bio}</p>
+                  <h3 className="mt-4 font-serif text-3xl font-semibold sm:text-4xl">{spotlight.name}</h3>
+                  {spotlight.bio && <p className="mt-4 text-lg leading-relaxed text-white/85">{spotlight.bio}</p>}
+                  {spotlight.message && (
+                    <div className="mt-6 border-l-4 border-gold-400 pl-5">
+                      <p className="text-sm font-semibold uppercase tracking-[0.2em] text-gold-300">A message from {spotlight.name}</p>
+                      <div className="mt-3 space-y-4 text-lg leading-relaxed text-white/90">
+                        {paragraphs(spotlight.message).map((p, i) => (
+                          <p key={i}>{p}</p>
+                        ))}
+                      </div>
+                      <p className="mt-4 font-serif text-lg font-semibold text-gold-300">{spotlight.name}</p>
+                    </div>
                   )}
                 </div>
               </div>

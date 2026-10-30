@@ -553,10 +553,14 @@ export interface Page {
                   name: string;
                   title?: string | null;
                   /**
-                   * A portrait photo. If empty, a coloured card with their initials is shown.
+                   * A portrait photo. If empty, a coloured card with their initials is shown. On the large highlighted card (the first person, when that is ticked above) a full-length, full-height photo is shown whole, never cropped.
                    */
                   photo?: (number | null) | Media;
                   bio?: string | null;
+                  /**
+                   * Optional: a personal welcome or message from this person. It is shown beside their name on the large highlighted card (the first person, when that is ticked above). Separate paragraphs with a blank line.
+                   */
+                  message?: string | null;
                   id?: string | null;
                 }[]
               | null;
@@ -1556,6 +1560,7 @@ export interface PagesSelect<T extends boolean = true> {
                     title?: T;
                     photo?: T;
                     bio?: T;
+                    message?: T;
                     id?: T;
                   };
               id?: T;
