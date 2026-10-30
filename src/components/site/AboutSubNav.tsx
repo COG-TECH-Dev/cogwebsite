@@ -9,7 +9,7 @@ const tabs = [
   { label: 'Tenets', href: '/about/tenets' },
   { label: 'History', href: '/about/history' },
   { label: 'Leadership', href: '/about/leadership' },
-  { label: 'Lead Pastor', href: '/about/lead-pastor' },
+  { label: "Pastor's Welcome", href: '/about/lead-pastor' },
 ]
 
 export function AboutSubNav() {

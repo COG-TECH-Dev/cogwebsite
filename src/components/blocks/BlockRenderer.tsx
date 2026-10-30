@@ -75,6 +75,13 @@ function mediaSize(image: unknown): { width: number; height: number } | null {
   return null
 }
 
+// A portrait or half-length photo fills the highlighted card's picture area edge to edge; a very tall, full-length figure
+// (narrower than about 1 to 2) is shown whole instead, standing on the card's bottom edge.
+function fillsPanel(photo: unknown): boolean {
+  const size = mediaSize(photo)
+  return !size || size.width / size.height >= 0.5
+}
+
 function MemberVisual({ photo, name, large }: { photo: unknown; name: string; large?: boolean }) {
   const img = mediaUrl(photo)
   if (img) {
@@ -370,10 +377,25 @@ function Block({ block }: { block: LayoutBlock }) {
             <Reveal className="mb-10">
               {/* The highlighted card stands out on a brand panel: a full-length photo shown whole (never cropped), standing on the
                   card's bottom edge, with the name and the personal message beside it. */}
-              <div className="relative isolate overflow-hidden rounded-3xl bg-linear-to-br from-brand-900 via-brand-700 to-brand-600 text-white shadow-xl md:grid md:grid-cols-5">
+              <div className="relative isolate overflow-hidden rounded-3xl bg-linear-to-br from-brand-900 via-brand-700 to-brand-600 text-white shadow-xl md:grid md:min-h-[32rem] md:grid-cols-5">
                 <Glows />
-                <div className="flex items-end justify-center px-6 pt-10 md:col-span-2 md:px-8 md:pt-12">
-                  {mediaUrl(spotlight.photo) ? (
+                <div
+                  className={
+                    mediaUrl(spotlight.photo) && fillsPanel(spotlight.photo)
+                      ? 'relative min-h-[26rem] md:col-span-2 md:min-h-full'
+                      : 'flex items-end justify-center px-6 pt-10 md:col-span-2 md:px-8 md:pt-12'
+                  }
+                >
+                  {mediaUrl(spotlight.photo) && fillsPanel(spotlight.photo) ? (
+                    <Image
+                      src={mediaUrl(spotlight.photo)!}
+                      alt={spotlight.name}
+                      fill
+                      sizes="(min-width: 768px) 40vw, 100vw"
+                      className="object-cover object-top"
+                      priority
+                    />
+                  ) : mediaUrl(spotlight.photo) ? (
                     <Image
                       src={mediaUrl(spotlight.photo)!}
                       alt={spotlight.name}

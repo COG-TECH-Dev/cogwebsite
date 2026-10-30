@@ -15,7 +15,7 @@ import { Reveal } from '@/components/ui/Reveal'
 
 export const revalidate = 60
 export const metadata: Metadata = {
-  title: 'Our Lead Pastor',
+  title: "Pastor's Welcome",
   description: `A welcome from ${LEAD_PASTOR.name} and ${LEAD_PASTOR.spouse}, Lead Pastor of City of God Christian Centre.`,
 }
 
@@ -27,6 +27,10 @@ function photoOf(value: unknown): { url: string; width: number; height: number }
   }
   return null
 }
+
+// A portrait or half-length photo fills the whole panel edge to edge (a little may be trimmed at the sides). A very tall,
+// full-length figure (narrower than about 1 to 2) is shown whole instead, standing on the bottom edge, so no head or feet are cut off.
+const fillsPanel = (photo: { width: number; height: number }) => photo.width / photo.height >= 0.5
 
 export default async function LeadPastorPage() {
   const payload = await getPayloadClient()
@@ -50,8 +54,8 @@ export default async function LeadPastorPage() {
       </PageHeader>
 
       <Container className="py-16">
-        {/* With a photo, the page is split 2 parts picture to 3 parts message. The picture fills the whole height of the
-            message beside it, shown whole (never cropped) and standing on the bottom edge of a brand-colour panel. */}
+        {/* With a photo, the page is split 2 parts picture to 3 parts message, and the picture fills the whole height of the
+            message beside it (see fillsPanel above for how it is fitted). */}
         <div className={photo ? 'grid gap-10 lg:grid-cols-5 lg:items-stretch lg:gap-14' : ''}>
           {photo && (
             <Reveal className="lg:col-span-2">
@@ -62,7 +66,7 @@ export default async function LeadPastorPage() {
                   alt={`${LEAD_PASTOR.name} and ${LEAD_PASTOR.spouse}`}
                   fill
                   sizes="(min-width: 1024px) 40vw, 100vw"
-                  className="object-contain object-bottom px-4 pt-6 drop-shadow-2xl"
+                  className={fillsPanel(photo) ? 'object-cover object-top' : 'object-contain object-bottom px-4 pt-6 drop-shadow-2xl'}
                   priority
                 />
               </div>
