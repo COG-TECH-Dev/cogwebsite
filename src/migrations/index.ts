@@ -28,6 +28,7 @@ import * as migration_20261009_064256_gateshead_church_page from './20261009_064
 import * as migration_20261012_054853_first_timer_how_heard_other from './20261012_054853_first_timer_how_heard_other';
 import * as migration_20261012_055555_first_timer_emails_by_church from './20261012_055555_first_timer_emails_by_church';
 import * as migration_20261030_044242_lead_pastor_page from './20261030_044242_lead_pastor_page';
+import * as migration_20261030_050019_reference_letter_for_school from './20261030_050019_reference_letter_for_school';
 
 export const migrations = [
   {
@@ -178,6 +179,11 @@ export const migrations = [
   {
     up: migration_20261030_044242_lead_pastor_page.up,
     down: migration_20261030_044242_lead_pastor_page.down,
-    name: '20261030_044242_lead_pastor_page'
+    name: '20261030_044242_lead_pastor_page',
+  },
+  {
+    up: migration_20261030_050019_reference_letter_for_school.up,
+    down: migration_20261030_050019_reference_letter_for_school.down,
+    name: '20261030_050019_reference_letter_for_school'
   },
 ];

@@ -70,7 +70,7 @@ export const Settings: GlobalConfig = {
           type: 'upload',
           relationTo: 'media',
           label: 'Photo',
-          admin: { description: 'A photo of Apostle Bright Onoka, or of him and Pastor Ufunwen Onoka together. It is shown whole, never cropped.' },
+          admin: { description: 'A photo of Apostle Bright Onoka, or of him and Pastor Ufumwen Onoka together. It is shown whole, never cropped.' },
         },
         {
           name: 'welcome',
@@ -78,7 +78,7 @@ export const Settings: GlobalConfig = {
           label: 'Welcome message',
           admin: {
             description:
-              'The welcome from Apostle Bright Onoka and Pastor Ufunwen Onoka. Separate paragraphs with a blank line; a short last line such as "God bless you." is shown with their names. Leave empty to show the draft.',
+              'The welcome from Apostle Bright Onoka and Pastor Ufumwen Onoka. Separate paragraphs with a blank line; a short last line such as "God bless you." is shown with their names. Leave empty to show the draft.',
           },
         },
       ],

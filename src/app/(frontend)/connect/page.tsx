@@ -1,4 +1,5 @@
 import {
+  Baby,
   CalendarCheck,
   DoorOpen,
   FileText,
@@ -35,7 +36,8 @@ const sections: { label: string; href: string; description: string; icon: Compon
   { label: 'Contact Us', href: '/connect/contact', description: 'General questions and enquiries.', icon: Mail },
   { label: 'Appointments', href: '/connect/appointments', description: 'Book time with our pastoral team.', icon: CalendarCheck },
   { label: 'Membership', href: '/connect/membership', description: 'Take the next step and join us.', icon: UserPlus },
-  { label: 'Reference Letter', href: '/connect/reference-letter', description: 'Request a character or membership letter.', icon: FileText },
+  { label: 'Life Events', href: '/connect/life-events', description: 'Baby dedications, naming ceremonies, engagements and weddings.', icon: Baby },
+  { label: 'Reference Letter', href: '/connect/reference-letter', description: 'Request a character, membership or school letter.', icon: FileText },
 ]
 
 export default function ConnectPage() {

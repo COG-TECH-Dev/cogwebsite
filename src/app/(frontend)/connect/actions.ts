@@ -3,6 +3,7 @@
 import { getPayloadClient } from '@/lib/payload'
 import { navLinks } from '@/components/site/navLinks'
 import { CONTACT_PREFERENCES, HOW_HEARD, VISITOR_INTENTS, VISITOR_TYPES } from '@/lib/firstTimer'
+import { isLetterType } from '@/lib/letters'
 import type { FormSubmission, PrayerRequest } from '@/payload-types'
 
 export type FormState = { status: 'idle' | 'success' | 'error'; message?: string }
@@ -254,6 +255,38 @@ export async function submitEnquiry(
   }
   const interestedMinistry = formData.get('interestedMinistry')
 
+  // A letter request: only a known kind of letter is accepted. A letter for a child's school needs the details the church
+  // asks for (they go into the notes, which the office reads), and any other letter needs its purpose.
+  const field = (key: string) => String(formData.get(key) || '').trim()
+  const rawLetterType = formData.get('letterType')
+  const letterType = formType === 'reference-letter' && isLetterType(rawLetterType) ? rawLetterType : undefined
+  let purpose = field('purpose') || undefined
+  let message = String(formData.get('message') || '')
+  if (formType === 'reference-letter') {
+    if (!letterType) return { status: 'error', message: 'Please choose the kind of letter you need.' }
+    if (letterType === 'school') {
+      const childName = field('childName')
+      const childDob = field('childDob')
+      const parentNames = field('parentNames')
+      const homeAddress = field('homeAddress')
+      if (!childName || !childDob || !parentNames || !homeAddress) {
+        return { status: 'error', message: "Please fill in your child's full name and date of birth, both parents' full names and your home address." }
+      }
+      const dob = new Date(childDob)
+      const details = [
+        `Child's full name: ${childName}`,
+        `Child's date of birth: ${Number.isNaN(dob.getTime()) ? childDob : dob.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}`,
+        `Parents' full names: ${parentNames}`,
+        `Home address: ${homeAddress}`,
+        `Home group: ${field('homegroup') || 'None given'}`,
+      ].join('\n')
+      purpose = 'Letter for school'
+      message = message.trim() ? `${details}\n\nNotes: ${message.trim()}` : details
+    } else if (!purpose) {
+      return { status: 'error', message: 'Please tell us what the letter is for.' }
+    }
+  }
+
   try {
     await payload.create({
       collection: 'form-submissions',
@@ -264,11 +297,11 @@ export async function submitEnquiry(
         phone: String(formData.get('phone') || ''),
         preferredDate: formData.get('preferredDate') ? String(formData.get('preferredDate')) : undefined,
         interestedMinistry: interestedMinistry ? Number(interestedMinistry) : undefined,
-        letterType: (formData.get('letterType') as FormSubmission['letterType']) || undefined,
-        purpose: formData.get('purpose') ? String(formData.get('purpose')) : undefined,
+        letterType,
+        purpose,
         requiredByDate: formData.get('requiredByDate') ? String(formData.get('requiredByDate')) : undefined,
         supportType: (formData.get('supportType') as FormSubmission['supportType']) || undefined,
-        message: String(formData.get('message') || ''),
+        message,
       },
     })
     return { status: 'success', message: successMessage }

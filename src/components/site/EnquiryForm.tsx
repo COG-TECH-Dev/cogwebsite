@@ -1,19 +1,13 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useState } from 'react'
 
 import type { FormState } from '@/app/(frontend)/connect/actions'
+import { LETTER_TYPES } from '@/lib/letters'
 import { ConsentNotice } from './ConsentNotice'
 import { Honeypot } from './Honeypot'
 
 const initialState: FormState = { status: 'idle' }
-
-const LETTER_TYPES = [
-  { value: 'character', label: 'Character Reference' },
-  { value: 'membership-confirmation', label: 'Membership Confirmation' },
-  { value: 'financial', label: 'Financial Reference' },
-  { value: 'other', label: 'Other' },
-]
 
 const SUPPORT_TYPES = [
   { value: 'financial', label: 'Financial' },
@@ -28,6 +22,8 @@ export function EnquiryForm({
   ministries,
   defaultMinistryId,
   showReferenceLetterFields = false,
+  defaultLetterType,
+  homegroups,
   showSupportType = false,
   defaultSupportType,
   submitLabel = 'Send',
@@ -37,11 +33,17 @@ export function EnquiryForm({
   ministries?: { id: number; name: string }[]
   defaultMinistryId?: number
   showReferenceLetterFields?: boolean
+  /** The letter type chosen when the form opens (the Life Events page links to the school letter). */
+  defaultLetterType?: string
+  /** Home group names, for the school letter's "home group" question. */
+  homegroups?: string[]
   showSupportType?: boolean
   defaultSupportType?: string
   submitLabel?: string
 }) {
   const [state, formAction, pending] = useActionState(action, initialState)
+  const [letterType, setLetterType] = useState(defaultLetterType ?? LETTER_TYPES[0].value)
+  const isSchool = letterType === 'school'
 
   if (state.status === 'success') {
     return <p className="rounded-xl bg-brand-50 p-6 text-brand-700">{state.message}</p>
@@ -113,7 +115,7 @@ export function EnquiryForm({
             <label htmlFor="letterType" className="mb-1 block text-sm font-medium text-ink">
               Letter Type
             </label>
-            <select id="letterType" name="letterType" required className="input">
+            <select id="letterType" name="letterType" required className="input" value={letterType} onChange={(e) => setLetterType(e.target.value)}>
               {LETTER_TYPES.map((type) => (
                 <option key={type.value} value={type.value}>
                   {type.label}
@@ -121,12 +123,57 @@ export function EnquiryForm({
               ))}
             </select>
           </div>
-          <div>
-            <label htmlFor="purpose" className="mb-1 block text-sm font-medium text-ink">
-              Purpose of Letter
-            </label>
-            <input id="purpose" name="purpose" type="text" required className="input" />
-          </div>
+          {isSchool ? (
+            <>
+              <p className="rounded-xl bg-brand-50 p-4 text-sm text-ink-muted">
+                Applying to a faith school? You may be asked for a letter confirming that you attend church. Please give the details below.
+              </p>
+              <div>
+                <label htmlFor="childName" className="mb-1 block text-sm font-medium text-ink">
+                  Child&apos;s full name
+                </label>
+                <input id="childName" name="childName" type="text" required className="input" />
+              </div>
+              <div>
+                <label htmlFor="childDob" className="mb-1 block text-sm font-medium text-ink">
+                  Child&apos;s date of birth
+                </label>
+                <input id="childDob" name="childDob" type="date" required className="input" />
+              </div>
+              <div>
+                <label htmlFor="parentNames" className="mb-1 block text-sm font-medium text-ink">
+                  Parents&apos; full names
+                </label>
+                <input id="parentNames" name="parentNames" type="text" required className="input" />
+              </div>
+              <div>
+                <label htmlFor="homeAddress" className="mb-1 block text-sm font-medium text-ink">
+                  Home address (with postcode)
+                </label>
+                <textarea id="homeAddress" name="homeAddress" rows={3} required autoComplete="street-address" className="input" />
+              </div>
+              <div>
+                <label htmlFor="homegroup" className="mb-1 block text-sm font-medium text-ink">
+                  Your home group
+                </label>
+                <select id="homegroup" name="homegroup" className="input" defaultValue="">
+                  <option value="">I don&apos;t have one yet</option>
+                  {(homegroups ?? []).map((group) => (
+                    <option key={group} value={group}>
+                      {group}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </>
+          ) : (
+            <div>
+              <label htmlFor="purpose" className="mb-1 block text-sm font-medium text-ink">
+                Purpose of Letter
+              </label>
+              <input id="purpose" name="purpose" type="text" required className="input" />
+            </div>
+          )}
           <div>
             <label htmlFor="requiredByDate" className="mb-1 block text-sm font-medium text-ink">
               Required By (optional)

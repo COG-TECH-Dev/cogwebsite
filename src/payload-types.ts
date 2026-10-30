@@ -1208,7 +1208,7 @@ export interface FormSubmission {
    * Which service they attended.
    */
   serviceAttended?: string | null;
-  letterType?: ('character' | 'membership-confirmation' | 'financial' | 'other') | null;
+  letterType?: ('character' | 'membership-confirmation' | 'financial' | 'school' | 'other') | null;
   /**
    * What the reference letter is for.
    */
@@ -2040,11 +2040,11 @@ export interface Setting {
    */
   leadPastor?: {
     /**
-     * A photo of Apostle Bright Onoka, or of him and Pastor Ufunwen Onoka together. It is shown whole, never cropped.
+     * A photo of Apostle Bright Onoka, or of him and Pastor Ufumwen Onoka together. It is shown whole, never cropped.
      */
     photo?: (number | null) | Media;
     /**
-     * The welcome from Apostle Bright Onoka and Pastor Ufunwen Onoka. Separate paragraphs with a blank line; a short last line such as "God bless you." is shown with their names. Leave empty to show the draft.
+     * The welcome from Apostle Bright Onoka and Pastor Ufumwen Onoka. Separate paragraphs with a blank line; a short last line such as "God bless you." is shown with their names. Leave empty to show the draft.
      */
     welcome?: string | null;
   };

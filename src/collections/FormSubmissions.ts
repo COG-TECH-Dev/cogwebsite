@@ -3,6 +3,7 @@ import type { Access, CollectionConfig, PayloadRequest } from 'payload'
 import { pastoralReadOnly, publicCreateOnly } from '../access'
 import { notifyOnSubmission } from '../hooks/notifyOnSubmission'
 import { CONTACT_PREFERENCES, VISITOR_INTENTS, VISITOR_TYPES, firstTimerRecipient, labelFor } from '../lib/firstTimer'
+import { LETTER_TYPES } from '../lib/letters'
 
 const dateOnly = (value: unknown) => (value ? new Date(String(value)).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : undefined)
 
@@ -79,6 +80,22 @@ async function describeSubmission(doc: Record<string, unknown>, req: PayloadRequ
     return `A first-time visitor filled in the website form:\n\n${details}`
   }
 
+  if (doc.formType === 'reference-letter') {
+    const lines: [string, string | undefined][] = [
+      ['Name', doc.name as string],
+      ['Email', doc.email as string],
+      ['Phone', doc.phone as string],
+      ['Letter type', labelFor(LETTER_TYPES, doc.letterType)],
+      ['Purpose', doc.purpose as string],
+      ['Required by', dateOnly(doc.requiredByDate)],
+    ]
+    const details = lines
+      .filter(([, value]) => value)
+      .map(([label, value]) => `${label}: ${value}`)
+      .join('\n')
+    return `A letter was requested through the website:\n\n${details}${doc.message ? `\n\n${doc.message}` : ''}`
+  }
+
   const contact = [doc.email, doc.phone].filter(Boolean).join(', ')
   return `${doc.name || 'Someone (anonymous)'}${contact ? ` (${contact})` : ''} submitted a ${doc.formType} form${groupName ? ` for ${groupName}` : ''}:\n\n${doc.message || '(no message)'}`
 }
@@ -98,6 +115,8 @@ export const FormSubmissions: CollectionConfig = {
           if (doc.formType === 'first-timer') return doc.campus ? `New first-time visitor (${doc.campus})` : 'New first-time visitor'
           if (doc.formType === 'welfare') return 'New welfare request'
           if (doc.formType === 'ministry-message') return `New message for ${(await ministryOf(doc, req))?.name ?? 'a ministry team'}`
+          // A school letter keeps the subject the church office already uses for these, so it is easy to spot.
+          if (doc.formType === 'reference-letter') return doc.letterType === 'school' ? 'LETTER FOR SCHOOL' : 'New letter request'
           return 'New Website Enquiry'
         },
         describeSubmission,
@@ -283,12 +302,7 @@ export const FormSubmissions: CollectionConfig = {
     {
       name: 'letterType',
       type: 'select',
-      options: [
-        { label: 'Character Reference', value: 'character' },
-        { label: 'Membership Confirmation', value: 'membership-confirmation' },
-        { label: 'Financial Reference', value: 'financial' },
-        { label: 'Other', value: 'other' },
-      ],
+      options: LETTER_TYPES.map((t) => ({ label: t.label, value: t.value })),
       admin: { condition: (data) => data.formType === 'reference-letter' },
     },
     {

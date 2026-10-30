@@ -73,6 +73,7 @@ export const navLinks: NavLink[] = [
       { label: 'Appointments', href: '/connect/appointments' },
       { label: 'Welfare & Support', href: '/connect/welfare' },
       { label: 'Membership', href: '/connect/membership' },
+      { label: 'Life Events', href: '/connect/life-events' },
       { label: 'Reference Letter', href: '/connect/reference-letter' },
     ],
   },

@@ -5,7 +5,7 @@
 export const LEAD_PASTOR = {
   name: 'Apostle Bright Onoka',
   title: 'Lead Pastor, City of God Christian Centre',
-  spouse: 'Pastor Ufunwen Onoka',
+  spouse: 'Pastor Ufumwen Onoka',
   // From the Leadership page.
   about:
     'Apostle Bright Onoka is the Lead Pastor of City of God Christian Centre worldwide. He has a teaching and healing ministry that has touched countless lives both in the UK, Africa, and across the globe.',
