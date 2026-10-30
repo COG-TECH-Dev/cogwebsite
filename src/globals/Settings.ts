@@ -56,6 +56,34 @@ export const Settings: GlobalConfig = {
     { name: 'contactEmail', type: 'text', access: { update: isAdminOrUpField } },
     { name: 'contactPhone', type: 'text', access: { update: isAdminOrUpField } },
     {
+      name: 'leadPastor',
+      type: 'group',
+      label: 'Lead Pastor page',
+      access: { update: isAdminOrUpField },
+      admin: {
+        description:
+          "The Lead Pastor page (About > Lead Pastor). Until a welcome message is entered here the page shows a draft that was written from the church's own About text, NOT in the pastors' own words: please replace it with the pastors' message (or have them approve the draft) before the site is made public.",
+      },
+      fields: [
+        {
+          name: 'photo',
+          type: 'upload',
+          relationTo: 'media',
+          label: 'Photo',
+          admin: { description: 'A photo of Apostle Bright Onoka, or of him and Pastor Ufunwen Onoka together. It is shown whole, never cropped.' },
+        },
+        {
+          name: 'welcome',
+          type: 'textarea',
+          label: 'Welcome message',
+          admin: {
+            description:
+              'The welcome from Apostle Bright Onoka and Pastor Ufunwen Onoka. Separate paragraphs with a blank line; a short last line such as "God bless you." is shown with their names. Leave empty to show the draft.',
+          },
+        },
+      ],
+    },
+    {
       name: 'gatesheadChurch',
       type: 'group',
       label: 'Gateshead church page',

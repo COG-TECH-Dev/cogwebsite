@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 
 import type { Page, Testimonial } from '@/payload-types'
+import { statDisplayValue } from '@/lib/church'
 import { youtubeVideoId } from '@/lib/youtube'
 import { YouTubePlayer } from '@/components/site/YouTubePlayer'
 import { ACCENTS, BrandPanel, Glows } from '@/components/ui/BrandVisuals'
@@ -338,7 +339,7 @@ function Block({ block }: { block: LayoutBlock }) {
             <StaggerGroup className={`grid grid-cols-2 gap-y-12 text-center ${lgCols}`}>
               {block.items?.map((item, i) => (
                 <StaggerItem key={i} className="px-4 lg:border-l lg:border-white/15 lg:first:border-l-0">
-                  <div className="font-serif text-5xl font-semibold text-gold-300 sm:text-6xl">{item.value}</div>
+                  <div className="font-serif text-5xl font-semibold text-gold-300 sm:text-6xl">{statDisplayValue(item)}</div>
                   <p className="mt-2 text-sm font-medium uppercase tracking-[0.15em] text-white/75">{item.label}</p>
                 </StaggerItem>
               ))}

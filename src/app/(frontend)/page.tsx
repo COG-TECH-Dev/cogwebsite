@@ -155,6 +155,9 @@ export default async function HomePage() {
               here. Our prayer is that you will encounter God&apos;s love, find genuine community, and discover your
               purpose as you journey with us.
             </p>
+            <Link href="/about/lead-pastor" className="mt-5 inline-block font-semibold text-brand-600 hover:underline">
+              Read a welcome from our Lead Pastor <span aria-hidden="true">→</span>
+            </Link>
           </Reveal>
         </Container>
       </section>

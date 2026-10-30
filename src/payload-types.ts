@@ -529,6 +529,9 @@ export interface Page {
         | {
             items?:
               | {
+                  /**
+                   * For a stat labelled "Years of Ministry" this is ignored: the site works the figure out itself and adds one every 10 October.
+                   */
                   value: string;
                   label: string;
                   id?: string | null;
@@ -2033,6 +2036,19 @@ export interface Setting {
   contactEmail?: string | null;
   contactPhone?: string | null;
   /**
+   * The Lead Pastor page (About > Lead Pastor). Until a welcome message is entered here the page shows a draft that was written from the church's own About text, NOT in the pastors' own words: please replace it with the pastors' message (or have them approve the draft) before the site is made public.
+   */
+  leadPastor?: {
+    /**
+     * A photo of Apostle Bright Onoka, or of him and Pastor Ufunwen Onoka together. It is shown whole, never cropped.
+     */
+    photo?: (number | null) | Media;
+    /**
+     * The welcome from Apostle Bright Onoka and Pastor Ufunwen Onoka. Separate paragraphs with a blank line; a short last line such as "God bless you." is shown with their names. Leave empty to show the draft.
+     */
+    welcome?: string | null;
+  };
+  /**
    * What the Gateshead church page shows (it has no website of its own). The address and meeting times the church supplied (Dunston Community Centre; Sundays 10am and Thursdays 7pm) show until you enter your own here, which then replace them. The pastor and the Gateshead homegroups are filled in for you.
    */
   gatesheadChurch?: {
@@ -2285,6 +2301,12 @@ export interface SettingsSelect<T extends boolean = true> {
       };
   contactEmail?: T;
   contactPhone?: T;
+  leadPastor?:
+    | T
+    | {
+        photo?: T;
+        welcome?: T;
+      };
   gatesheadChurch?:
     | T
     | {

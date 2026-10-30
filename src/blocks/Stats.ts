@@ -10,7 +10,12 @@ export const Stats: Block = {
       minRows: 1,
       maxRows: 6,
       fields: [
-        { name: 'value', type: 'text', required: true },
+        {
+          name: 'value',
+          type: 'text',
+          required: true,
+          admin: { description: 'For a stat labelled "Years of Ministry" this is ignored: the site works the figure out itself and adds one every 10 October.' },
+        },
         { name: 'label', type: 'text', required: true },
       ],
     },
