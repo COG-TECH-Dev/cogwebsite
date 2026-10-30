@@ -2,11 +2,13 @@ import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
 
+import { getPageBySlug } from '@/lib/getPageBySlug'
 import { LEAD_PASTOR, welcomeParagraphs } from '@/lib/leadPastor'
 import { getPayloadClient } from '@/lib/payload'
 import { AboutSubNav } from '@/components/site/AboutSubNav'
 import { PlanYourVisitCta } from '@/components/site/PlanYourVisitCta'
 import { Button } from '@/components/ui/Button'
+import { Glows } from '@/components/ui/BrandVisuals'
 import { Container } from '@/components/ui/Container'
 import { PageHeader } from '@/components/ui/PageHeader'
 import { Reveal } from '@/components/ui/Reveal'
@@ -29,7 +31,13 @@ function photoOf(value: unknown): { url: string; width: number; height: number }
 export default async function LeadPastorPage() {
   const payload = await getPayloadClient()
   const settings = await payload.findGlobal({ slug: 'settings' }).catch(() => null)
-  const photo = photoOf(settings?.leadPastor?.photo)
+  // One upload serves both pages: if no photo is set under Settings > Lead Pastor page, the photo on his card on the
+  // Leadership page (the first person in its team list) is used.
+  const leadership = settings?.leadPastor?.photo ? null : await getPageBySlug('leadership').catch(() => null)
+  const cardPhoto = leadership?.layout
+    ?.flatMap((b) => (b.blockType === 'teamGrid' ? (b.members ?? []).slice(0, 1) : []))
+    .find((m) => m.name === LEAD_PASTOR.name)?.photo
+  const photo = photoOf(settings?.leadPastor?.photo) ?? photoOf(cardPhoto)
   const paragraphs = welcomeParagraphs(settings?.leadPastor?.welcome)
   // The last short line ("God bless you.") sits with the signature rather than in the body text.
   const closing = paragraphs.length > 1 && paragraphs[paragraphs.length - 1].length < 40 ? paragraphs[paragraphs.length - 1] : null
@@ -42,17 +50,19 @@ export default async function LeadPastorPage() {
       </PageHeader>
 
       <Container className="py-16">
-        <div className={photo ? 'grid items-start gap-10 lg:grid-cols-5 lg:gap-14' : ''}>
+        {/* With a photo, the page is split 2 parts picture to 3 parts message. The picture fills the whole height of the
+            message beside it, shown whole (never cropped) and standing on the bottom edge of a brand-colour panel. */}
+        <div className={photo ? 'grid gap-10 lg:grid-cols-5 lg:items-stretch lg:gap-14' : ''}>
           {photo && (
             <Reveal className="lg:col-span-2">
-              <div className="overflow-hidden rounded-2xl shadow-lg">
+              <div className="relative isolate h-full min-h-[30rem] overflow-hidden rounded-3xl bg-linear-to-br from-brand-900 via-brand-700 to-brand-600 shadow-lg lg:min-h-[36rem]">
+                <Glows />
                 <Image
                   src={photo.url}
                   alt={`${LEAD_PASTOR.name} and ${LEAD_PASTOR.spouse}`}
-                  width={photo.width}
-                  height={photo.height}
+                  fill
                   sizes="(min-width: 1024px) 40vw, 100vw"
-                  className="h-auto w-full"
+                  className="object-contain object-bottom px-4 pt-6 drop-shadow-2xl"
                   priority
                 />
               </div>

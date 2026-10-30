@@ -70,7 +70,10 @@ export const Settings: GlobalConfig = {
           type: 'upload',
           relationTo: 'media',
           label: 'Photo',
-          admin: { description: 'A photo of Apostle Bright Onoka, or of him and Pastor Ufumwen Onoka together. It is shown whole, never cropped.' },
+          admin: {
+            description:
+              'A full-length photo of Apostle Bright Onoka, or of him and Pastor Ufumwen Onoka together. It fills the height beside the welcome and is shown whole, never cropped. Leave empty to use the photo on his card on the Leadership page.',
+          },
         },
         {
           name: 'welcome',
