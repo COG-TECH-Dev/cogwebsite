@@ -30,6 +30,18 @@ const paragraphs = (text: string | null | undefined) =>
     .map((p) => p.trim())
     .filter(Boolean)
 
+// Words wrapped in **two stars** in a text box are shown in bold.
+const withBold = (text: string) =>
+  text.split('**').map((part, i) =>
+    i % 2 === 1 ? (
+      <strong key={i} className="font-bold text-ink">
+        {part}
+      </strong>
+    ) : (
+      part
+    ),
+  )
+
 const isExternal = (href: string) => /^https?:\/\//i.test(href)
 
 const TITLE_WORDS = new Set(['apostle', 'pastor', 'rev', 'dr', 'prophet', 'bishop', 'elder', 'evangelist', 'minister', 'mr', 'mrs', 'ms'])
@@ -146,7 +158,7 @@ function Block({ block }: { block: LayoutBlock }) {
       const imageLeft = block.imagePosition === 'left'
       const tinted = block.background === 'tinted'
       return (
-        <section className={tinted ? 'bg-brand-50' : ''}>
+        <section className={tinted ? 'overflow-x-clip bg-brand-50' : 'overflow-x-clip'}>
           <Container className="grid items-center gap-14 py-20 lg:grid-cols-2 lg:gap-20">
             <Reveal className={imageLeft ? 'lg:order-2' : ''}>
               {block.eyebrow && (
@@ -157,7 +169,7 @@ function Block({ block }: { block: LayoutBlock }) {
               </h2>
               <div className="mt-6 space-y-4 text-lg leading-relaxed text-ink-muted">
                 {paragraphs(block.body).map((p, i) => (
-                  <p key={i}>{p}</p>
+                  <p key={i}>{withBold(p)}</p>
                 ))}
               </div>
               {block.bullets && block.bullets.length > 0 && (
@@ -208,6 +220,11 @@ function Block({ block }: { block: LayoutBlock }) {
                   )}
                 </div>
               </div>
+              {block.imageCaption && (
+                <p className="mx-auto mt-10 max-w-xl text-balance text-center font-serif text-2xl font-extrabold leading-snug text-brand-700 sm:text-3xl">
+                  {block.imageCaption}
+                </p>
+              )}
             </Reveal>
           </Container>
         </section>

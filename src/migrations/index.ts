@@ -32,6 +32,7 @@ import * as migration_20261030_050019_reference_letter_for_school from './202610
 import * as migration_20261030_050825_bookstore_orders from './20261030_050825_bookstore_orders';
 import * as migration_20261030_100211_team_member_message from './20261030_100211_team_member_message';
 import * as migration_20261030_144902_life_event_requests from './20261030_144902_life_event_requests';
+import * as migration_20261030_194717_mission_image_caption from './20261030_194717_mission_image_caption';
 
 export const migrations = [
   {
@@ -202,6 +203,11 @@ export const migrations = [
   {
     up: migration_20261030_144902_life_event_requests.up,
     down: migration_20261030_144902_life_event_requests.down,
-    name: '20261030_144902_life_event_requests'
+    name: '20261030_144902_life_event_requests',
+  },
+  {
+    up: migration_20261030_194717_mission_image_caption.up,
+    down: migration_20261030_194717_mission_image_caption.down,
+    name: '20261030_194717_mission_image_caption'
   },
 ];

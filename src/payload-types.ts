@@ -413,7 +413,7 @@ export interface Page {
             eyebrow?: string | null;
             heading: string;
             /**
-             * Leave a blank line between paragraphs.
+             * Leave a blank line between paragraphs. Put two stars on each side of words to make them bold, like **this**.
              */
             body?: string | null;
             /**
@@ -429,6 +429,10 @@ export interface Page {
              * Optional photo. If left empty, a branded panel with the church logo is shown instead.
              */
             image?: (number | null) | Media;
+            /**
+             * Optional. Shown in bold type just under the photo.
+             */
+            imageCaption?: string | null;
             imagePosition?: ('right' | 'left') | null;
             background?: ('light' | 'tinted') | null;
             buttonLabel?: string | null;
@@ -1478,6 +1482,7 @@ export interface PagesSelect<T extends boolean = true> {
                     id?: T;
                   };
               image?: T;
+              imageCaption?: T;
               imagePosition?: T;
               background?: T;
               buttonLabel?: T;
