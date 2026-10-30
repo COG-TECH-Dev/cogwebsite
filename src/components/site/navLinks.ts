@@ -56,10 +56,16 @@ export const navLinks: NavLink[] = [
     href: '/give',
     children: [
       { label: 'Give Online', href: '/give' },
-      { label: 'Bookstore', href: '/give/bookstore' },
     ],
   },
-  { label: 'Resources', href: '/resources' },
+  {
+    label: 'Resources',
+    href: '/resources',
+    children: [
+      { label: 'All Resources', href: '/resources' },
+      { label: 'Bookstore', href: '/resources/bookstore' },
+    ],
+  },
   {
     label: 'Connect',
     href: '/connect',

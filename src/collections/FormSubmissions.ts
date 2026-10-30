@@ -3,6 +3,7 @@ import type { Access, CollectionConfig, PayloadRequest } from 'payload'
 import { pastoralReadOnly, publicCreateOnly } from '../access'
 import { notifyOnSubmission } from '../hooks/notifyOnSubmission'
 import { CONTACT_PREFERENCES, VISITOR_INTENTS, VISITOR_TYPES, firstTimerRecipient, labelFor } from '../lib/firstTimer'
+import { totalDisplay } from '../lib/books'
 import { LETTER_TYPES } from '../lib/letters'
 
 const dateOnly = (value: unknown) => (value ? new Date(String(value)).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }) : undefined)
@@ -80,6 +81,25 @@ async function describeSubmission(doc: Record<string, unknown>, req: PayloadRequ
     return `A first-time visitor filled in the website form:\n\n${details}`
   }
 
+  if (doc.formType === 'book-order') {
+    const qty = Number(doc.quantity) || 1
+    const item = doc.bookTitle
+      ? await req.payload.find({ collection: 'bookstore-items', where: { title: { equals: doc.bookTitle as string } }, limit: 1, depth: 0, req }).then((r) => r.docs[0]).catch(() => null)
+      : null
+    const total = totalDisplay(item?.priceDisplay, qty)
+    const lines: [string, string | undefined][] = [
+      ['Name', doc.name as string],
+      ['Email', doc.email as string],
+      ['Phone', doc.phone as string],
+      ['Book', `${qty} x ${doc.bookTitle}${item?.priceDisplay ? ` (${item.priceDisplay} each${total ? `, ${total} in total` : ''})` : ''}`],
+    ]
+    const details = lines
+      .filter(([, value]) => value)
+      .map(([label, value]) => `${label}: ${value}`)
+      .join('\n')
+    return `A book was ordered through the website, to be collected at church. Please contact them when it is ready.\n\n${details}${doc.message ? `\n\nNotes: ${doc.message}` : ''}`
+  }
+
   if (doc.formType === 'reference-letter') {
     const lines: [string, string | undefined][] = [
       ['Name', doc.name as string],
@@ -115,6 +135,7 @@ export const FormSubmissions: CollectionConfig = {
           if (doc.formType === 'first-timer') return doc.campus ? `New first-time visitor (${doc.campus})` : 'New first-time visitor'
           if (doc.formType === 'welfare') return 'New welfare request'
           if (doc.formType === 'ministry-message') return `New message for ${(await ministryOf(doc, req))?.name ?? 'a ministry team'}`
+          if (doc.formType === 'book-order') return `New book order: ${doc.bookTitle ?? 'a book'}`
           // A school letter keeps the subject the church office already uses for these, so it is easy to spot.
           if (doc.formType === 'reference-letter') return doc.letterType === 'school' ? 'LETTER FOR SCHOOL' : 'New letter request'
           return 'New Website Enquiry'
@@ -165,6 +186,7 @@ export const FormSubmissions: CollectionConfig = {
         { label: 'Mission Trip / Volunteer Sign-Up', value: 'mission-trip' },
         { label: 'Campus Connection (relocating student)', value: 'campus-connect' },
         { label: 'Message to a Ministry Team', value: 'ministry-message' },
+        { label: 'Book Order (collect at church)', value: 'book-order' },
       ],
     },
     {
@@ -201,6 +223,8 @@ export const FormSubmissions: CollectionConfig = {
       },
     },
     { name: 'preferredDate', type: 'date', admin: { condition: (data) => data.formType === 'appointment' } },
+    { name: 'bookTitle', type: 'text', label: 'Book ordered', admin: { condition: (data) => data.formType === 'book-order' } },
+    { name: 'quantity', type: 'number', label: 'How many', min: 1, admin: { condition: (data) => data.formType === 'book-order' } },
     {
       name: 'interestedMinistry',
       type: 'relationship',

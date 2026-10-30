@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { BookOpen, Building2, HandCoins, HeartHandshake } from 'lucide-react'
+import { Building2, HandCoins, HeartHandshake } from 'lucide-react'
 import Link from 'next/link'
 
 import { getPageBySlug } from '@/lib/getPageBySlug'
@@ -130,7 +130,7 @@ export default async function GivePage() {
           </Reveal>
 
           {/* In person */}
-          <Reveal delay={0.15} className="rounded-2xl border border-border bg-surface p-7">
+          <Reveal delay={0.15} className="rounded-2xl border border-border bg-surface p-7 lg:col-span-2">
             <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-sky-500/10 text-sky-500">
               <HeartHandshake className="h-6 w-6" aria-hidden="true" />
             </span>
@@ -138,23 +138,6 @@ export default async function GivePage() {
             <p className="mt-2 text-sm leading-relaxed text-ink-muted">
               Give by cash or card at any Sunday service — an offering point is available at each of our locations.
             </p>
-          </Reveal>
-
-          {/* Bookstore */}
-          <Reveal delay={0.2} className="rounded-2xl border border-border bg-surface p-7">
-            <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-gold-100 text-gold-600">
-              <BookOpen className="h-6 w-6" aria-hidden="true" />
-            </span>
-            <h3 className="mt-5 font-serif text-xl font-semibold text-brand-700">Bookstore</h3>
-            <p className="mt-2 text-sm leading-relaxed text-ink-muted">
-              Support the ministry by picking up a book or resource from our bookstore.
-            </p>
-            <Link
-              href="/give/bookstore"
-              className="mt-5 inline-flex items-center gap-1 text-sm font-semibold text-brand-600 hover:underline"
-            >
-              Visit our bookstore →
-            </Link>
           </Reveal>
         </div>
 

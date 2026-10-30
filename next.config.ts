@@ -71,6 +71,8 @@ const nextConfig: NextConfig = {
       { source: '/cog-grand-radio', destination: '/media/cog-grand-radio', permanent: true },
       { source: '/im-new-here', destination: '/connect/new-here', permanent: true },
       { source: '/online-giving', destination: '/give', permanent: true },
+      // The bookstore moved from Give to Resources.
+      { source: '/give/bookstore', destination: '/resources/bookstore', permanent: true },
       { source: '/book-an-appointment', destination: '/connect/appointments', permanent: true },
       { source: '/request-a-reference-letter', destination: '/connect/reference-letter', permanent: true },
       { source: '/register-as-a-member', destination: '/connect/membership', permanent: true },

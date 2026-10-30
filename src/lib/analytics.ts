@@ -70,6 +70,7 @@ const FORM_LABELS: Record<string, string> = {
   'mission-trip': 'Mission trip / volunteer sign-up',
   'campus-connect': 'Campus connection',
   'ministry-message': 'Message to a ministry team',
+  'book-order': 'Book order',
 }
 
 // ---------------------------------------------------------------- dates (all in UK time)

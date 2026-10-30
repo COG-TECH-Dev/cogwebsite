@@ -978,6 +978,8 @@ export interface Resource {
   createdAt: string;
 }
 /**
+ * Books shown on the Bookstore page (Resources menu). Visitors order with a form and collect the book at church; each order arrives as a form submission and by email.
+ *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "bookstore-items".
  */
@@ -987,10 +989,17 @@ export interface BookstoreItem {
   author?: string | null;
   coverImage?: (number | null) | Media;
   /**
-   * e.g. "£9.99"
+   * Optional: a line or two about the book.
+   */
+  description?: string | null;
+  /**
+   * e.g. "£10". Shown on the page and used to work out the total on an order.
    */
   priceDisplay?: string | null;
-  externalPurchaseLink: string;
+  /**
+   * Optional. Leave empty for a book collected at church. If you add a shop link, a "Buy online" link also shows.
+   */
+  externalPurchaseLink?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1171,11 +1180,14 @@ export interface FormSubmission {
     | 'first-timer'
     | 'mission-trip'
     | 'campus-connect'
-    | 'ministry-message';
+    | 'ministry-message'
+    | 'book-order';
   name?: string | null;
   email?: string | null;
   phone?: string | null;
   preferredDate?: string | null;
+  bookTitle?: string | null;
+  quantity?: number | null;
   /**
    * Which ministry they want to join, or sent a message to.
    */
@@ -1831,6 +1843,7 @@ export interface BookstoreItemsSelect<T extends boolean = true> {
   title?: T;
   author?: T;
   coverImage?: T;
+  description?: T;
   priceDisplay?: T;
   externalPurchaseLink?: T;
   updatedAt?: T;
@@ -1948,6 +1961,8 @@ export interface FormSubmissionsSelect<T extends boolean = true> {
   email?: T;
   phone?: T;
   preferredDate?: T;
+  bookTitle?: T;
+  quantity?: T;
   interestedMinistry?: T;
   interestedHomegroup?: T;
   visitDate?: T;

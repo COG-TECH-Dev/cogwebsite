@@ -97,6 +97,14 @@ export default async function ResourcesPage({ searchParams }: Args) {
           </div>
         </section>
 
+        <aside aria-label="Bookstore" className="mb-10 flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border bg-surface p-5 sm:p-6">
+          <div>
+            <h2 className="font-serif text-xl font-semibold text-brand-700">Bookstore</h2>
+            <p className="mt-1 text-sm text-ink-muted">Books from City of God Christian Centre: order one online and collect it at church.</p>
+          </div>
+          <Button href="/resources/bookstore">Visit the bookstore</Button>
+        </aside>
+
         <FilterForm
           action="/resources"
           role="search"

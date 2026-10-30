@@ -3,6 +3,7 @@
 import { getPayloadClient } from '@/lib/payload'
 import { navLinks } from '@/components/site/navLinks'
 import { CONTACT_PREFERENCES, HOW_HEARD, VISITOR_INTENTS, VISITOR_TYPES } from '@/lib/firstTimer'
+import { MAX_BOOKS_PER_ORDER } from '@/lib/books'
 import { isLetterType } from '@/lib/letters'
 import type { FormSubmission, PrayerRequest } from '@/payload-types'
 
@@ -150,6 +151,49 @@ export async function submitFirstTimer(_prev: FormState, formData: FormData): Pr
         intents,
         newsletterOptIn: formData.get('newsletterOptIn') === 'on',
         message: text('message'),
+      },
+    })
+    return { status: 'success', message: successMessage }
+  } catch {
+    return { status: 'error', message: 'Something went wrong. Please try again.' }
+  }
+}
+
+export async function submitBookOrder(_prev: FormState, formData: FormData): Promise<FormState> {
+  const successMessage = "Thank you — we've received your order. We'll contact you when your book is ready to collect from church."
+
+  if (isSpam(formData)) {
+    return { status: 'success', message: successMessage }
+  }
+
+  const name = String(formData.get('name') || '').trim()
+  const email = String(formData.get('email') || '').trim()
+  const quantity = Number(formData.get('quantity'))
+  const bookId = Number(formData.get('bookId'))
+  if (!Number.isInteger(bookId) || bookId <= 0) return { status: 'error', message: 'Please choose a book.' }
+  if (!Number.isInteger(quantity) || quantity < 1 || quantity > MAX_BOOKS_PER_ORDER) {
+    return { status: 'error', message: `Please choose how many copies (1 to ${MAX_BOOKS_PER_ORDER}).` }
+  }
+  if (!name) return { status: 'error', message: 'Please enter your name.' }
+  if (!email || !EMAIL_FORMAT.test(email)) return { status: 'error', message: 'Please enter a valid email address.' }
+  if (!consentGiven(formData)) return { status: 'error', message: NO_CONSENT }
+
+  const payload = await getPayloadClient()
+  // Only a book that is really in the bookstore can be ordered.
+  const book = await payload.findByID({ collection: 'bookstore-items', id: bookId, depth: 0 }).catch(() => null)
+  if (!book) return { status: 'error', message: 'Please choose a book from the list.' }
+
+  try {
+    await payload.create({
+      collection: 'form-submissions',
+      data: {
+        formType: 'book-order',
+        name,
+        email,
+        phone: String(formData.get('phone') || '').trim() || undefined,
+        bookTitle: book.title,
+        quantity,
+        message: String(formData.get('message') || '').trim() || undefined,
       },
     })
     return { status: 'success', message: successMessage }
