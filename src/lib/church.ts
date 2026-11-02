@@ -1,3 +1,6 @@
+// The church's own app, where appointments with the pastoral team are booked.
+export const CHURCH_APP_URL = 'https://app.cityofgodchristiancentre.org'
+
 // The day the church began. Anything that counts the church's years works from this one date: the "Years of Ministry"
 // figure goes up by one every year on 10 October.
 export const CHURCH_FOUNDED = { year: 2007, month: 10, day: 10 }

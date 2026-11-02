@@ -340,7 +340,7 @@ export async function submitCampusConnect(_prev: FormState, formData: FormData):
 }
 
 export async function submitEnquiry(
-  formType: 'contact' | 'appointment' | 'membership' | 'reference-letter' | 'welfare',
+  formType: 'contact' | 'membership' | 'reference-letter' | 'welfare',
   _prev: FormState,
   formData: FormData,
 ): Promise<FormState> {
@@ -404,7 +404,6 @@ export async function submitEnquiry(
         name: String(formData.get('name') || ''),
         email: String(formData.get('email') || ''),
         phone: String(formData.get('phone') || ''),
-        preferredDate: formData.get('preferredDate') ? String(formData.get('preferredDate')) : undefined,
         interestedMinistry: interestedMinistry ? Number(interestedMinistry) : undefined,
         letterType,
         purpose,

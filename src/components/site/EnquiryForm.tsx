@@ -18,7 +18,6 @@ const SUPPORT_TYPES = [
 
 export function EnquiryForm({
   action,
-  showPreferredDate = false,
   ministries,
   defaultMinistryId,
   showReferenceLetterFields = false,
@@ -29,7 +28,6 @@ export function EnquiryForm({
   submitLabel = 'Send',
 }: {
   action: (prev: FormState, formData: FormData) => Promise<FormState>
-  showPreferredDate?: boolean
   ministries?: { id: number; name: string }[]
   defaultMinistryId?: number
   showReferenceLetterFields?: boolean
@@ -72,14 +70,6 @@ export function EnquiryForm({
           <input id="phone" name="phone" type="tel" className="input" />
         </div>
       </div>
-      {showPreferredDate && (
-        <div>
-          <label htmlFor="preferredDate" className="mb-1 block text-sm font-medium text-ink">
-            Preferred Date
-          </label>
-          <input id="preferredDate" name="preferredDate" type="date" className="input" />
-        </div>
-      )}
       {ministries && ministries.length > 0 && (
         <div>
           <label htmlFor="interestedMinistry" className="mb-1 block text-sm font-medium text-ink">
