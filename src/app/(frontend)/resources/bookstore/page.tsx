@@ -9,11 +9,14 @@ import { PageHeader } from '@/components/ui/PageHeader'
 
 export const metadata = { title: 'Bookstore' }
 
-function mediaUrl(image: unknown): string | null {
-  if (image && typeof image === 'object' && 'url' in image && typeof image.url === 'string') {
-    return image.url
-  }
-  return null
+/**
+ * A cover's address, and whether it is a wide wrap-around cover (back, spine and front side by side). The front cover is
+ * the right-hand half of a wrap, so a wide picture is cropped to that half to fill the card; an upright cover is shown whole.
+ */
+function cover(image: unknown): { url: string; wrap: boolean } | null {
+  if (!image || typeof image !== 'object' || !('url' in image) || typeof image.url !== 'string') return null
+  const { width, height } = image as { width?: number | null; height?: number | null }
+  return { url: image.url, wrap: typeof width === 'number' && typeof height === 'number' && width > height }
 }
 
 /**
@@ -39,12 +42,19 @@ export default async function BookstorePage({ searchParams }: { searchParams: Pr
           <>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
               {items.docs.map((item) => {
-                const img = mediaUrl(item.coverImage)
+                const img = cover(item.coverImage)
                 return (
                   <div key={item.id} className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
                     <div className="relative aspect-2/3 bg-brand-50">
                       {img ? (
-                        <Image src={img} alt={`Cover of ${item.title}`} fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" className="object-contain" />
+                        <Image
+                          src={img.url}
+                          alt={`Cover of ${item.title}`}
+                          fill
+                          // A wrap shows at about twice the card's width (only its right half is in view), so it asks for a larger file.
+                          sizes={img.wrap ? '(min-width: 1024px) 50vw, 200vw' : '(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw'}
+                          className={img.wrap ? 'object-cover object-right' : 'object-contain'}
+                        />
                       ) : (
                         <div className="flex h-full items-center justify-center text-gold-600">
                           <BookOpen className="h-14 w-14" aria-hidden="true" />
