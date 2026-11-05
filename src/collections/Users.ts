@@ -2,6 +2,23 @@ import type { CollectionConfig } from 'payload'
 
 import { isAdminOrUp, isAdminOrUpField, isSuperAdmin } from '../access'
 import { ROLE_OPTIONS } from '../access/roles'
+import { getSiteUrl } from '../lib/siteUrl'
+
+const escapeHtml = (text: string) => text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+
+/**
+ * The reset email's link is built from the site's own address. Payload's own wording works the link out from the incoming
+ * request, which on the live site arrives with no address, so the email carried a bare "/admin/reset/..." that cannot be opened.
+ */
+function resetPasswordEmail({ token, user, adminPath }: { token?: string; user?: { name?: string | null }; adminPath: string }) {
+  const link = `${getSiteUrl()}${adminPath}/${token}`
+  const greeting = user?.name ? `Hello ${escapeHtml(user.name)},` : 'Hello,'
+  return `<p>${greeting}</p>
+<p>Someone (hopefully you) asked to reset the password for your City of God Christian Centre website account. To choose a new password, open this link within the next hour:</p>
+<p><a href="${link}" style="display:inline-block;padding:10px 20px;background:#d4a017;color:#0b2a30;font-weight:600;text-decoration:none;border-radius:999px">Choose a new password</a></p>
+<p>Or copy this address into your browser:<br><a href="${link}">${link}</a></p>
+<p>If you did not ask for this, ignore this email and your password stays as it is.</p>`
+}
 
 export const Users: CollectionConfig = {
   slug: 'users',
@@ -10,7 +27,17 @@ export const Users: CollectionConfig = {
     group: 'People & Enquiries',
     defaultColumns: ['name', 'email', 'role'],
   },
-  auth: true,
+  auth: {
+    forgotPassword: {
+      generateEmailSubject: () => 'Reset your City of God website password',
+      generateEmailHTML: (args) =>
+        resetPasswordEmail({
+          token: args?.token,
+          user: args?.user,
+          adminPath: `${args?.req?.payload.config.routes.admin ?? '/admin'}${args?.req?.payload.config.admin.routes.reset ?? '/reset'}`,
+        }),
+    },
+  },
   access: {
     // Logged-in users can be listed (e.g. for "assigned to" relationship
     // fields); only Admin+ can create/update, only Super Admin can delete.
