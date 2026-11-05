@@ -42,7 +42,7 @@ export default async function BookstorePage({ searchParams }: { searchParams: Pr
                 const img = mediaUrl(item.coverImage)
                 return (
                   <div key={item.id} className="flex flex-col overflow-hidden rounded-2xl border border-border bg-surface shadow-sm">
-                    <div className="relative aspect-3/4 bg-brand-50">
+                    <div className="relative aspect-2/3 bg-brand-50">
                       {img ? (
                         <Image src={img} alt={`Cover of ${item.title}`} fill sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw" className="object-contain" />
                       ) : (

@@ -995,6 +995,9 @@ export interface BookstoreItem {
   id: number;
   title: string;
   author?: string | null;
+  /**
+   * The front cover only, upright (a 6 x 9 inch book is about 2 wide to 3 tall). Not the full wrap-around cover with the back and spine: it would show small, with empty bands above and below.
+   */
   coverImage?: (number | null) | Media;
   /**
    * Optional: a line or two about the book.

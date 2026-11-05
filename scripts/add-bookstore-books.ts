@@ -1,10 +1,10 @@
-// One-off: adds the church's two books to the Bookstore (Resources menu), £10 each, to be ordered with the form and
-// collected at church. Run via `npx payload run scripts/add-bookstore-books.ts`.
+// One-off: adds Training for Ministry to the Bookstore (Resources menu), £10, to be ordered with the form and collected at
+// church. Run via `npx payload run scripts/add-bookstore-books.ts`. (It first also added a placeholder for the Apostle's
+// book; his three real titles are now added by scripts/add-apostle-books.ts instead.)
 //
 // Add-only and safe to re-run: a book is created only if no bookstore item already has that title (ignoring case).
-// Nothing is edited or deleted. The Apostle's book is added under a plain placeholder title: rename it, and add the cover
-// picture and a short description, in the admin (Bookstore Items). The Training for Ministry author and description are
-// left empty for the same reason.
+// Nothing is edited or deleted. The Training for Ministry author, cover picture and description are added in the admin
+// (Bookstore Items).
 //
 // Against production, set NODE_ENV=production first (see the project notes), or Payload treats the database as a dev database.
 
@@ -14,7 +14,6 @@ import config from '../src/payload.config'
 
 const BOOKS = [
   { title: 'Training for Ministry', author: undefined, priceDisplay: '£10' },
-  { title: "Apostle Bright Onoka's Book", author: 'Apostle Bright Onoka', priceDisplay: '£10' },
 ]
 
 try {
@@ -39,5 +38,5 @@ for (const book of BOOKS) {
   added++
   console.log(`Added ${book.title} (${book.priceDisplay})`)
 }
-console.log(added === 0 ? 'Nothing to add.' : `Done: ${added} book(s) added. Rename the Apostle's book and add covers in the admin.`)
+console.log(added === 0 ? 'Nothing to add.' : `Done: ${added} book(s) added. Add the cover in the admin.`)
 process.exit(0)

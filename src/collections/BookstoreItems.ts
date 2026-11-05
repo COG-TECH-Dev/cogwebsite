@@ -27,7 +27,12 @@ export const BookstoreItems: CollectionConfig = {
   fields: [
     { name: 'title', type: 'text', required: true },
     { name: 'author', type: 'text' },
-    { name: 'coverImage', type: 'upload', relationTo: 'media' },
+    {
+      name: 'coverImage',
+      type: 'upload',
+      relationTo: 'media',
+      admin: { description: 'The front cover only, upright (a 6 x 9 inch book is about 2 wide to 3 tall). Not the full wrap-around cover with the back and spine: it would show small, with empty bands above and below.' },
+    },
     { name: 'description', type: 'textarea', admin: { description: 'Optional: a line or two about the book.' } },
     { name: 'priceDisplay', type: 'text', admin: { description: 'e.g. "£10". Shown on the page and used to work out the total on an order.' } },
     {
